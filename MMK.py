@@ -15,9 +15,59 @@ import Hash
 import Stat
 import GraphTree as gt
 
-version='1.3.7'
-OptimPath=''
-maxHashWay=-100000000
+version='1.3.8'
+dateversion='19.10.2022'
+
+def clearOptimPath():
+    global OptimPath
+    global maxHashWay
+    OptimPath=''
+    maxHashWay=-100000000
+    
+def GoNZTypeParametr(typeParametr):
+    global KolIteration
+    global MaxkolIterationAntZero
+    if typeParametr==1:
+      return Ant.N  
+    elif typeParametr==2:
+      return Ant.Ro 
+    elif typeParametr==3:
+      return Ant.Q 
+    elif typeParametr==4:
+      return Ant.alf1  
+    elif typeParametr==5:
+      return Ant.alf2 
+    elif typeParametr==6:
+      return Ant.koef1     
+    elif typeParametr==7:
+      return Ant.koef2 
+    elif typeParametr==8:
+      return KolIteration
+    elif typeParametr==9:
+      return MaxkolIterationAntZero  
+    
+def EndTypeParametr(typeParametr,Par):
+    global KolIteration
+    global MaxkolIterationAntZero
+    if typeParametr==1:
+      Ant.N=Par   
+    elif typeParametr==2:
+      Ant.Ro=Par  
+    elif typeParametr==3:
+      Ant.Q=Par  
+    elif typeParametr==4:
+      Ant.alf1=Par   
+    elif typeParametr==5:
+      Ant.alf2=Par  
+    elif typeParametr==6:
+      Ant.koef1=Par      
+    elif typeParametr==7:
+      Ant.koef2=Par  
+    elif typeParametr==8:
+      KolIteration=Par 
+    elif typeParametr==9:
+      MaxkolIterationAntZero=Par  
+        
 
 def GiveAntPheromonAndHash(PathWay,NomAnt,NomSolution):
     global OptimPath 
@@ -42,7 +92,9 @@ goGraphTree = 1                     # Муравей Zero перемещаетс
 KolIteration=10000 #10 000
 KolStatIteration = 5 # 500
 MaxkolIterationAntZero = 10
-
+endParametr = 100
+shagParametr = 5
+typeParametr = 1
 NameFileGraph='test1.xlsx'
 
 def readSetting(NameFile):
@@ -57,9 +109,15 @@ def readSetting(NameFile):
     global MaxkolIterationAntZero
     global KolTimeDelEl
     global NameFileGraph
+    global endParametr
+    global shagParametr
+    global typeParametr
     config = configparser.ConfigParser()  # создаём объекта парсера
     config.read(NameFile)  # читаем конфиг
     endprint=int(config["setting_global"]["endprint"])  
+    endParametr=float(config["setting_global"]["endParametr"]) 
+    typeParametr=int(config["setting_global"]["typeParametr"])   
+    shagParametr=float(config["setting_global"]["shagParametr"]) 
     AddFeromonAntZero=int(config["setting_global"]["AddFeromonAntZero"])    
     SbrosGraphAllAntZero=int(config["setting_global"]["SbrosGraphAllAntZero"])   
     goNewIterationAntZero=int(config["setting_global"]["goNewIterationAntZero"])   
@@ -80,22 +138,24 @@ def readSetting(NameFile):
     Ant.typeProbability=int(config["ant"]["typeProbability"]) 
     
     gt.SortPheromon=int(config["graph_tree"]["SortPheromon"]) 
+    
+    
 if os.path.exists('setting.ini'):
     readSetting('setting.ini')
 
+clearOptimPath()
 print('Go Parametric Graph')
 # Создание параметрического графа
-NameFile=os.getcwd()+'/'+'test1no.xlsx'
+NameFile=os.getcwd()+'/ParametricGraph/'+NameFileGraph
 print(NameFile)
 Klaster.TypeKlaster,MaxIter,Stat.BestOF,Stat.LowOF = pg.ReadParametrGraphExcelFile(NameFile)
-KolAnt = Ant.N
-Ro = Ant.Ro
+Par=GoNZTypeParametr(typeParametr)
 
 NameFileRes = os.getcwd()+'/'+'res.xlsx'
 Stat.SaveParametr(version,NameFileRes,Ant.N,Ant.Ro,Ant.Q,Ant.alf1,Ant.alf2,Ant.koef1,Ant.koef2,Ant.typeProbability,NameFile,AddFeromonAntZero,SbrosGraphAllAntZero,goNewIterationAntZero,goGraphTree,gt.SortPheromon,KolIteration,KolStatIteration,MaxkolIterationAntZero)
 
 print('Go')
-while KolAnt<=100:
+while Par<=endParametr:
     Stat.StartStatistic()
     Stat.StartStatisticGrahTree(len(pg.ParametricGraph))
     NomStatIteration = 0
@@ -108,10 +168,9 @@ while KolAnt<=100:
         NomIteration = 1
         NomSolution = 0
         KolAntZero=0
-        OptimPath=''
-        maxHashWay=-100000000
+        clearOptimPath()
         StartTime = datetime.now()
-        KolAntEnd=KolAnt
+        KolAntEnd=Ant.N
         KolIterationEnd=KolIteration
         TimeIteration = datetime.now() 
         NomIterationTime=KolIteration/Stat.KolTimeDelEl
@@ -127,7 +186,7 @@ while KolAnt<=100:
                 NomIterationTime=NomIterationTime+KolIteration/Stat.KolTimeDelEl
             
             #Создание агентов
-            Ant.CreateAntArray(KolAnt+1)
+            Ant.CreateAntArray(Ant.N+1)
             NomAnt=0
             KolAntZero = 0
             # Проход по сем агентам
@@ -188,8 +247,8 @@ while KolAnt<=100:
                 # Переход к следующему агенту
                 NomAnt=NomAnt+1
             
-            Stat.ProcAntZero = Stat.ProcAntZero+KolAntZero/KolAnt
-            if KolAntZero==KolAnt:
+            Stat.ProcAntZero = Stat.ProcAntZero+KolAntZero/Ant.N
+            if KolAntZero==Ant.N:
                 #Все агенты не нашли новых путей в графе
                 if SbrosGraphAllAntZero==1:
                   pg.ClearPheromon()  
@@ -209,6 +268,7 @@ while KolAnt<=100:
                         pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].KolSolution = pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].KolSolution + 1
                     NomWay = NomWay+1
                 NomAnt=NomAnt+1
+                
             # Переход к следующей итерации
             if Ant.typeProbability==1:
                 pg.NormPheromon()
@@ -216,27 +276,14 @@ while KolAnt<=100:
             NomIteration=NomIteration+1
         
         Stat.EndStatistik(NomIteration, NomSolution)
-        Stat.SaveTimeIteration((datetime.now() - StartTime).total_seconds()) #Ошибка времени
+        Stat.SaveTimeIteration((datetime.now() - StartTime).total_seconds())
         NomStatIteration=NomStatIteration+1
-        print(datetime.now(),' END ',(datetime.now() - StartTime)*(KolStatIteration-NomStatIteration),' KolAnt ',KolAnt,' NomStatIteration ',NomStatIteration,Stat.MIterationAntZero/NomStatIteration,' Duration: {} '.format(datetime.now() - StartTime),' OptimPath ',OptimPath)
-        if endprint==1:  
-            print('KolIteration ',NomIteration,' NomSolution ',NomSolution)
-            print(Hash.GetMaxPath())
-            
-            print('MOFI ',Stat.MOFI)
-            print('MOFS ',Stat.MOFS)
-            print('MIterAllAntZero ',Stat.MIterAllAntZero)
-            print('MSltnAllAntZero ',Stat.MSltnAllAntZero)
-            print('MIter ',Stat.MIter)
-            print('MSolution ',Stat.MSolution)
-            print('KolEndIs ',Stat.KolEndIs)
+        print(datetime.now(),' END ',(datetime.now() - StartTime)*(KolStatIteration-NomStatIteration),' typeParametr=',typeParametr,Par,' NomStatIteration ',NomStatIteration,Stat.MIterationAntZero/NomStatIteration,' Duration: {} '.format(datetime.now() - StartTime),' OptimPath ',OptimPath)
+           
         
-        
-        
-        
-    Stat.SaveStatisticsExcel(NameFileRes,datetime.now() - StartTime,NomStatIteration,OptimPath,KolAnt)
-    KolAnt=KolAnt+5
-    Ant.Ro=Ro
-    Ant.N = KolAnt
+    Stat.SaveStatisticsExcel(NameFileRes,datetime.now() - StartTime,NomStatIteration,OptimPath,Par)
+    Par=Par+shagParametr
+    EndTypeParametr(typeParametr,Par)
+
 
 
