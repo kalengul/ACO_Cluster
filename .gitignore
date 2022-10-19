@@ -1,0 +1,11 @@
+Program Proc2/
+Program Proc3/
+Program Proc4/
+Program Proc5/
+Program Proc6/
+__pycache__/
+*.log
+*_Temp.py
+res.xlsx
+ММК Кластер.docx
+Setting.ini
