@@ -15,7 +15,7 @@ import Hash
 import Stat
 import GraphTree as gt
 
-version='1.3.8'
+version='1.3.9'
 dateversion='19.10.2022'
 
 def clearOptimPath():
