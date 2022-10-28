@@ -15,8 +15,8 @@ import Hash
 import Stat
 import GraphTree as gt
 
-version='1.3.9'
-dateversion='19.10.2022'
+version='1.3.10'
+dateversion='28.10.2022'
 
 def clearOptimPath():
     global OptimPath
@@ -278,7 +278,7 @@ while Par<=endParametr:
         Stat.EndStatistik(NomIteration, NomSolution)
         Stat.SaveTimeIteration((datetime.now() - StartTime).total_seconds())
         NomStatIteration=NomStatIteration+1
-        print(datetime.now(),' END ',(datetime.now() - StartTime)*(KolStatIteration-NomStatIteration),' typeParametr=',typeParametr,Par,' NomStatIteration ',NomStatIteration,Stat.MIterationAntZero/NomStatIteration,' Duration: {} '.format(datetime.now() - StartTime),' OptimPath ',OptimPath)
+        print(datetime.now(),' END ',(datetime.now() - StartTime)*(KolStatIteration-NomStatIteration),' typeParametr=',typeParametr,Par,' NomStatIteration ',NomStatIteration,Stat.MIterationAntZero/NomStatIteration,' Duration: {} '.format(datetime.now() - StartTime),' OptimPath ',OptimPath,version)
            
         
     Stat.SaveStatisticsExcel(NameFileRes,datetime.now() - StartTime,NomStatIteration,OptimPath,Par)

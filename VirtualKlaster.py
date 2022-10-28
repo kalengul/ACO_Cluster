@@ -45,6 +45,22 @@ def Klaster2no(path):
         OF=OF+20
     return OF
 
+def Klaster2so(path):
+    OF = 0
+    OF=OF+path[5]-path[4]+2*path[7]+path[12]+2*path[3]
+    OF=OF+0.5*path[9]-0.12*path[6]-path[8]+80*path[10]+0.00001*path[11]
+    if path[1]=='Сильное':
+        OF=OF+20
+    return OF
+
+def Klaster2nso(path):
+    OF = 0
+    OF=OF+path[12-5]-path[12-4]+2*path[12-7]+path[12-12]+2*path[12-3]
+    OF=OF+0.5*path[12-9]-0.12*path[12-6]-path[12-8]+80*path[12-10]+0.00001*path[12-11]
+    if path[12-1]=='Сильное':
+        OF=OF+20
+    return OF
+
 def Klaster3(path):
     OF = 0
     OF=OF+(path[0]-4)*(path[0]-4)+math.cos(path[1])+math.cos(math.exp(path[2]))+(path[3]-10)*(path[3]-10)+2*path[4]
@@ -100,6 +116,15 @@ def Bench4x22(path):
 def Bench4x222(path):
     p0=path[0]*(path[1]+path[2]+path[3]+path[4])
     p1=path[5]*(path[6]+path[7]+path[8]+path[9])
+    a1=p0**2
+    a2=p1**2
+    a=1-(a1+a2)**0.5/math.pi
+    OF=(math.cos(p0)*math.cos(p1)*math.exp((math.fabs(a))))**2
+    return OF
+
+def Bench4x2222(path):
+    p0=path[0]*(path[1]+path[2]+path[3]+path[4]+path[5])
+    p1=path[6]*(path[7]+path[8]+path[9]+path[10]+path[11])
     a1=p0**2
     a2=p1**2
     a=1-(a1+a2)**0.5/math.pi
@@ -171,6 +196,10 @@ def GetObjectivFunction(path):
        OF=Klaster2o(path)
     elif TypeKlaster==2002:
        OF=Klaster2no(path)
+    elif TypeKlaster==2003:
+       OF=Klaster2so(path)
+    elif TypeKlaster==2004:
+       OF=Klaster2nso(path)
     elif TypeKlaster==3:
        OF=Klaster3(path) 
     elif TypeKlaster==401:
@@ -187,6 +216,8 @@ def GetObjectivFunction(path):
        OF=Bench4x22(path) 
     elif TypeKlaster==4044:
        OF=Bench4x222(path)
+    elif TypeKlaster==4045:
+       OF=Bench4x2222(path)
     elif TypeKlaster==410:
        OF=Bench10(path) 
     elif TypeKlaster==990:
