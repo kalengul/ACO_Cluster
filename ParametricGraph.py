@@ -12,7 +12,10 @@ Each vertex of a parametric graph is a class. This class has a parameter value. 
 
 import win32com.client #Для загрузки из Excel
 
+PGArray=[]
+
 ParametricGraph=[] #Параметрический граф
+AllSolution = 1    #Общее количество решений в параметрическом графе
 
 class Node:  #Узел графа
     def __init__(self,value):
@@ -26,8 +29,18 @@ class Parametr:
    def __init__(self,value):
        self.name = value 
        self.node=[]
+
+def GiveAllSolutionPG(PG):
+    Nom=0
+    AllSolution = 1
+    while Nom<len(PG):
+        AllSolution=AllSolution*len(PG[Nom].node)
+        Nom=Nom+1
+    return AllSolution
        
 def ReadParametrGraphExcelFile(NameFile):
+    global AllSolution
+    global ParametricGraph
     Excel = win32com.client.Dispatch("Excel.Application")
     wb = Excel.Workbooks.Open(NameFile)
     sheet = wb.ActiveSheet
@@ -53,15 +66,11 @@ def ReadParametrGraphExcelFile(NameFile):
         ParametricGraph.append(new_parametr)
         i=i+1
         val = sheet.Cells(4,i).value
-    #сохраняем рабочую книгу
-    #wb.Save()
-    #закрываем ее
+    AllSolution=GiveAllSolutionPG(ParametricGraph)
     wb.Close()
-    #закрываем COM объект
     Excel.Quit()
     return ParametricFunction,KolSolution,OF,MinOF
-    
-        
+           
 def CreateParametrShag (start,end,shag=1):
     parametr_array=[]
     current=start

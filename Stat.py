@@ -59,16 +59,16 @@ def SaveStatisticsExcel(NameFile,time,koliter,OptimPath,P):
     sheet.Cells(NomR,3).value = DSolution/koliter
     sheet.Cells(NomR,11).value = MIter/koliter
     sheet.Cells(NomR,12).value = DIter/koliter
-    sheet.Cells(NomR,14).value = MIterationAntZero/koliter
-    sheet.Cells(NomR,15).value = DIterationAntZero/koliter
-    sheet.Cells(NomR,16).value = MIterAllAntZero/koliter
-    sheet.Cells(NomR,17).value = DIterAllAntZero/koliter
-    sheet.Cells(NomR,24).value = KolAllAntZero/koliter
-    sheet.Cells(NomR,25).value = KolAntZero/koliter
-    sheet.Cells(NomR,26).value = MSltnAllAntZero/koliter
-    sheet.Cells(NomR,27).value = DSltnAllAntZero/koliter
-    sheet.Cells(NomR,32).value = SumProcAntZero/koliter
-    sheet.Cells(NomR,33).value = str(time)
+    sheet.Cells(NomR,13).value = MIterAllAntZero/koliter
+    sheet.Cells(NomR,14).value = DIterAllAntZero/koliter
+    sheet.Cells(NomR,18).value = KolAllAntZero/koliter
+    sheet.Cells(NomR,19).value = KolAntZero/koliter
+    sheet.Cells(NomR,20).value = SumProcAntZero/koliter
+    sheet.Cells(NomR,21).value = str(time)
+    sheet.Cells(NomR,23).value = MIterationAntZero/koliter
+    sheet.Cells(NomR,24).value = DIterationAntZero/koliter
+    sheet.Cells(NomR,28).value = MSltnAllAntZero/koliter
+    sheet.Cells(NomR,29).value = DSltnAllAntZero/koliter
 
     i=0
     while i<lenProcIS:
@@ -222,31 +222,7 @@ def StartStatistic():
    global DIterationAntZero
    global MTime
    global DTime
-   ProcIS.clear()
-   ProcIS.append(0.5)
-   ProcIS.append(0.75)
-   ProcIS.append(0.80)
-   ProcIS.append(0.81)
-   ProcIS.append(0.82)
-   ProcIS.append(0.83)
-   ProcIS.append(0.84)
-   ProcIS.append(0.85)
-   ProcIS.append(0.86)
-   ProcIS.append(0.87)
-   ProcIS.append(0.88)
-   ProcIS.append(0.89)
-   ProcIS.append(0.90)
-   ProcIS.append(0.91)
-   ProcIS.append(0.92)
-   ProcIS.append(0.93)
-   ProcIS.append(0.94)
-   ProcIS.append(0.95)
-   ProcIS.append(0.96)
-   ProcIS.append(0.97)
-   ProcIS.append(0.98)
-   ProcIS.append(0.99)
-   ProcIS.append(0.9999)
-   ProcIS.append(1)
+   
    
    MSolution=0
    DSolution=0
@@ -291,7 +267,33 @@ def StartStatistic():
        i=i+1
         
         
-def SaveParametr(version,NameFile,N,Ro,Q,alf1,alf2,koef1,koef2,typeProbability,NameFileXL,AddFeromonAntZero,SbrosGraphAllAntZero,goNewIterationAntZero,goGraphTree,SortPheromon,KolIteration,KolStatIteration,MaxkolIterationAntZero):
+def SaveParametr(version,NameFile,N,Ro,Q,alf1,alf2,koef1,koef2,typeProbability,NameFileXL,AddFeromonAntZero,SbrosGraphAllAntZero,goNewIterationAntZero,goGraphTree,SortPheromon,KolIteration,KolStatIteration,MaxkolIterationAntZero,typeParametr,KolElNomElGraphTree):
+    ProcIS.clear()
+    ProcIS.append(0.5)
+    ProcIS.append(0.75)
+    ProcIS.append(0.80)
+    ProcIS.append(0.81)
+    ProcIS.append(0.82)
+    ProcIS.append(0.83)
+    ProcIS.append(0.84)
+    ProcIS.append(0.85)
+    ProcIS.append(0.86)
+    ProcIS.append(0.87)
+    ProcIS.append(0.88)
+    ProcIS.append(0.89)
+    ProcIS.append(0.90)
+    ProcIS.append(0.91)
+    ProcIS.append(0.92)
+    ProcIS.append(0.93)
+    ProcIS.append(0.94)
+    ProcIS.append(0.95)
+    ProcIS.append(0.96)
+    ProcIS.append(0.97)
+    ProcIS.append(0.98)
+    ProcIS.append(0.99)
+    ProcIS.append(0.9999)
+    ProcIS.append(1)
+    
     Excel = win32com.client.Dispatch("Excel.Application")
     wb = Excel.Workbooks.Open(NameFile)
     sheet = wb.ActiveSheet 
@@ -333,6 +335,84 @@ def SaveParametr(version,NameFile,N,Ro,Q,alf1,alf2,koef1,koef2,typeProbability,N
     sheet.Cells(NomR,21).value = a
     a='MaxkolIterationAntZero='+str(MaxkolIterationAntZero)
     sheet.Cells(NomR,22).value = a
+    
+    NomR=NomR+1
+    if typeParametr==1:
+      sheet.Cells(NomR,1).value = 'KolAnt' 
+    elif typeParametr==2:
+      sheet.Cells(NomR,1).value = 'Ro'  
+    elif typeParametr==3:
+      sheet.Cells(NomR,1).value = 'Q' 
+    elif typeParametr==4:
+      sheet.Cells(NomR,1).value = 'alf1' 
+    elif typeParametr==5:
+      sheet.Cells(NomR,1).value = 'alf2'  
+    elif typeParametr==6:
+      sheet.Cells(NomR,1).value = 'koef1'      
+    elif typeParametr==7:
+      sheet.Cells(NomR,1).value = 'koef2'  
+    elif typeParametr==8:
+      sheet.Cells(NomR,1).value = 'KolIter' 
+    elif typeParametr==9:
+      sheet.Cells(NomR,1).value = 'KolIterZero' 
+    sheet.Cells(NomR,2).value = 'M Solution'
+    sheet.Cells(NomR,3).value = 'La2 Solution'
+    sheet.Cells(NomR,4).value = 'D Solution'
+    sheet.Cells(NomR,5).value = 'I(-M)'
+    sheet.Cells(NomR,6).value = 'I(+M)'
+    sheet.Cells(NomR,7).value = 'Norm Solution'
+    sheet.Cells(NomR,8).value = 'Norm I(-M)'
+    sheet.Cells(NomR,9).value = 'Norm I(+M)'    
+    
+    sheet.Cells(NomR,11).value = 'M Iteration'
+    sheet.Cells(NomR,12).value = 'La2 Iteration'
+    sheet.Cells(NomR,13).value = 'M KolIterAntGoZero'
+    sheet.Cells(NomR,14).value = 'La2 KolIterAntGoZero'
+    sheet.Cells(NomR,15).value = 'D KolIterAntGoZero'
+    sheet.Cells(NomR,16).value = 'I(-M)'
+    sheet.Cells(NomR,17).value = 'I(+M)'
+    sheet.Cells(NomR,18).value = 'KolAllAntZero'
+    sheet.Cells(NomR,19).value = 'KolAntZero'
+    sheet.Cells(NomR,20).value = 'SumProcAntZero'
+    sheet.Cells(NomR,21).value = 'Time'
+    sheet.Cells(NomR,23).value = 'M IterAllAntZero'
+    sheet.Cells(NomR,24).value = 'La2 IterAllAntZero'
+    sheet.Cells(NomR,25).value = 'D IterAllAntZero'
+    sheet.Cells(NomR,26).value = 'I(-M)'
+    sheet.Cells(NomR,27).value = 'I(+M)'  
+    sheet.Cells(NomR,28).value = 'M SolutionAllAntZero'
+    sheet.Cells(NomR,29).value = 'La2 SolutionAllAntZero'
+    sheet.Cells(NomR,30).value = 'D SolutionAllAntZero'
+    sheet.Cells(NomR,31).value = 'I(-M)'
+    sheet.Cells(NomR,32).value = 'I(+M)' 
+    
+    i=0
+    while i<lenProcIS:
+        sheet.Cells(NomR,34+i*2).value = 'MIter '+str(ProcIS[i])
+        sheet.Cells(NomR,34+i*2+1).value = 'La2Iter '+str(ProcIS[i])
+        sheet.Cells(NomR,34+i*2+2*lenProcIS+4).value = 'MSol '+str(ProcIS[i])
+        sheet.Cells(NomR,34+i*2+1+2*lenProcIS+4).value = 'La2Sol '+str(ProcIS[i])
+        sheet.Cells(NomR,34+i+4*lenProcIS+8).value = 'OptZn '+str(ProcIS[i])
+        sheet.Cells(NomR,34+i+5*lenProcIS+9).value ='IterZn '+str(ProcIS[i])
+        sheet.Cells(NomR,34+i+6*lenProcIS+10).value = 'KolZn '+str(ProcIS[i])
+        i=i+1
+    i=0
+    while i<KolElNomElGraphTree: 
+        sheet.Cells(NomR,34+i+7*lenProcIS+11).value = 'LevelGT '+str(i)
+        i=i+1
+
+
+    sheet.Cells(NomR,34+7*lenProcIS+KolElNomElGraphTree+12).value = 'OptimPath'
+    sheet.Cells(NomR,34+7*lenProcIS+KolElNomElGraphTree+13).value = 'M All Time'
+    sheet.Cells(NomR,34+7*lenProcIS+KolElNomElGraphTree+14).value = 'La2 All Time'
+
+    i=0
+    while i<KolTimeDelEl: 
+        sheet.Cells(NomR,34+i*2+7*lenProcIS+KolElNomElGraphTree+16).value ='M Time '+str(i)
+        sheet.Cells(NomR,34+i*2+1+7*lenProcIS+KolElNomElGraphTree+16).value ='La2 Time '+str(i)
+        i=i+1
+
+
     
     sheet.Cells(1,1).value=NomR+1
     #сохраняем рабочую книгу

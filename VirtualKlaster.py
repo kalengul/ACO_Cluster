@@ -8,8 +8,27 @@ Created on Tue Jul 26 16:22:49 2022
 import math
 import SIRVD
 import os
+import win32com.client #Для загрузки из Excel
 
 TypeKlaster = 1
+VivodKlasterExcel = 0
+
+def SavePathExcel(NameFile,path,OF,TypeKlaster):
+    Excel = win32com.client.Dispatch("Excel.Application")
+    wb = Excel.Workbooks.Open(NameFile)
+    sheet = wb.ActiveSheet
+    NomR=sheet.Cells(1,1).value
+    sheet.Cells(1,2).value=TypeKlaster
+    i=1;
+    while i<len(path):
+      sheet.Cells(NomR,i).value = path[i-1]
+      i=i+1
+    sheet.Cells(NomR,i).value = OF  
+    wb.Save()
+    #закрываем ее
+    wb.Close()
+    #закрываем COM объект
+    Excel.Quit()
 
 def Klaster1(path):
     OF = 0
@@ -236,4 +255,6 @@ def GetObjectivFunction(path):
     elif TypeKlaster==991:
        OF=SIRVD2(path) 
     #print(OF, path)
+    if VivodKlasterExcel==1:
+      SavePathExcel('Cluster.xlsx',path,OF,TypeKlaster)  
     return OF

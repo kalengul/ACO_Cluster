@@ -13,6 +13,7 @@ KolIterWay =0
 NomElKolIterWay = []
 NomArrEl = []
 SortPheromon = 0
+HorizontalTree = 0
 
 def NextWay(way,nomWay):
   global KolIterWay
@@ -22,10 +23,13 @@ def NextWay(way,nomWay):
   if NomArrEl[nomWay]>=len(pg.ParametricGraph[nomWay].node):  
       NomArrEl[nomWay]=0
   way[nomWay]=ArrNomWay[NomArrEl[nomWay]]
+  
+def NextHorizontalWay(way,nomWay):
+    
+   NomElKolIterWay[nomWay]=NomElKolIterWay[nomWay]+1 
 
 
 def CreateArrayNomWay(way,nomWay):
-
     ArrNomWay.clear()
     ArrEl=way[nomWay]
     KolEl=0
@@ -54,6 +58,12 @@ def SortArrayNomWay(nomWay):
        KolEl=KolEl+1 
 
 def GoPathGraphTree(StartWay):
+    if HorizontalTree==1:
+        return GoPathGraphTreeHorizontal(StartWay)
+    else:
+        return GoPathGraphTreeNode(StartWay)
+    
+def GoPathGraphTreeNode(StartWay):
     global KolIterWay
     NomArrEl.clear()
     NomElKolIterWay.clear()
@@ -88,3 +98,29 @@ def GoPathGraphTree(StartWay):
     if nomWay>=len(StartWay):
         way.clear()
     return way
+
+def GoPathGraphTreeHorizontal(StartWay):
+    global KolIterWay
+    NomArrEl.clear()
+    NomElKolIterWay.clear()
+    way=[]
+    i=0
+    KolIterWay=0
+    while i<len(StartWay):
+        way.append(StartWay[i])
+        NomArrEl.append(0)
+        NomElKolIterWay.append(0)
+        i=i+1
+    PathWay=Hash.goPathStr(way)
+    HashWay = Hash.getPath(PathWay)
+    nomWay=0
+    CreateArr=1
+    while nomWay<len(StartWay) and HashWay!=0:
+        
+        PathWay=Hash.goPathStr(way)
+        HashWay = Hash.getPath(PathWay)
+    if nomWay>=len(StartWay):
+        way.clear()
+    return way
+
+    
