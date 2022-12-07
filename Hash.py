@@ -16,6 +16,9 @@ def goPathStr(path):
         i=i+1
     return st
 
+def KolHash():
+    return len(HashPath)
+
 def getPath (path):
     if HashPath.get(path):
         return HashPath[path]
@@ -37,6 +40,7 @@ def GetMaxPath():
     return MaxPath
     
 def SortHash():
+    global MaxPath
     ssd =sorted(HashPath, key=HashPath.__getitem__)
     k = ssd[-1]
     MaxPath={k: HashPath[k]}
