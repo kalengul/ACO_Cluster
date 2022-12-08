@@ -11,11 +11,19 @@ Each vertex of a parametric graph is a class. This class has a parameter value. 
 """
 
 import win32com.client #Для загрузки из Excel
+import random
 
 PGArray=[]
 
 ParametricGraph=[] #Параметрический граф
 AllSolution = 1    #Общее количество решений в параметрическом графе
+alf1 = 1  #1
+alf2 = 1  #1
+koef1 = 1 #1
+koef2 = 1 #1
+typeProbability = 1
+NomSolution=0
+NameFilePg=''
 
 class Node:  #Узел графа
     def __init__(self,value):
@@ -29,6 +37,35 @@ class Parametr:
    def __init__(self,value):
        self.name = value 
        self.node=[]
+
+class ProbabilityWay:
+    def __init__(self,NameFile):
+        global NameFilePg
+        if NameFile!=NameFilePg:
+            if NameFilePg=='':
+                ReadParametrGraphExcelFile(NameFile)
+            NameFilePg=NameFile
+        
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        # Здесь мы обновляем значение и возвращаем результат
+        #Выбор первого слоя параметров
+        if NomSolution<AllSolution:
+            way=[]
+            NomParametr=0
+            # Окончание движения агента
+            while NomParametr<len(ParametricGraph):
+                # Получение вершины из слоя
+                way.append(GoAntNextNode(ParametricGraph[NomParametr].node))
+                # Выбор следующего слоя
+                NomParametr = NextNode(NomParametr)
+            return way
+        else:
+            raise StopIteration
+        
+
 
 def GiveAllSolutionPG(PG):
     Nom=0
@@ -144,3 +181,36 @@ def GetWayGraphValue(path):
         way.append(ParametricGraph[i].node[path[i]].val)
         i=i+1
     return way
+
+def NextNode(nom):
+    nom=nom+1
+    return nom
+
+def ProbabilityNode(Node):
+    kolSolution= Node.KolSolution
+    if kolSolution==0:
+        kolSolution=0.5
+    if typeProbability==0:
+        Probability=koef1*(Node.pheromon**alf1)+koef2*(1/(kolSolution))**alf2 
+    if typeProbability==1:
+        Probability=koef1*(Node.pheromonNorm**alf1)+koef2*(1/(kolSolution))**alf2 
+    if typeProbability==2:
+        Probability=(Node.pheromon**alf1)*(1/(kolSolution**alf2))
+    if Probability==0:
+        Probability=0.00000001
+    return Probability
+
+       
+def GoAntNextNode(ArrayNode):
+    probability = []
+    sum=0
+    i=0
+    while i<len(ArrayNode):
+       sum=sum + ProbabilityNode(ArrayNode[i])
+       probability.append(sum)
+       i=i+1
+    rnd=random.random()
+    i=0
+    while rnd>probability[i]/sum:
+        i=i+1
+    return i

@@ -14,6 +14,26 @@ NomElKolIterWay = []
 NomArrEl = []
 SortPheromon = 0
 HorizontalTree = 0
+StartWayGraphTree = []
+
+class GraphWay:
+    def __init__(self):
+        # Здесь хранится промежуточное значение
+        pass
+        
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        # Здесь мы обновляем значение и возвращаем результат
+        if HorizontalTree==1:
+            way=GoPathGraphTreeHorizontal(StartWayGraphTree)
+        else:
+            way=GoPathGraphTreeNode(StartWayGraphTree)
+        if way!=[]:
+            return way
+        else:
+            raise StopIteration
 
 def NextWay(way,nomWay):
   global KolIterWay

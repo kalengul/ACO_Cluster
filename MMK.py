@@ -18,8 +18,8 @@ import GraphTree as gt
 import SaveMap
 import GoTime
 
-version='1.4.0'
-dateversion='05.12.2022'
+version='1.4.1'
+dateversion='07.12.2022'
 
 def clearOptimPath():
     global OptimPath
@@ -29,7 +29,6 @@ def clearOptimPath():
     
 def clearStartIteration():
     global NomIteration
-    global NomSolution
     global KolAntZero
     global KolAntEnd
     global KolIterationEnd
@@ -39,7 +38,7 @@ def clearStartIteration():
     Hash.MaxPath.clear()
     Stat.SbrosStatistic()
     NomIteration = 1
-    NomSolution = 0
+    pg.NomSolution = 0
     KolAntZero=0
     clearOptimPath()
     KolAntEnd=Ant.N
@@ -59,7 +58,7 @@ def SaveTimeFromFile():
          GoTime.setTimeIteration() 
          NomIterationTime=NomIterationTime+Setting.KolIteration/Stat.KolTimeDelEl       
 
-def GiveAntPheromonAndHash(PathWay,NomAnt,NomSolution):
+def GiveAntPheromonAndHash(PathWay,NomAnt):
     global OptimPath 
     global maxHashWay
     # Получение нового пути в графе
@@ -68,11 +67,19 @@ def GiveAntPheromonAndHash(PathWay,NomAnt,NomSolution):
     # Добавление нового ключа в Хэш-таблицу
     Hash.addPath(PathWay,Ant.AntArr[NomAnt].pheromon)
     if Setting.GoSaveMap2==1:
-        SaveMap.AddElMap2(Ant.AntArr[NomAnt].way[0], Ant.AntArr[NomAnt].way[1], NomSolution)
+        SaveMap.AddElMap2(Ant.AntArr[NomAnt].way[0], Ant.AntArr[NomAnt].way[1], pg.NomSolution)
     if Ant.AntArr[NomAnt].pheromon>maxHashWay:
         maxHashWay=Ant.AntArr[NomAnt].pheromon
         OptimPath=PathWay
-    Stat.ProcBestOF(Ant.AntArr[NomAnt].pheromon,NomIteration,NomSolution)
+    Stat.ProcBestOF(Ant.AntArr[NomAnt].pheromon,NomIteration,pg.NomSolution)
+
+def GoPathWayHash(NomAnt):
+    PathWay=Hash.goPathStr(Ant.AntArr[NomAnt].way)
+    HashWay = Hash.getPath(PathWay)
+    if HashWay==0:   
+        pg.NomSolution = pg.NomSolution+1
+        GiveAntPheromonAndHash(PathWay,NomAnt)
+    return HashWay
 
 def EndSolution(NomAnt,NomIteration):
     KolAntEnd=NomAnt 
@@ -91,8 +98,10 @@ NameFile=os.getcwd()+'/ParametricGraph/'+Setting.NameFileGraph
 print(NameFile)
 Klaster.TypeKlaster,MaxIter,Stat.BestOF,Stat.LowOF = pg.ReadParametrGraphExcelFile(NameFile)
 Par=Setting.GoNZTypeParametr(Setting.typeParametr)
+wayPg = pg.ProbabilityWay()
+wayGT = gt.GraphWay()
 NameFileRes = os.getcwd()+'/'+'res.xlsx'
-Stat.SaveParametr(version,NameFileRes,Ant.N,Ant.Ro,Ant.Q,Ant.alf1,Ant.alf2,Ant.koef1,Ant.koef2,Ant.typeProbability,NameFile,Setting.AddFeromonAntZero,Setting.SbrosGraphAllAntZero,Setting.goNewIterationAntZero,Setting.goGraphTree,gt.SortPheromon,Setting.KolIteration,Setting.KolStatIteration,Setting.MaxkolIterationAntZero,Setting.typeParametr,len(pg.ParametricGraph))
+Stat.SaveParametr(version,NameFileRes,Ant.N,Ant.Ro,Ant.Q,pg.alf1,pg.alf2,pg.koef1,pg.koef2,pg.typeProbability,NameFile,Setting.AddFeromonAntZero,Setting.SbrosGraphAllAntZero,Setting.goNewIterationAntZero,Setting.goGraphTree,gt.SortPheromon,Setting.KolIteration,Setting.KolStatIteration,Setting.MaxkolIterationAntZero,Setting.typeParametr,len(pg.ParametricGraph))
 print('Go')
 while Par<=Setting.endParametr:
     Stat.StartStatistic()
@@ -111,59 +120,53 @@ while Par<=Setting.endParametr:
             KolAntZero=0
             # Проход по всем агентам
             while NomAnt<KolAntEnd:
-                #Выбор первого слоя параметров
-                NomParametr=0
-                # Окончание движения агента
-                while NomParametr<len(pg.ParametricGraph):
-                    # Получение вершины из слоя
-                    node=Ant.GoAntNextNode(Ant.AntArr[NomAnt],pg.ParametricGraph[NomParametr].node)
-                    # Выбор следующего слоя
-                    NomParametr = Ant.NextNode(NomParametr)
-                # Проверка полученного пути в Хэш-Таблице
-                PathWay=Hash.goPathStr(Ant.AntArr[NomAnt].way)
-                HashWay = Hash.getPath(PathWay)
-                if HashWay==0:   
-                    NomSolution = NomSolution+1
-                    GiveAntPheromonAndHash(PathWay,NomAnt,NomSolution)
+                try:
+                    Ant.AntArr[NomAnt].way=next(wayPg)
+                except StopIteration:
+                    KolAntEnd,KolIterationEnd=EndSolution(NomAnt,NomIteration) 
                 else:
-                    # Такой путь уже есть в Хэш-таблице
-                    if Setting.AddFeromonAntZero==0:
-                        Ant.AntArr[NomAnt].pheromon=0
-                    else:
-                        Ant.AntArr[NomAnt].pheromon=HashWay
-                    Stat.KolAntZero = Stat.KolAntZero+1
-                    KolAntZero = KolAntZero+1
-                    
-                    if Setting.goNewIterationAntZero==1:
-                        #Если путь не найден, то продолжать генерацию маршрутов, пока не найдется уникальный
-                        kolIterationAntZero=0
-                        while HashWay!=0 and kolIterationAntZero<Setting.MaxkolIterationAntZero:
-                            Ant.AntArr[NomAnt].way.clear()
-                            NomParametr=0
-                            while NomParametr<len(pg.ParametricGraph):
-                                node=Ant.GoAntNextNode(Ant.AntArr[NomAnt],pg.ParametricGraph[NomParametr].node)
-                                NomParametr = Ant.NextNode(NomParametr)
-                            PathWay=Hash.goPathStr(Ant.AntArr[NomAnt].way)
-                            HashWay = Hash.getPath(PathWay)
-                            kolIterationAntZero = kolIterationAntZero+1
-                        if kolIterationAntZero<Setting.MaxkolIterationAntZero:
-                            NomSolution = NomSolution+1
-                            GiveAntPheromonAndHash(PathWay,NomAnt,NomSolution)
-                        Stat.StatIterationAntZero(kolIterationAntZero)
-                    
-                    #Если путь не найден, то обход графа в виде дерева 
-                    if Setting.goGraphTree==1:
-                      Ant.AntArr[NomAnt].way=gt.GoPathGraphTree(Ant.AntArr[NomAnt].way)
-                      if Ant.AntArr[NomAnt].way==[]:
-                          KolAntEnd,KolIterationEnd=EndSolution(NomAnt,NomIteration)
-                      else:
-                          PathWay=Hash.goPathStr(Ant.AntArr[NomAnt].way)
-                          NomSolution = NomSolution+1
-                          GiveAntPheromonAndHash(PathWay,NomAnt,NomSolution)
-                          Stat.StatIterationAntZero(gt.KolIterWay) 
-                          Stat.StatIterationAntZeroGraphTree(gt.NomElKolIterWay)
-                # Переход к следующему агенту
-                NomAnt=NomAnt+1
+                    # Проверка полученного пути в Хэш-Таблице
+                    HashWay=GoPathWayHash(NomAnt)
+                    if HashWay!=0:
+                        # Такой путь уже есть в Хэш-таблице
+                        if Setting.AddFeromonAntZero==0:
+                            Ant.AntArr[NomAnt].pheromon=0
+                        else:
+                            Ant.AntArr[NomAnt].pheromon=HashWay
+                        Stat.KolAntZero = Stat.KolAntZero+1
+                        KolAntZero = KolAntZero+1
+                        
+                        #Если включены повторные итерации алгоритма
+                        if Setting.goNewIterationAntZero==1:
+                            #Если путь не найден, то продолжать генерацию маршрутов, пока не найдется уникальный
+                            kolIterationAntZero=0
+                            while HashWay!=0 and kolIterationAntZero<Setting.MaxkolIterationAntZero:
+                                kolIterationAntZero = kolIterationAntZero+1
+                                if kolIterationAntZero<Setting.MaxkolIterationAntZero:
+                                    try:
+                                        Ant.AntArr[NomAnt].way=next(wayPg)
+                                    except StopIteration:
+                                        KolAntEnd,KolIterationEnd=EndSolution(NomAnt,NomIteration) 
+                                        HashWay=10
+                                    else:
+                                        HashWay=GoPathWayHash(NomAnt)
+                            Stat.StatIterationAntZero(kolIterationAntZero)
+                        
+                        #Если путь не найден, то обход графа в виде дерева 
+                        if Setting.goGraphTree==1:
+                          try:
+                              gt.StartWayGraphTree=Ant.AntArr[NomAnt].way 
+                              Ant.AntArr[NomAnt].way=next(wayGT)
+                          except StopIteration:
+                              KolAntEnd,KolIterationEnd=EndSolution(NomAnt,NomIteration) 
+                          else:
+                              PathWay=Hash.goPathStr(Ant.AntArr[NomAnt].way)
+                              pg.NomSolution = pg.NomSolution+1
+                              GiveAntPheromonAndHash(PathWay,NomAnt)
+                              Stat.StatIterationAntZero(gt.KolIterWay) 
+                              Stat.StatIterationAntZeroGraphTree(gt.NomElKolIterWay)
+                    # Переход к следующему агенту
+                    NomAnt=NomAnt+1
                 
             #Все агенты не нашли новых путей в графе
             Stat.ProcAntZero = Stat.ProcAntZero+KolAntZero/Ant.N
@@ -171,7 +174,7 @@ while Par<=Setting.endParametr:
                 if Setting.SbrosGraphAllAntZero==1:
                   pg.ClearPheromon()  
                 Stat.KolAllAntZero = Stat.KolAllAntZero+1
-                Stat.StatAllAntZero(NomIteration, NomSolution)
+                Stat.StatAllAntZero(NomIteration, pg.NomSolution)
     
             # Испарение феромона
             pg.DecreasePheromon(Ant.Ro)
@@ -187,18 +190,14 @@ while Par<=Setting.endParametr:
                         NomWay = NomWay+1
                 NomAnt=NomAnt+1
             
-            #Проверить сколько решений осталось
-            if Hash.KolHash()==pg.AllSolution:
-                KolAntEnd,KolIterationEnd=EndSolution(NomAnt,NomIteration)
-            
             # Переход к следующей итерации
-            if Ant.typeProbability==1:
+            if pg.typeProbability==1:
                 pg.NormPheromon()
             Ant.DelAllAgent()
             NomIteration=NomIteration+1
             
 
-        Stat.EndStatistik(NomIteration, NomSolution)
+        Stat.EndStatistik(NomIteration, pg.NomSolution)
         Stat.SaveTimeIteration((GoTime.DeltStartTime()).total_seconds())
         NomStatIteration=NomStatIteration+1
         print(GoTime.now(),' END ',(GoTime.DeltStartTime())*(Setting.KolStatIteration-NomStatIteration),' typeParametr=',Setting.typeParametr,Par,' NomStatIteration ',NomStatIteration,"{:8.3f}".format(Stat.MIterationAntZero/NomStatIteration),' Duration: {} '.format(GoTime.DeltStartTime()),' OptimPath ',OptimPath,version)

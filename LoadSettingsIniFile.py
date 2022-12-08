@@ -62,11 +62,12 @@ def readSetting(NameFile):
     Ant.N=float(config["ant"]["N"]) 
     Ant.Q=float(config["ant"]["Q"]) 
     Ant.Ro=float(config["ant"]["Ro"]) 
-    Ant.alf1=float(config["ant"]["alf1"]) 
-    Ant.alf2=float(config["ant"]["alf2"]) 
-    Ant.koef1=float(config["ant"]["koef1"])
-    Ant.koef2=float(config["ant"]["koef2"] )
-    Ant.typeProbability=int(config["ant"]["typeProbability"]) 
+    
+    ParametricGraph.alf1=float(config["ParametricGraph"]["alf1"]) 
+    ParametricGraph.alf2=float(config["ParametricGraph"]["alf2"]) 
+    ParametricGraph.koef1=float(config["ParametricGraph"]["koef1"])
+    ParametricGraph.koef2=float(config["ParametricGraph"]["koef2"] )
+    ParametricGraph.typeProbability=int(config["ParametricGraph"]["typeProbability"]) 
     
     GraphTree.SortPheromon=int(config["graph_tree"]["SortPheromon"]) 
     GraphTree.HorizontalTree=int(config["graph_tree"]["HorizontalTree"])
