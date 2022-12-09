@@ -13,38 +13,157 @@ Each vertex of a parametric graph is a class. This class has a parameter value. 
 import win32com.client #Для загрузки из Excel
 import random
 
-PGArray=[]
-
-ParametricGraph=[] #Параметрический граф
-AllSolution = 1    #Общее количество решений в параметрическом графе
 alf1 = 1  #1
 alf2 = 1  #1
 koef1 = 1 #1
 koef2 = 1 #1
 typeProbability = 1
-NomSolution=0
-NameFilePg=''
+#PGArray=[]
+ArrayAllPG=[]
+NomCurrentPG=0
+
+def SearchPGName(NameFile):
+    i=0
+    while i<len(ArrayAllPG) and ArrayAllPG[i].NameFilePg!=NameFile:
+        i=i+1
+    if i<len(ArrayAllPG):
+        return ArrayAllPG[i],i
+    else:
+        return False,0
+
+class PG:
+    def __init__(self,NameFile):
+        self.ParametricGraph=[] #Параметрический граф
+        self.AllSolution = 1    #Общее количество решений в параметрическом графе
+        self.NomSolution=0
+        self.NameFilePg=NameFile
+        self.TypeKlaster=1
+        self.MaxIter=0
+        self.BestOF=0
+        self.LowOF=0
+        
+    def ReadParametrGraphExcelFile(self):
+        Excel = win32com.client.Dispatch("Excel.Application")
+        wb = Excel.Workbooks.Open(self.NameFilePg)
+        sheet = wb.ActiveSheet
+        # Настройки графа
+        self.TypeKlaster = sheet.Cells(2,1).value
+        self.KolSolution = sheet.Cells(2,2).value
+        self.OF = sheet.Cells(1,11).value
+        self.MinOF = sheet.Cells(1,12).value
+        # Загрузка самого граа
+        i=1
+        val = sheet.Cells(4,1).value
+        while val != None :
+            new_parametr=Parametr(val)
+            parametr_array=[]
+            j=5
+            val = sheet.Cells(j,i).value
+            while val != None :
+                new_node=Node(val)
+                parametr_array.append(new_node)
+                j=j+1
+                val = sheet.Cells(j,i).value
+            new_parametr.node=parametr_array
+            self.ParametricGraph.append(new_parametr)
+            i=i+1
+            val = sheet.Cells(4,i).value
+        self.AllSolution=GiveAllSolutionPG(self.ParametricGraph)
+        wb.Close()
+        Excel.Quit()
+        return self.TypeKlaster,self.KolSolution,self.OF,self.MinOF
+
+    def PrintParametricGraph(self,VivodPheromon):
+        for elem in self.ParametricGraph:
+            print("Node name - ",elem.name)
+            PrintParametr(elem,VivodPheromon)
+            print( );
+    
+    def NormPheromon(self):
+        NomPar=0
+        while NomPar<len(self.ParametricGraph):
+            MaxP=0
+            MaxK=0
+            NomEl=0
+            while NomEl<len(self.ParametricGraph[NomPar].node):
+                if self.ParametricGraph[NomPar].node[NomEl].pheromon==0:
+                    self.ParametricGraph[NomPar].node[NomEl].pheromon=0.00000001
+                if self.ParametricGraph[NomPar].node[NomEl].pheromon>MaxP:
+                    MaxP=self.ParametricGraph[NomPar].node[NomEl].pheromon
+                if self.ParametricGraph[NomPar].node[NomEl].KolSolution>MaxK:
+                    MaxK=self.ParametricGraph[NomPar].node[NomEl].KolSolution
+                NomEl=NomEl+1
+            NomEl=0
+            while NomEl<len(self.ParametricGraph[NomPar].node):
+                if MaxP!=0:
+                    self.ParametricGraph[NomPar].node[NomEl].pheromonNorm=self.ParametricGraph[NomPar].node[NomEl].pheromon/MaxP
+                if MaxK!=0:
+                    self.ParametricGraph[NomPar].node[NomEl].KolSolutionNorm=self.ParametricGraph[NomPar].node[NomEl].KolSolution/MaxK
+                NomEl=NomEl+1
+            NomPar=NomPar+1        
+
+    def ClearPheromon(self):
+        NomPar=0
+        while NomPar<len(self.ParametricGraph):
+            self.ParametricGraph[NomPar].ClearAllNode()
+            NomPar=NomPar+1    
+
+    def DecreasePheromon(self,par):
+        NomPar=0
+        while NomPar<len(self.ParametricGraph):
+            self.ParametricGraph[NomPar].DecreasePheromon(par)
+            NomPar=NomPar+1
+
+    def GetWayGraphValue(self,path):
+        way =[]
+        i=0 
+        while i<len(path):
+            way.append(self.ParametricGraph[i].node[path[i]].val)
+            i=i+1
+        return way
 
 class Node:  #Узел графа
     def __init__(self,value):
-        self.pheromon = 1
-        self.KolSolution = 0
-        self.pheromonNorm = 1
-        self.KolSolutionNorm = 1
+        self.clear()
         self.val = value
+        
+    def clear(self):
+        self.pheromon=1
+        self.KolSolution=0
+        self.pheromonNorm = 1
+        self.KolSolutionNorm = 1 
+        
+    def DecreasePheromon(self,par):
+        self.pheromon=self.pheromon*par
         
 class Parametr:
    def __init__(self,value):
        self.name = value 
        self.node=[]
-
+       
+   def ClearAllNode(self):
+       NomEl=0
+       while NomEl<len(self.node):
+           self.node[NomEl].clear()
+           NomEl=NomEl+1
+           
+   def DecreasePheromon(self,par):
+       NomEl=0
+       while NomEl<len(self.node):
+           self.node[NomEl].DecreasePheromon(par)
+           NomEl=NomEl+1
+                                
 class ProbabilityWay:
-    def __init__(self,NameFile):
-        global NameFilePg
-        if NameFile!=NameFilePg:
-            if NameFilePg=='':
-                ReadParametrGraphExcelFile(NameFile)
-            NameFilePg=NameFile
+    def __init__(self,NameFile):  
+        global NomCurrentPG
+        self.pg,NomCurrentPG=SearchPGName(NameFile)
+        if self.pg==False:
+            self.pg=PG(NameFile)
+            self.pg.ReadParametrGraphExcelFile()
+            print(self.pg.NameFilePg)
+            NomCurrentPG=len(ArrayAllPG)
+            ArrayAllPG.append(self.pg)
+            
         
     def __iter__(self):
         return self
@@ -52,20 +171,20 @@ class ProbabilityWay:
     def __next__(self):
         # Здесь мы обновляем значение и возвращаем результат
         #Выбор первого слоя параметров
-        if NomSolution<AllSolution:
+        if self.pg.NomSolution<self.pg.AllSolution:
             way=[]
             NomParametr=0
             # Окончание движения агента
-            while NomParametr<len(ParametricGraph):
+            while NomParametr<len(self.pg.ParametricGraph):
                 # Получение вершины из слоя
-                way.append(GoAntNextNode(ParametricGraph[NomParametr].node))
+                way.append(GoAntNextNode(self.pg.ParametricGraph[NomParametr].node))
                 # Выбор следующего слоя
                 NomParametr = NextNode(NomParametr)
+            #print(way)
             return way
         else:
             raise StopIteration
         
-
 
 def GiveAllSolutionPG(PG):
     Nom=0
@@ -75,112 +194,13 @@ def GiveAllSolutionPG(PG):
         Nom=Nom+1
     return AllSolution
        
-def ReadParametrGraphExcelFile(NameFile):
-    global AllSolution
-    global ParametricGraph
-    Excel = win32com.client.Dispatch("Excel.Application")
-    wb = Excel.Workbooks.Open(NameFile)
-    sheet = wb.ActiveSheet
-    # Настройки графа
-    ParametricFunction = sheet.Cells(2,1).value
-    KolSolution = sheet.Cells(2,2).value
-    OF = sheet.Cells(1,11).value
-    MinOF = sheet.Cells(1,12).value
-    # Загрузка самого граа
-    i=1
-    val = sheet.Cells(4,1).value
-    while val != None :
-        new_parametr=Parametr(val)
-        parametr_array=[]
-        j=5
-        val = sheet.Cells(j,i).value
-        while val != None :
-            new_node=Node(val)
-            parametr_array.append(new_node)
-            j=j+1
-            val = sheet.Cells(j,i).value
-        new_parametr.node=parametr_array
-        ParametricGraph.append(new_parametr)
-        i=i+1
-        val = sheet.Cells(4,i).value
-    AllSolution=GiveAllSolutionPG(ParametricGraph)
-    wb.Close()
-    Excel.Quit()
-    return ParametricFunction,KolSolution,OF,MinOF
-           
-def CreateParametrShag (start,end,shag=1):
-    parametr_array=[]
-    current=start
-    while current<end:
-        new_node=Node(current)
-        parametr_array.append(new_node)
-        current=current+shag
-    return parametr_array
-
 def PrintParametr(Par:Parametr,VivodPheromon):
     for elem in Par.node:
         if VivodPheromon==0:
             print(elem.val, end=' ')
         else:
             print(elem.val,'(',elem.pheromon,')', end=' ')
-        
-def PrintParametricGraph(VivodPheromon):
-    for elem in ParametricGraph:
-        print("Node name - ",elem.name)
-        PrintParametr(elem,VivodPheromon)
-        print( );
-    
-def NormPheromon():
-    NomPar=0
-    while NomPar<len(ParametricGraph):
-        MaxP=0
-        MaxK=0
-        NomEl=0
-        while NomEl<len(ParametricGraph[NomPar].node):
-            if ParametricGraph[NomPar].node[NomEl].pheromon==0:
-                ParametricGraph[NomPar].node[NomEl].pheromon=0.00000001
-            if ParametricGraph[NomPar].node[NomEl].pheromon>MaxP:
-                MaxP=ParametricGraph[NomPar].node[NomEl].pheromon
-            if ParametricGraph[NomPar].node[NomEl].KolSolution>MaxK:
-                MaxK=ParametricGraph[NomPar].node[NomEl].KolSolution
-            NomEl=NomEl+1
-        NomEl=0
-        while NomEl<len(ParametricGraph[NomPar].node):
-            if MaxP!=0:
-                ParametricGraph[NomPar].node[NomEl].pheromonNorm=ParametricGraph[NomPar].node[NomEl].pheromon/MaxP
-            if MaxK!=0:
-                ParametricGraph[NomPar].node[NomEl].KolSolutionNorm=ParametricGraph[NomPar].node[NomEl].KolSolution/MaxK
-            NomEl=NomEl+1
-        NomPar=NomPar+1        
 
-def ClearPheromon():
-    NomPar=0
-    while NomPar<len(ParametricGraph):
-        NomEl=0
-        while NomEl<len(ParametricGraph[NomPar].node):
-            ParametricGraph[NomPar].node[NomEl].pheromon=1
-            ParametricGraph[NomPar].node[NomEl].KolSolution=0
-            ParametricGraph[NomPar].node[NomEl].pheromonNorm = 1
-            ParametricGraph[NomPar].node[NomEl].KolSolutionNorm = 1
-            NomEl=NomEl+1
-        NomPar=NomPar+1    
-    
-def DecreasePheromon(par):
-    NomPar=0
-    while NomPar<len(ParametricGraph):
-        NomEl=0
-        while NomEl<len(ParametricGraph[NomPar].node):
-            ParametricGraph[NomPar].node[NomEl].pheromon=ParametricGraph[NomPar].node[NomEl].pheromon*par
-            NomEl=NomEl+1
-        NomPar=NomPar+1
-        
-def GetWayGraphValue(path):
-    way =[]
-    i=0 
-    while i<len(path):
-        way.append(ParametricGraph[i].node[path[i]].val)
-        i=i+1
-    return way
 
 def NextNode(nom):
     nom=nom+1
@@ -199,7 +219,6 @@ def ProbabilityNode(Node):
     if Probability==0:
         Probability=0.00000001
     return Probability
-
        
 def GoAntNextNode(ArrayNode):
     probability = []

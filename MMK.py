@@ -18,8 +18,8 @@ import GraphTree as gt
 import SaveMap
 import GoTime
 
-version='1.4.1'
-dateversion='07.12.2022'
+version='1.4.2'
+dateversion='09.12.2022'
 
 def clearOptimPath():
     global OptimPath
@@ -27,7 +27,7 @@ def clearOptimPath():
     OptimPath=''
     maxHashWay=-100000000
     
-def clearStartIteration():
+def clearStartIteration(pg):
     global NomIteration
     global KolAntZero
     global KolAntEnd
@@ -58,12 +58,12 @@ def SaveTimeFromFile():
          GoTime.setTimeIteration() 
          NomIterationTime=NomIterationTime+Setting.KolIteration/Stat.KolTimeDelEl       
 
-def GiveAntPheromonAndHash(PathWay,NomAnt):
+def GiveAntPheromonAndHash(pg,PathWay,NomAnt):
     global OptimPath 
     global maxHashWay
     # Получение нового пути в графе
     # Получения значения целевой функции
-    Ant.AntArr[NomAnt].pheromon = Klaster.GetObjectivFunction(pg.GetWayGraphValue(Ant.AntArr[NomAnt].way))
+    Ant.AntArr[NomAnt].pheromon = Klaster.GetObjectivFunction(pg.GetWayGraphValue(Ant.AntArr[NomAnt].way),pg.TypeKlaster)
     # Добавление нового ключа в Хэш-таблицу
     Hash.addPath(PathWay,Ant.AntArr[NomAnt].pheromon)
     if Setting.GoSaveMap2==1:
@@ -73,12 +73,12 @@ def GiveAntPheromonAndHash(PathWay,NomAnt):
         OptimPath=PathWay
     Stat.ProcBestOF(Ant.AntArr[NomAnt].pheromon,NomIteration,pg.NomSolution)
 
-def GoPathWayHash(NomAnt):
+def GoPathWayHash(pg,NomAnt):
     PathWay=Hash.goPathStr(Ant.AntArr[NomAnt].way)
     HashWay = Hash.getPath(PathWay)
     if HashWay==0:   
         pg.NomSolution = pg.NomSolution+1
-        GiveAntPheromonAndHash(PathWay,NomAnt)
+        GiveAntPheromonAndHash(pg,PathWay,NomAnt)
     return HashWay
 
 def EndSolution(NomAnt,NomIteration):
@@ -95,23 +95,23 @@ clearOptimPath()
 print('Go Parametric Graph')
 # Создание параметрического графа
 NameFile=os.getcwd()+'/ParametricGraph/'+Setting.NameFileGraph
-print(NameFile)
-Klaster.TypeKlaster,MaxIter,Stat.BestOF,Stat.LowOF = pg.ReadParametrGraphExcelFile(NameFile)
+#Klaster.TypeKlaster,MaxIter,Stat.BestOF,Stat.LowOF = pg.ReadParametrGraphExcelFile(NameFile)
 Par=Setting.GoNZTypeParametr(Setting.typeParametr)
-wayPg = pg.ProbabilityWay()
-wayGT = gt.GraphWay()
+wayPg = pg.ProbabilityWay(NameFile)
+wayGT = gt.GraphWay(NameFile)
+#wayPg.pg.PrintParametricGraph(1)
 NameFileRes = os.getcwd()+'/'+'res.xlsx'
-Stat.SaveParametr(version,NameFileRes,Ant.N,Ant.Ro,Ant.Q,pg.alf1,pg.alf2,pg.koef1,pg.koef2,pg.typeProbability,NameFile,Setting.AddFeromonAntZero,Setting.SbrosGraphAllAntZero,Setting.goNewIterationAntZero,Setting.goGraphTree,gt.SortPheromon,Setting.KolIteration,Setting.KolStatIteration,Setting.MaxkolIterationAntZero,Setting.typeParametr,len(pg.ParametricGraph))
+Stat.SaveParametr(version,NameFileRes,Ant.N,Ant.Ro,Ant.Q,pg.alf1,pg.alf2,pg.koef1,pg.koef2,pg.typeProbability,NameFile,Setting.AddFeromonAntZero,Setting.SbrosGraphAllAntZero,Setting.goNewIterationAntZero,Setting.goGraphTree,gt.SortPheromon,Setting.KolIteration,Setting.KolStatIteration,Setting.MaxkolIterationAntZero,Setting.typeParametr,len(wayPg.pg.ParametricGraph),wayPg.pg.BestOF,wayPg.pg.LowOF)
 print('Go')
 while Par<=Setting.endParametr:
     Stat.StartStatistic()
-    Stat.StartStatisticGrahTree(len(pg.ParametricGraph))
+    Stat.StartStatisticGrahTree(len(wayPg.pg.ParametricGraph))
     if Setting.GoSaveMap2==1:
-        SaveMap.CreateElMap2(len(pg.ParametricGraph[0].node), len(pg.ParametricGraph[1].node))
+        SaveMap.CreateElMap2(len(wayPg.pg.ParametricGraph[0].node), len(wayPg.pg.ParametricGraph[1].node))
     NomStatIteration = 0
     while NomStatIteration<Setting.KolStatIteration:
         GoTime.setPrintTime()
-        clearStartIteration()
+        clearStartIteration(wayPg.pg)
         while NomIteration<KolIterationEnd:
             SaveTimeFromFile()
             #Создание агентов
@@ -126,7 +126,7 @@ while Par<=Setting.endParametr:
                     KolAntEnd,KolIterationEnd=EndSolution(NomAnt,NomIteration) 
                 else:
                     # Проверка полученного пути в Хэш-Таблице
-                    HashWay=GoPathWayHash(NomAnt)
+                    HashWay=GoPathWayHash(wayPg.pg,NomAnt)
                     if HashWay!=0:
                         # Такой путь уже есть в Хэш-таблице
                         if Setting.AddFeromonAntZero==0:
@@ -149,7 +149,7 @@ while Par<=Setting.endParametr:
                                         KolAntEnd,KolIterationEnd=EndSolution(NomAnt,NomIteration) 
                                         HashWay=10
                                     else:
-                                        HashWay=GoPathWayHash(NomAnt)
+                                        HashWay=GoPathWayHash(wayPg.pg,NomAnt)
                             Stat.StatIterationAntZero(kolIterationAntZero)
                         
                         #Если путь не найден, то обход графа в виде дерева 
@@ -160,9 +160,7 @@ while Par<=Setting.endParametr:
                           except StopIteration:
                               KolAntEnd,KolIterationEnd=EndSolution(NomAnt,NomIteration) 
                           else:
-                              PathWay=Hash.goPathStr(Ant.AntArr[NomAnt].way)
-                              pg.NomSolution = pg.NomSolution+1
-                              GiveAntPheromonAndHash(PathWay,NomAnt)
+                              HashWay=GoPathWayHash(wayGT.pg,NomAnt)
                               Stat.StatIterationAntZero(gt.KolIterWay) 
                               Stat.StatIterationAntZeroGraphTree(gt.NomElKolIterWay)
                     # Переход к следующему агенту
@@ -172,12 +170,12 @@ while Par<=Setting.endParametr:
             Stat.ProcAntZero = Stat.ProcAntZero+KolAntZero/Ant.N
             if KolAntZero==Ant.N:
                 if Setting.SbrosGraphAllAntZero==1:
-                  pg.ClearPheromon()  
+                  wayPg.pg.ClearPheromon()  
                 Stat.KolAllAntZero = Stat.KolAllAntZero+1
-                Stat.StatAllAntZero(NomIteration, pg.NomSolution)
+                Stat.StatAllAntZero(NomIteration, wayPg.pg.NomSolution)
     
             # Испарение феромона
-            pg.DecreasePheromon(Ant.Ro)
+            wayPg.pg.DecreasePheromon(Ant.Ro)
                 
             # Добавление феромона
             NomAnt=0
@@ -185,19 +183,19 @@ while Par<=Setting.endParametr:
                 if Ant.AntArr[NomAnt].pheromon!=0:
                     NomWay = 0
                     while NomWay<len(Ant.AntArr[NomAnt].way):
-                        pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].pheromon = pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].pheromon + (1-Ant.Ro)*Ant.AntArr[NomAnt].pheromon
-                        pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].KolSolution = pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].KolSolution + 1
+                        wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].pheromon = wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].pheromon + (1-Ant.Ro)*Ant.AntArr[NomAnt].pheromon
+                        wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].KolSolution = wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].KolSolution + 1
                         NomWay = NomWay+1
                 NomAnt=NomAnt+1
             
             # Переход к следующей итерации
             if pg.typeProbability==1:
-                pg.NormPheromon()
+                wayPg.pg.NormPheromon()
             Ant.DelAllAgent()
             NomIteration=NomIteration+1
             
 
-        Stat.EndStatistik(NomIteration, pg.NomSolution)
+        Stat.EndStatistik(NomIteration, wayPg.pg.NomSolution)
         Stat.SaveTimeIteration((GoTime.DeltStartTime()).total_seconds())
         NomStatIteration=NomStatIteration+1
         print(GoTime.now(),' END ',(GoTime.DeltStartTime())*(Setting.KolStatIteration-NomStatIteration),' typeParametr=',Setting.typeParametr,Par,' NomStatIteration ',NomStatIteration,"{:8.3f}".format(Stat.MIterationAntZero/NomStatIteration),' Duration: {} '.format(GoTime.DeltStartTime()),' OptimPath ',OptimPath,version)

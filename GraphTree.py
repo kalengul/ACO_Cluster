@@ -17,9 +17,15 @@ HorizontalTree = 0
 StartWayGraphTree = []
 
 class GraphWay:
-    def __init__(self):
-        # Здесь хранится промежуточное значение
-        pass
+    def __init__(self,NameFile):  
+        self.pg,NomCurrentPG=pg.SearchPGName(NameFile)
+        if self.pg==False:
+            self.pg=pg.PG(NameFile)
+            self.pg.ReadParametrGraphExcelFile()
+            print(self.pg.NameFilePg)
+            pg.NomCurrentPG=len(pg.ArrayAllPG)
+            pg.ArrayAllPG.append(self.pg)
+            
         
     def __iter__(self):
         return self
@@ -27,15 +33,15 @@ class GraphWay:
     def __next__(self):
         # Здесь мы обновляем значение и возвращаем результат
         if HorizontalTree==1:
-            way=GoPathGraphTreeHorizontal(StartWayGraphTree)
+            way=GoPathGraphTreeHorizontal(self.pg,StartWayGraphTree)
         else:
-            way=GoPathGraphTreeNode(StartWayGraphTree)
+            way=GoPathGraphTreeNode(self.pg,StartWayGraphTree)
         if way!=[]:
             return way
         else:
             raise StopIteration
 
-def NextWay(way,nomWay):
+def NextWay(pg,way,nomWay):
   global KolIterWay
   KolIterWay=KolIterWay+1
   NomElKolIterWay[nomWay]=NomElKolIterWay[nomWay]+1
@@ -49,7 +55,7 @@ def NextHorizontalWay(way,nomWay):
    NomElKolIterWay[nomWay]=NomElKolIterWay[nomWay]+1 
 
 
-def CreateArrayNomWay(way,nomWay):
+def CreateArrayNomWay(pg,way,nomWay):
     ArrNomWay.clear()
     ArrEl=way[nomWay]
     KolEl=0
@@ -60,10 +66,10 @@ def CreateArrayNomWay(way,nomWay):
        if ArrEl>=len(pg.ParametricGraph[nomWay].node):  
             ArrEl=0
     if SortPheromon==1:
-        SortArrayNomWay(nomWay)
+        SortArrayNomWay(pg,nomWay)
 
             
-def SortArrayNomWay(nomWay):
+def SortArrayNomWay(pg,nomWay):
     KolEl=1
     while KolEl<len(pg.ParametricGraph[nomWay].node):
        MinEl=KolEl
@@ -76,14 +82,8 @@ def SortArrayNomWay(nomWay):
        ArrNomWay[KolEl]=ArrNomWay[NomMin]
        ArrNomWay[NomMin]=p
        KolEl=KolEl+1 
-
-def GoPathGraphTree(StartWay):
-    if HorizontalTree==1:
-        return GoPathGraphTreeHorizontal(StartWay)
-    else:
-        return GoPathGraphTreeNode(StartWay)
     
-def GoPathGraphTreeNode(StartWay):
+def GoPathGraphTreeNode(pg,StartWay):
     global KolIterWay
     NomArrEl.clear()
     NomElKolIterWay.clear()
@@ -101,15 +101,15 @@ def GoPathGraphTreeNode(StartWay):
     CreateArr=1
     while nomWay<len(StartWay) and HashWay!=0:
         if CreateArr==1:
-            CreateArrayNomWay(StartWay,nomWay)
+            CreateArrayNomWay(pg,StartWay,nomWay)
             CreateArr=0
-        NextWay(way,nomWay)
+        NextWay(pg,way,nomWay)
         if nomWay<len(StartWay) and way[nomWay]==StartWay[nomWay]:
             while nomWay<len(StartWay) and way[nomWay]==StartWay[nomWay] :
               nomWay=nomWay+1
               if nomWay<len(StartWay):
-                  CreateArrayNomWay(StartWay,nomWay)
-                  NextWay(way,nomWay)
+                  CreateArrayNomWay(pg,StartWay,nomWay)
+                  NextWay(pg,way,nomWay)
             if nomWay<len(StartWay):
                 CreateArr=1
                 nomWay=0
@@ -119,7 +119,7 @@ def GoPathGraphTreeNode(StartWay):
         way.clear()
     return way
 
-def GoPathGraphTreeHorizontal(StartWay):
+def GoPathGraphTreeHorizontal(pg,StartWay):
     global KolIterWay
     NomArrEl.clear()
     NomElKolIterWay.clear()

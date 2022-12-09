@@ -267,7 +267,11 @@ def StartStatistic():
        i=i+1
         
         
-def SaveParametr(version,NameFile,N,Ro,Q,alf1,alf2,koef1,koef2,typeProbability,NameFileXL,AddFeromonAntZero,SbrosGraphAllAntZero,goNewIterationAntZero,goGraphTree,SortPheromon,KolIteration,KolStatIteration,MaxkolIterationAntZero,typeParametr,KolElNomElGraphTree):
+def SaveParametr(version,NameFile,N,Ro,Q,alf1,alf2,koef1,koef2,typeProbability,NameFileXL,AddFeromonAntZero,SbrosGraphAllAntZero,goNewIterationAntZero,goGraphTree,SortPheromon,KolIteration,KolStatIteration,MaxkolIterationAntZero,typeParametr,KolElNomElGraphTree,Best,Low):
+    global BestOF
+    global LowOF
+    BestOF=Best
+    LowOF=Low
     ProcIS.clear()
     ProcIS.append(0.5)
     ProcIS.append(0.75)
