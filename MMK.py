@@ -13,13 +13,13 @@ import ParametricGraph as pg
 import Ant
 import VirtualKlaster as Klaster
 import Hash
-import Stat
+import Stat as St
 import GraphTree as gt
 import SaveMap
 import GoTime
 
-version='1.4.2'
-dateversion='09.12.2022'
+version='1.4.3'
+dateversion='30.12.2022'
 
 def clearOptimPath():
     global OptimPath
@@ -96,12 +96,13 @@ print('Go Parametric Graph')
 # Создание параметрического графа
 NameFile=os.getcwd()+'/ParametricGraph/'+Setting.NameFileGraph
 #Klaster.TypeKlaster,MaxIter,Stat.BestOF,Stat.LowOF = pg.ReadParametrGraphExcelFile(NameFile)
+Stat=St.stat()
 Par=Setting.GoNZTypeParametr(Setting.typeParametr)
 wayPg = pg.ProbabilityWay(NameFile)
 wayGT = gt.GraphWay(NameFile)
 #wayPg.pg.PrintParametricGraph(1)
 NameFileRes = os.getcwd()+'/'+'res.xlsx'
-Stat.SaveParametr(version,NameFileRes,Ant.N,Ant.Ro,Ant.Q,pg.alf1,pg.alf2,pg.koef1,pg.koef2,pg.typeProbability,NameFile,Setting.AddFeromonAntZero,Setting.SbrosGraphAllAntZero,Setting.goNewIterationAntZero,Setting.goGraphTree,gt.SortPheromon,Setting.KolIteration,Setting.KolStatIteration,Setting.MaxkolIterationAntZero,Setting.typeParametr,len(wayPg.pg.ParametricGraph),wayPg.pg.BestOF,wayPg.pg.LowOF)
+Stat.SaveParametr(version,NameFileRes,Ant.N,Ant.Ro,Ant.Q,pg.alf1,pg.alf2,pg.koef1,pg.koef2,pg.typeProbability,NameFile,Setting.AddFeromonAntZero,Setting.SbrosGraphAllAntZero,Setting.goNewIterationAntZero,Setting.goGraphTree,gt.SortPheromon,Setting.KolIteration,Setting.KolStatIteration,Setting.MaxkolIterationAntZero,Setting.typeParametr,len(wayPg.pg.ParametricGraph),wayPg.pg.OF,wayPg.pg.MinOF)
 print('Go')
 while Par<=Setting.endParametr:
     Stat.StartStatistic()
@@ -193,8 +194,9 @@ while Par<=Setting.endParametr:
                 wayPg.pg.NormPheromon()
             Ant.DelAllAgent()
             NomIteration=NomIteration+1
-            
-
+        
+        
+        St.SaveIterJSONFile(Stat)
         Stat.EndStatistik(NomIteration, wayPg.pg.NomSolution)
         Stat.SaveTimeIteration((GoTime.DeltStartTime()).total_seconds())
         NomStatIteration=NomStatIteration+1
