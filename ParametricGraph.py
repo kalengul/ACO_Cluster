@@ -13,25 +13,23 @@ Each vertex of a parametric graph is a class. This class has a parameter value. 
 import win32com.client #Для загрузки из Excel
 import random
 
-alf1 = 1  #1
-alf2 = 1  #1
-koef1 = 1 #1
-koef2 = 1 #1
-typeProbability = 1
-#PGArray=[]
-ArrayAllPG=[]
-NomCurrentPG=0
-
 def SearchPGName(NameFile):
     i=0
-    while i<len(ArrayAllPG) and ArrayAllPG[i].NameFilePg!=NameFile:
+    while i<len(PG.ArrayAllPG) and PG.ArrayAllPG[i].NameFilePg!=NameFile:
         i=i+1
-    if i<len(ArrayAllPG):
-        return ArrayAllPG[i],i
+    if i<len(PG.ArrayAllPG):
+        return PG.ArrayAllPG[i],i
     else:
         return False,0
 
 class PG:
+    ArrayAllPG=[]
+    alf1 = 1  #1
+    alf2 = 1  #1
+    koef1 = 1 #1
+    koef2 = 1 #1
+    typeProbability = 1
+    NomCurrentPG=0
     def __init__(self,NameFile):
         self.ParametricGraph=[] #Параметрический граф
         self.AllSolution = 1    #Общее количество решений в параметрическом графе
@@ -161,8 +159,8 @@ class ProbabilityWay:
             self.pg=PG(NameFile)
             self.pg.ReadParametrGraphExcelFile()
             print(self.pg.NameFilePg)
-            NomCurrentPG=len(ArrayAllPG)
-            ArrayAllPG.append(self.pg)
+            NomCurrentPG=len(PG.ArrayAllPG)
+            PG.ArrayAllPG.append(self.pg)
             
         
     def __iter__(self):
@@ -210,12 +208,12 @@ def ProbabilityNode(Node):
     kolSolution= Node.KolSolution
     if kolSolution==0:
         kolSolution=0.5
-    if typeProbability==0:
-        Probability=koef1*(Node.pheromon**alf1)+koef2*(1/(kolSolution))**alf2 
-    if typeProbability==1:
-        Probability=koef1*(Node.pheromonNorm**alf1)+koef2*(1/(kolSolution))**alf2 
-    if typeProbability==2:
-        Probability=(Node.pheromon**alf1)*(1/(kolSolution**alf2))
+    if PG.typeProbability==0:
+        Probability=PG.koef1*(Node.pheromon**PG.alf1)+PG.koef2*(1/(kolSolution))**PG.alf2 
+    if PG.typeProbability==1:
+        Probability=PG.koef1*(Node.pheromonNorm**PG.alf1)+PG.koef2*(1/(kolSolution))**PG.alf2 
+    if PG.typeProbability==2:
+        Probability=(Node.pheromon**PG.alf1)*(1/(kolSolution**PG.alf2))
     if Probability==0:
         Probability=0.00000001
     return Probability

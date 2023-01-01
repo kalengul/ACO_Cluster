@@ -9,7 +9,6 @@ import configparser  # импортируем библиотеку
 import ParametricGraph
 import Ant
 import VirtualKlaster
-import Hash
 import Stat
 import GraphTree
 
@@ -63,11 +62,11 @@ def readSetting(NameFile):
     Ant.Q=float(config["ant"]["Q"]) 
     Ant.Ro=float(config["ant"]["Ro"]) 
     
-    ParametricGraph.alf1=float(config["ParametricGraph"]["alf1"]) 
-    ParametricGraph.alf2=float(config["ParametricGraph"]["alf2"]) 
-    ParametricGraph.koef1=float(config["ParametricGraph"]["koef1"])
-    ParametricGraph.koef2=float(config["ParametricGraph"]["koef2"] )
-    ParametricGraph.typeProbability=int(config["ParametricGraph"]["typeProbability"]) 
+    ParametricGraph.PG.alf1=float(config["ParametricGraph"]["alf1"]) 
+    ParametricGraph.PG.alf2=float(config["ParametricGraph"]["alf2"]) 
+    ParametricGraph.PG.koef1=float(config["ParametricGraph"]["koef1"])
+    ParametricGraph.PG.koef2=float(config["ParametricGraph"]["koef2"] )
+    ParametricGraph.PG.typeProbability=int(config["ParametricGraph"]["typeProbability"]) 
     
     GraphTree.SortPheromon=int(config["graph_tree"]["SortPheromon"]) 
     GraphTree.HorizontalTree=int(config["graph_tree"]["HorizontalTree"])

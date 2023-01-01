@@ -4,7 +4,6 @@ Created on Tue Jul 26 09:28:44 2022
 
 @author: Юрий
 """
-
 AntArr =[]
 N = 5  #20
 Q = 2  #2

@@ -102,7 +102,7 @@ wayPg = pg.ProbabilityWay(NameFile)
 wayGT = gt.GraphWay(NameFile)
 #wayPg.pg.PrintParametricGraph(1)
 NameFileRes = os.getcwd()+'/'+'res.xlsx'
-Stat.SaveParametr(version,NameFileRes,Ant.N,Ant.Ro,Ant.Q,pg.alf1,pg.alf2,pg.koef1,pg.koef2,pg.typeProbability,NameFile,Setting.AddFeromonAntZero,Setting.SbrosGraphAllAntZero,Setting.goNewIterationAntZero,Setting.goGraphTree,gt.SortPheromon,Setting.KolIteration,Setting.KolStatIteration,Setting.MaxkolIterationAntZero,Setting.typeParametr,len(wayPg.pg.ParametricGraph),wayPg.pg.OF,wayPg.pg.MinOF)
+Stat.SaveParametr(version,NameFileRes,Ant.N,Ant.Ro,Ant.Q,pg.PG.alf1,pg.PG.alf2,pg.PG.koef1,pg.PG.koef2,pg.PG.typeProbability,NameFile,Setting.AddFeromonAntZero,Setting.SbrosGraphAllAntZero,Setting.goNewIterationAntZero,Setting.goGraphTree,gt.SortPheromon,Setting.KolIteration,Setting.KolStatIteration,Setting.MaxkolIterationAntZero,Setting.typeParametr,len(wayPg.pg.ParametricGraph),wayPg.pg.OF,wayPg.pg.MinOF)
 print('Go')
 while Par<=Setting.endParametr:
     Stat.StartStatistic()
@@ -114,6 +114,7 @@ while Par<=Setting.endParametr:
         GoTime.setPrintTime()
         clearStartIteration(wayPg.pg)
         while NomIteration<KolIterationEnd:
+            NomStatIteration,Par=St.JSONFile.LoadIterJSONFileIfExist(Stat,Par)
             SaveTimeFromFile()
             #Создание агентов
             Ant.CreateAntArray(Ant.N+1)
@@ -190,19 +191,20 @@ while Par<=Setting.endParametr:
                 NomAnt=NomAnt+1
             
             # Переход к следующей итерации
-            if pg.typeProbability==1:
+            if pg.PG.typeProbability==1:
                 wayPg.pg.NormPheromon()
             Ant.DelAllAgent()
             NomIteration=NomIteration+1
         
         
-        St.SaveIterJSONFile(Stat)
         Stat.EndStatistik(NomIteration, wayPg.pg.NomSolution)
         Stat.SaveTimeIteration((GoTime.DeltStartTime()).total_seconds())
         NomStatIteration=NomStatIteration+1
+        St.JSONFile.SaveIterJSONFile(Stat,NomStatIteration,Par)
         print(GoTime.now(),' END ',(GoTime.DeltStartTime())*(Setting.KolStatIteration-NomStatIteration),' typeParametr=',Setting.typeParametr,Par,' NomStatIteration ',NomStatIteration,"{:8.3f}".format(Stat.MIterationAntZero/NomStatIteration),' Duration: {} '.format(GoTime.DeltStartTime()),' OptimPath ',OptimPath,version)
            
-        
+    
+    St.JSONFile.RemoveJSONFile()
     Stat.SaveStatisticsExcel(NameFileRes,GoTime.DeltStartTime(),NomStatIteration,OptimPath,Par)
     if Setting.GoSaveMap2==1:
         SaveMap.PrintElMap2(os.getcwd()+'/'+'MapFile.xlsx')

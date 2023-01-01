@@ -9,57 +9,97 @@ Created on Fri Jul 29 19:14:48 2022
 
 import win32com.client #Для загрузки из Excel
 import json
+import os
 
-def SaveIterJSONFile(Stat):
+
+class JSONDataAdapter:
+    @staticmethod
+    def to_json(o):
+        if isinstance(o, stat):
+              result = o.__dict__
+              result["className"] = o.__class__.__name__
+              return result
+ 
+    @staticmethod
+    def from_json(o,stat):
+        o = json.loads(o)
+ 
+        try:
+            stat.MOFI=o["MOFI"]
+            form = Form(o["form"])
+            color = Color(o["color"])
+            figure = Figure(o["title"], form, color)
+            return figure
+        except AttributeError:
+            print("Неверная структура")
+class JSONFile:
     NameFile='currentiter.json'
-    to_json=Stat
-    json_string=json.dumps(to_json, default=lambda x: x.__dict__)
-    print(json_string)
-    with open(NameFile, 'w') as f:
-        f.write(json_string)
+    def SaveIterJSONFile(Stat,NomStatIteration,Par):
+        Stat_json_string=JSONDataAdapter.to_json(Stat)
+        json_string=json.dumps([NomStatIteration,Par,Stat_json_string])
+        #print(json_string)
+        with open(JSONFile.NameFile, 'w') as f:
+            f.write(json_string)
+    
+    def LoadIterJSONFileIfExist(Stat,Par):
+       if os.path.exists(JSONFile.NameFile): 
+           with open(JSONFile.NameFile, 'r') as f: 
+               json_string=json.loads(f.read())
+               NomStatIteration=json_string[0]
+               Par=json_string[1]
+               for NameAtr in json_string[2]:
+                   Stat.__dict__[NameAtr]=json_string[2][NameAtr]
+               return NomStatIteration,Par
+       else:
+           return 0,Par
+       
+    def RemoveJSONFile():
+        os.remove(JSONFile.NameFile)
+             
 
 class stat:
-    MOFI =[]
-    DOFI =[]
-    MOFS =[]
-    DOFS =[]
-    ProcIS =[]
-    EndIS =[]
-    MEndIs =[]
-    OFProc = []
-    KolEndIs =[]
-    NomElGraphTree =[]
-    ArrTime = []
-    DArrTime=[]
-    
-    lenProcIS = 24
-    KolTimeDelEl = 10
-    
-    MSolution =0
-    DSolution = 0
-    MIter = 0
-    DIter = 0
-    
-    MIterAllAntZero = 0
-    DIterAllAntZero = 0
-    MSltnAllAntZero = 0
-    DSltnAllAntZero = 0
-    EndAllAntZero = 0
-    KolAllAntZero = 0
-    KolAntZero = 0
-    ProcAntZero =0
-    SumProcAntZero = 0
-    MTime = 0
-    DTime = 0
-    
-    MIterationAntZero = 0
-    DIterationAntZero = 0
-    
-    BestOF=0
-    LowOF = 0
+
     
     def __init__(self):
-      self.StartStatistic()  
+        self.MOFI =[]
+        self.DOFI =[]
+        self.MOFS =[]
+        self.DOFS =[]
+        self.ProcIS =[]
+        self.EndIS =[]
+        self.MEndIs =[]
+        self.OFProc = []
+        self.KolEndIs =[]
+        self.NomElGraphTree =[]
+        self.ArrTime = []
+        self.DArrTime=[]
+
+        self.lenProcIS = 24
+        self.KolTimeDelEl = 10
+
+        self.MSolution =0
+        self.DSolution = 0
+        self.MIter = 0
+        self.DIter = 0
+
+        self.MIterAllAntZero = 0
+        self.DIterAllAntZero = 0
+        self.MSltnAllAntZero = 0
+        self.DSltnAllAntZero = 0
+        self.EndAllAntZero = 0
+        self.KolAllAntZero = 0
+        self.KolAntZero = 0
+        self.ProcAntZero =0
+        self.SumProcAntZero = 0
+        self.MTime = 0
+        self.DTime = 0
+
+        self.MIterationAntZero = 0
+        self.DIterationAntZero = 0
+
+        self.BestOF=0
+        self.LowOF = 0  
+        self.StartStatistic()  
     
     def SaveStatisticsExcel(self,NameFile,time,koliter,OptimPath,P):
         Excel = win32com.client.Dispatch("Excel.Application")
@@ -400,3 +440,4 @@ class stat:
         wb.Close()
         #закрываем COM объект
         Excel.Quit()        
+        
