@@ -64,9 +64,12 @@ def readSetting(NameFile):
     
     ParametricGraph.PG.alf1=float(config["ParametricGraph"]["alf1"]) 
     ParametricGraph.PG.alf2=float(config["ParametricGraph"]["alf2"]) 
+    ParametricGraph.PG.alf3=float(config["ParametricGraph"]["alf3"]) 
     ParametricGraph.PG.koef1=float(config["ParametricGraph"]["koef1"])
     ParametricGraph.PG.koef2=float(config["ParametricGraph"]["koef2"] )
+    ParametricGraph.PG.koef3=float(config["ParametricGraph"]["koef3"] )
     ParametricGraph.PG.typeProbability=int(config["ParametricGraph"]["typeProbability"]) 
+    ParametricGraph.PG.EndAllSolution=int(config["ParametricGraph"]["EndAllSolution"]) 
     
     GraphTree.SortPheromon=int(config["graph_tree"]["SortPheromon"]) 
     GraphTree.HorizontalTree=int(config["graph_tree"]["HorizontalTree"])

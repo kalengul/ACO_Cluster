@@ -26,9 +26,12 @@ class PG:
     ArrayAllPG=[]
     alf1 = 1  #1
     alf2 = 1  #1
+    alf3 = 1
     koef1 = 1 #1
     koef2 = 1 #1
-    typeProbability = 1
+    koef3 = 0
+    typeProbability = 3
+    EndAllSolution = 0
     NomCurrentPG=0
     def __init__(self,NameFile):
         self.ParametricGraph=[] #Параметрический граф
@@ -175,7 +178,7 @@ class ProbabilityWay:
             # Окончание движения агента
             while NomParametr<len(self.pg.ParametricGraph):
                 # Получение вершины из слоя
-                way.append(GoAntNextNode(self.pg.ParametricGraph[NomParametr].node))
+                way.append(GoAntNextNode(self.pg,self.pg.ParametricGraph[NomParametr].node))
                 # Выбор следующего слоя
                 NomParametr = NextNode(NomParametr)
             #print(way)
@@ -204,26 +207,29 @@ def NextNode(nom):
     nom=nom+1
     return nom
 
-def ProbabilityNode(Node):
+def ProbabilityNode(ParametricGraph,Node):
     kolSolution= Node.KolSolution
     if kolSolution==0:
         kolSolution=0.5
     if PG.typeProbability==0:
         Probability=PG.koef1*(Node.pheromon**PG.alf1)+PG.koef2*(1/(kolSolution))**PG.alf2 
-    if PG.typeProbability==1:
+    elif PG.typeProbability==1:
         Probability=PG.koef1*(Node.pheromonNorm**PG.alf1)+PG.koef2*(1/(kolSolution))**PG.alf2 
-    if PG.typeProbability==2:
+    elif PG.typeProbability==2:
         Probability=(Node.pheromon**PG.alf1)*(1/(kolSolution**PG.alf2))
+    elif PG.typeProbability==3:
+        Probability=PG.koef1*(Node.pheromonNorm**PG.alf1)+PG.koef2*(1/(kolSolution))**PG.alf2+PG.koef3*(kolSolution/(ParametricGraph.AllSolution))**PG.alf3
     if Probability==0:
         Probability=0.00000001
     return Probability
        
-def GoAntNextNode(ArrayNode):
+def GoAntNextNode(ParametricGraph,ArrayNode):
     probability = []
     sum=0
     i=0
     while i<len(ArrayNode):
-       sum=sum + ProbabilityNode(ArrayNode[i])
+       if (PG.EndAllSolution==0) or (ParametricGraph.AllSolution!=Node.KolSolution): 
+           sum=sum + ProbabilityNode(ParametricGraph,ArrayNode[i])
        probability.append(sum)
        i=i+1
     rnd=random.random()

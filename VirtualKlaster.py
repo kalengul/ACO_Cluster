@@ -96,8 +96,8 @@ def Bench4(path):
     return OF
 
 def Bench4x(path):
-    p0=path[0]+path[1]+path[2]+path[3]
-    p1=path[4]+path[5]+path[6]+path[7]
+    p0=path[0]+path[1]
+    p1=path[2]+path[3]
     a1=p0**2
     a2=p1**2
     a=1-(a1+a2)**0.5/math.pi
@@ -105,8 +105,8 @@ def Bench4x(path):
     return OF
 
 def Bench4x1(path):
-    p0=path[0]+path[1]
-    p1=path[2]+path[3]
+    p0=path[0]*path[1]
+    p1=path[2]*path[3]
     a1=p0**2
     a2=p1**2
     a=1-(a1+a2)**0.5/math.pi
@@ -116,6 +116,24 @@ def Bench4x1(path):
 def Bench4x2(path):
     p0=path[0]*(path[1]+path[2])
     p1=path[3]*(path[4]+path[5])
+    a1=p0**2
+    a2=p1**2
+    a=1-(a1+a2)**0.5/math.pi
+    OF=(math.cos(p0)*math.cos(p1)*math.exp((math.fabs(a))))**2
+    return OF
+
+def Bench4x3(path):
+    p0=path[0]*(path[1]+path[2]+path[3])
+    p1=path[4]*(path[5]+path[6]+path[7])
+    a1=p0**2
+    a2=p1**2
+    a=1-(a1+a2)**0.5/math.pi
+    OF=(math.cos(p0)*math.cos(p1)*math.exp((math.fabs(a))))**2
+    return OF
+
+def Bench4x4(path):
+    p0=path[0]*(path[1]+path[2]+path[3]+path[4])
+    p1=path[5]*(path[6]+path[7]+path[8]+path[9])
     a1=p0**2
     a2=p1**2
     a=1-(a1+a2)**0.5/math.pi
@@ -239,6 +257,10 @@ def GetObjectivFunction(path,TypeKlaster):
        OF=Bench4x1(path) 
     elif TypeKlaster==4042:
        OF=Bench4x2(path) 
+    elif TypeKlaster==40442:
+       OF=Bench4x3(path) 
+    elif TypeKlaster==40443:
+       OF=Bench4x4(path) 
     elif TypeKlaster==4043:
        OF=Bench4x22(path) 
     elif TypeKlaster==4044:

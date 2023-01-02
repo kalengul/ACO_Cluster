@@ -133,13 +133,42 @@ def GoPathGraphTreeHorizontal(pg,StartWay):
         i=i+1
     PathWay=Hash.goPathStr(way)
     HashWay = Hash.getPath(PathWay)
-    nomWay=0
-    CreateArr=1
-    while nomWay<len(StartWay) and HashWay!=0:
+    StartNomWay=-1
+    nomWay=-1
+    while StartNomWay<len(StartWay) and HashWay!=0:    
         
+        if nomWay>=0:
+            way[nomWay]=way[nomWay]-1
+            if way[nomWay]<0:
+               way[nomWay]=len(pg.ParametricGraph[nomWay].node)  
+            #print('-',way,nomWay) 
+        
+        nomWay=nomWay+1
+        
+        if nomWay>=len(StartWay):
+           nomWay=0 
+           #print('++',way,nomWay) 
+           way[nomWay]=way[nomWay]+1
+           if way[nomWay]>len(pg.ParametricGraph[nomWay].node):  
+               way[nomWay]=0
+           #print('+++',way,nomWay) 
+           while way[nomWay]==StartWay[nomWay]:
+               nomWay=nomWay+1
+           
+        #print('++++',way,nomWay) 
+        way[nomWay]=way[nomWay]+1
+        if way[nomWay]>len(pg.ParametricGraph[nomWay].node):  
+            way[nomWay]=0
+        #print('+++++',way,nomWay) 
+        while way[nomWay]==StartWay[nomWay]:
+            nomWay=nomWay+1
+          
+       # print('+',way,nomWay)    
+
         PathWay=Hash.goPathStr(way)
         HashWay = Hash.getPath(PathWay)
-    if nomWay>=len(StartWay):
+        #print(PathWay,HashWay)
+    if StartNomWay>=len(StartWay):
         way.clear()
     return way
 

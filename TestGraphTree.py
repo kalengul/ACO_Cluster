@@ -17,12 +17,12 @@ print('Go Parametric Graph')
 # Создание параметрического графа
 NameFile=os.getcwd()+'/ParametricGraph/'+Setting.NameFileGraph
 print(NameFile)
-pg.ReadParametrGraphExcelFile(NameFile)
-wayGT = gt.GraphWay()
+wayPg = pg.ProbabilityWay(NameFile)
+wayGT = gt.GraphWay(NameFile)
 StartWay=[]
 i=0
-while i<len(pg.ParametricGraph):
-    StartWay.append(0)
+while i<len(pg.PG.ArrayAllPG[pg.PG.NomCurrentPG].ParametricGraph):
+    StartWay.append(1)
     i=i+1
 gt.StartWayGraphTree=StartWay
 for way in wayGT:

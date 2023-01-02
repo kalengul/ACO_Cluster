@@ -18,8 +18,8 @@ import GraphTree as gt
 import SaveMap
 import GoTime
 
-version='1.4.3'
-dateversion='30.12.2022'
+version='1.4.5'
+dateversion='02.01.2023'
 
 def clearOptimPath():
     global OptimPath
