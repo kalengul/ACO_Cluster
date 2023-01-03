@@ -27,7 +27,7 @@ def clearOptimPath():
     OptimPath=''
     maxHashWay=-100000000
     
-def clearStartIteration(pg):
+def clearStartIteration(Stat,pg):
     global NomIteration
     global KolAntZero
     global KolAntEnd
@@ -112,9 +112,9 @@ while Par<=Setting.endParametr:
     NomStatIteration = 0
     while NomStatIteration<Setting.KolStatIteration:
         GoTime.setPrintTime()
-        clearStartIteration(wayPg.pg)
+        clearStartIteration(Stat,wayPg.pg)
+        NomStatIteration,Par=St.JSONFile.LoadIterJSONFileIfExist(Stat,Par)
         while NomIteration<KolIterationEnd:
-            NomStatIteration,Par=St.JSONFile.LoadIterJSONFileIfExist(Stat,Par)
             SaveTimeFromFile()
             #Создание агентов
             Ant.CreateAntArray(Ant.N+1)
@@ -144,14 +144,13 @@ while Par<=Setting.endParametr:
                             kolIterationAntZero=0
                             while HashWay!=0 and kolIterationAntZero<Setting.MaxkolIterationAntZero:
                                 kolIterationAntZero = kolIterationAntZero+1
-                                if kolIterationAntZero<Setting.MaxkolIterationAntZero:
-                                    try:
-                                        Ant.AntArr[NomAnt].way=next(wayPg)
-                                    except StopIteration:
-                                        KolAntEnd,KolIterationEnd=EndSolution(NomAnt,NomIteration) 
-                                        HashWay=10
-                                    else:
-                                        HashWay=GoPathWayHash(wayPg.pg,NomAnt)
+                                try:
+                                    Ant.AntArr[NomAnt].way=next(wayPg)
+                                except StopIteration:
+                                    KolAntEnd,KolIterationEnd=EndSolution(NomAnt,NomIteration) 
+                                    HashWay=10
+                                else:
+                                    HashWay=GoPathWayHash(wayPg.pg,NomAnt)
                             Stat.StatIterationAntZero(kolIterationAntZero)
                         
                         #Если путь не найден, то обход графа в виде дерева 
@@ -195,13 +194,14 @@ while Par<=Setting.endParametr:
                 wayPg.pg.NormPheromon()
             Ant.DelAllAgent()
             NomIteration=NomIteration+1
+
         
         
         Stat.EndStatistik(NomIteration, wayPg.pg.NomSolution)
         Stat.SaveTimeIteration((GoTime.DeltStartTime()).total_seconds())
         NomStatIteration=NomStatIteration+1
         St.JSONFile.SaveIterJSONFile(Stat,NomStatIteration,Par)
-        print(GoTime.now(),' END ',(GoTime.DeltStartTime())*(Setting.KolStatIteration-NomStatIteration),' typeParametr=',Setting.typeParametr,Par,' NomStatIteration ',NomStatIteration,"{:8.3f}".format(Stat.MIterationAntZero/NomStatIteration),' Duration: {} '.format(GoTime.DeltStartTime()),' OptimPath ',OptimPath,version)
+        print(GoTime.now(),' END ',(GoTime.DeltStartTime())*(Setting.KolStatIteration-NomStatIteration),' typeParametr=',Setting.typeParametr,Par,' NomStatIteration ',NomStatIteration,"{:8.3f}".format(Stat.MIterationAntZero/Setting.KolStatIteration),' Duration: {} '.format(GoTime.DeltStartTime()),' OptimPath ',OptimPath,version)
            
     
     St.JSONFile.RemoveJSONFile()
