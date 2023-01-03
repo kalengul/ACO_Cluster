@@ -228,7 +228,7 @@ def GoAntNextNode(ParametricGraph,ArrayNode):
     sum=0
     i=0
     while i<len(ArrayNode):
-       if (PG.EndAllSolution==0) or (ParametricGraph.AllSolution!=ParametricGraph,ArrayNode[i].KolSolution): 
+       if (PG.EndAllSolution==0) or (ParametricGraph.AllSolution!=ArrayNode[i].KolSolution): 
            sum=sum + ProbabilityNode(ParametricGraph,ArrayNode[i])
        probability.append(sum)
        i=i+1
