@@ -283,7 +283,7 @@ class stat:
            i=i+1
             
             
-    def SaveParametr(self,version,NameFile,N,Ro,Q,alf1,alf2,koef1,koef2,typeProbability,NameFileXL,AddFeromonAntZero,SbrosGraphAllAntZero,goNewIterationAntZero,goGraphTree,SortPheromon,KolIteration,KolStatIteration,MaxkolIterationAntZero,typeParametr,KolElNomElGraphTree,Best,Low):
+    def SaveParametr(self,version,NameFile,N,Ro,Q,alf1,alf2,alf3,koef1,koef2,koef3,typeProbability,EndAllSolution,NameFileXL,AddFeromonAntZero,SbrosGraphAllAntZero,goNewIterationAntZero,goGraphTree,SortPheromon,KolIteration,KolStatIteration,MaxkolIterationAntZero,typeParametr,KolElNomElGraphTree,Best,Low):
 
         self.BestOF=Best
         self.LowOF=Low
@@ -332,28 +332,34 @@ class stat:
         sheet.Cells(NomR,10).value = a
         a='alf2='+str(alf2)
         sheet.Cells(NomR,11).value = a
-        a='koef1='+str(koef1)
+        a='alf3='+str(alf3)
         sheet.Cells(NomR,12).value = a
-        a='koef2='+str(koef2)
+        a='koef1='+str(koef1)
         sheet.Cells(NomR,13).value = a
-        a='typeProbability='+str(typeProbability)
+        a='koef2='+str(koef2)
         sheet.Cells(NomR,14).value = a
-        a='AddFeromonAntZero='+str(AddFeromonAntZero)
+        a='koef3='+str(koef3)
         sheet.Cells(NomR,15).value = a
-        a='SbrosGraphAllAntZero='+str(SbrosGraphAllAntZero)
+        a='typeProbability='+str(typeProbability)
         sheet.Cells(NomR,16).value = a
-        a='goNewIterationAntZero='+str(goNewIterationAntZero)
+        a='EndAllSolution='+str(EndAllSolution)
         sheet.Cells(NomR,17).value = a
-        a='goGraphTree='+str(goGraphTree)
+        a='AddFeromonAntZero='+str(AddFeromonAntZero)
         sheet.Cells(NomR,18).value = a
-        a='SortPheromon='+str(SortPheromon)
+        a='SbrosGraphAllAntZero='+str(SbrosGraphAllAntZero)
         sheet.Cells(NomR,19).value = a
-        a='KolIteration='+str(KolIteration)
+        a='goNewIterationAntZero='+str(goNewIterationAntZero)
         sheet.Cells(NomR,20).value = a
-        a='KolStatIteration='+str(KolStatIteration)
+        a='goGraphTree='+str(goGraphTree)
         sheet.Cells(NomR,21).value = a
-        a='MaxkolIterationAntZero='+str(MaxkolIterationAntZero)
+        a='SortPheromon='+str(SortPheromon)
         sheet.Cells(NomR,22).value = a
+        a='KolIteration='+str(KolIteration)
+        sheet.Cells(NomR,23).value = a
+        a='KolStatIteration='+str(KolStatIteration)
+        sheet.Cells(NomR,24).value = a
+        a='MaxkolIterationAntZero='+str(MaxkolIterationAntZero)
+        sheet.Cells(NomR,25).value = a
         
         NomR=NomR+1
         if typeParametr==1:
