@@ -112,8 +112,8 @@ while Par<=Setting.endParametr:
     NomStatIteration = 0
     while NomStatIteration<Setting.KolStatIteration:
         GoTime.setPrintTime()
-        clearStartIteration(Stat,wayPg.pg)
         NomStatIteration,Par=St.JSONFile.LoadIterJSONFileIfExist(Stat,Par)
+        clearStartIteration(Stat,wayPg.pg)
         while NomIteration<KolIterationEnd:
             SaveTimeFromFile()
             #Создание агентов
@@ -201,6 +201,7 @@ while Par<=Setting.endParametr:
         Stat.SaveTimeIteration((GoTime.DeltStartTime()).total_seconds())
         NomStatIteration=NomStatIteration+1
         St.JSONFile.SaveIterJSONFile(Stat,NomStatIteration,Par)
+
         print(GoTime.now(),' END ',(GoTime.DeltStartTime())*(Setting.KolStatIteration-NomStatIteration),' typeParametr=',Setting.typeParametr,Par,' NomStatIteration ',NomStatIteration,"{:8.3f}".format(Stat.MIterationAntZero/NomStatIteration),' Duration: {} '.format(GoTime.DeltStartTime()),' OptimPath ',OptimPath,version)
            
     
