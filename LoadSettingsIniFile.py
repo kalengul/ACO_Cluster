@@ -99,6 +99,10 @@ def GoNZTypeParametr(typeParametr):
       return KolIteration
     elif typeParametr==9:
       return MaxkolIterationAntZero  
+    elif typeParametr==10:
+      return Ant.alf3  
+    elif typeParametr==11:
+      return Ant.koef3  
     
 def EndTypeParametr(typeParametr,Par):
     global KolIteration
@@ -121,4 +125,8 @@ def EndTypeParametr(typeParametr,Par):
       KolIteration=Par 
     elif typeParametr==9:
       MaxkolIterationAntZero=Par  
+    elif typeParametr==10:
+      Ant.alf3=Par 
+    elif typeParametr==11:
+      Ant.koef3=Par 
       
