@@ -200,7 +200,7 @@ def PrintParametr(Par:Parametr,VivodPheromon):
         if VivodPheromon==0:
             print(elem.val, end=' ')
         else:
-            print(elem.val,'(',elem.pheromon,')', end=' ')
+            print(elem.val,'(',elem.pheromon,elem.KolSolution,')', end=' ')
 
 
 def NextNode(nom):
@@ -228,7 +228,7 @@ def GoAntNextNode(ParametricGraph,ArrayNode):
     sum=0
     i=0
     while i<len(ArrayNode):
-       if (PG.EndAllSolution==0) or (ParametricGraph.AllSolution!=ArrayNode[i].KolSolution): 
+       if (PG.EndAllSolution==0) or (ParametricGraph.AllSolution/len(ArrayNode)>ArrayNode[i].KolSolution): 
            sum=sum + ProbabilityNode(ParametricGraph,ArrayNode[i])
        probability.append(sum)
        i=i+1

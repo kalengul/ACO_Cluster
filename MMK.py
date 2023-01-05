@@ -189,11 +189,13 @@ while Par<=Setting.endParametr:
                         NomWay = NomWay+1
                 NomAnt=NomAnt+1
             
+            
             # Переход к следующей итерации
-            if pg.PG.typeProbability==1:
+            if (pg.PG.typeProbability==1) or (pg.PG.typeProbability==3):
                 wayPg.pg.NormPheromon()
             Ant.DelAllAgent()
             NomIteration=NomIteration+1
+            #wayPg.pg.PrintParametricGraph(1)
 
         
         
