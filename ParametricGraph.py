@@ -126,6 +126,7 @@ class PG:
 class Node:  #Узел графа
     def __init__(self,value):
         self.clear()
+        self.KolSolutionAll=0
         self.val = value
         
     def clear(self):
@@ -207,7 +208,7 @@ def NextNode(nom):
     nom=nom+1
     return nom
 
-def ProbabilityNode(ParametricGraph,Node):
+def ProbabilityNode(AllSolution,Node):
     kolSolution= Node.KolSolution
     if kolSolution==0:
         kolSolution=0.5
@@ -218,7 +219,7 @@ def ProbabilityNode(ParametricGraph,Node):
     elif PG.typeProbability==2:
         Probability=(Node.pheromon**PG.alf1)*(1/(kolSolution**PG.alf2))
     elif PG.typeProbability==3:
-        Probability=PG.koef1*(Node.pheromonNorm**PG.alf1)+PG.koef2*(1/(kolSolution))**PG.alf2+PG.koef3*(kolSolution/(ParametricGraph.AllSolution))**PG.alf3
+        Probability=PG.koef1*(Node.pheromonNorm**PG.alf1)+PG.koef2*(1/(kolSolution))**PG.alf2+PG.koef3*(Node.KolSolutionAll/(AllSolution))**PG.alf3
     if Probability==0:
         Probability=0.00000001
     return Probability
@@ -229,7 +230,7 @@ def GoAntNextNode(ParametricGraph,ArrayNode):
     i=0
     while i<len(ArrayNode):
        if (PG.EndAllSolution==0) or (ParametricGraph.AllSolution/len(ArrayNode)>ArrayNode[i].KolSolution): 
-           sum=sum + ProbabilityNode(ParametricGraph,ArrayNode[i])
+           sum=sum + ProbabilityNode(ParametricGraph.AllSolution/len(ArrayNode),ArrayNode[i])
        probability.append(sum)
        i=i+1
     rnd=random.random()

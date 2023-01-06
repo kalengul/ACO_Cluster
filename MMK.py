@@ -18,8 +18,8 @@ import GraphTree as gt
 import SaveMap
 import GoTime
 
-version='1.4.5'
-dateversion='02.01.2023'
+version='1.4.5.7'
+dateversion='06.01.2023'
 
 def clearOptimPath():
     global OptimPath
@@ -186,6 +186,7 @@ while Par<=Setting.endParametr:
                     while NomWay<len(Ant.AntArr[NomAnt].way):
                         wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].pheromon = wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].pheromon + (1-Ant.Ro)*Ant.AntArr[NomAnt].pheromon
                         wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].KolSolution = wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].KolSolution + 1
+                        wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].KolSolutionAll = wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].KolSolutionAll + 1
                         NomWay = NomWay+1
                 NomAnt=NomAnt+1
             
