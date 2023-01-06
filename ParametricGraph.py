@@ -125,6 +125,7 @@ class PG:
 
 class Node:  #Узел графа
     def __init__(self,value):
+
         self.clear(1)
         self.val = value
         
