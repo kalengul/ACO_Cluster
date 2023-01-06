@@ -103,10 +103,10 @@ class PG:
                 NomEl=NomEl+1
             NomPar=NomPar+1        
 
-    def ClearPheromon(self):
+    def ClearPheromon(self,allClear):
         NomPar=0
         while NomPar<len(self.ParametricGraph):
-            self.ParametricGraph[NomPar].ClearAllNode()
+            self.ParametricGraph[NomPar].ClearAllNode(allClear)
             NomPar=NomPar+1    
 
     def DecreasePheromon(self,par):
@@ -125,14 +125,16 @@ class PG:
 
 class Node:  #Узел графа
     def __init__(self,value):
-        self.clear()
+        self.clear(1)
         self.val = value
         
-    def clear(self):
+    def clear(self,allClear):
         self.pheromon=1
         self.KolSolution=0
         self.pheromonNorm = 1
         self.KolSolutionNorm = 1 
+        if allClear==1:
+            self.KolSolutionAll=0
         
     def DecreasePheromon(self,par):
         self.pheromon=self.pheromon*par
@@ -142,10 +144,10 @@ class Parametr:
        self.name = value 
        self.node=[]
        
-   def ClearAllNode(self):
+   def ClearAllNode(self,allClear):
        NomEl=0
        while NomEl<len(self.node):
-           self.node[NomEl].clear()
+           self.node[NomEl].clear(allClear)
            NomEl=NomEl+1
            
    def DecreasePheromon(self,par):
@@ -207,7 +209,7 @@ def NextNode(nom):
     nom=nom+1
     return nom
 
-def ProbabilityNode(ParametricGraph,Node):
+def ProbabilityNode(AllSolution,Node):
     kolSolution= Node.KolSolution
     if kolSolution==0:
         kolSolution=0.5
@@ -218,7 +220,7 @@ def ProbabilityNode(ParametricGraph,Node):
     elif PG.typeProbability==2:
         Probability=(Node.pheromon**PG.alf1)*(1/(kolSolution**PG.alf2))
     elif PG.typeProbability==3:
-        Probability=PG.koef1*(Node.pheromonNorm**PG.alf1)+PG.koef2*(1/(kolSolution))**PG.alf2+PG.koef3*(kolSolution/(ParametricGraph.AllSolution))**PG.alf3
+        Probability=PG.koef1*(Node.pheromonNorm**PG.alf1)+PG.koef2*(1/(kolSolution))**PG.alf2+PG.koef3*(Node.KolSolutionAll/(AllSolution))**PG.alf3
     if Probability==0:
         Probability=0.00000001
     return Probability
@@ -228,8 +230,8 @@ def GoAntNextNode(ParametricGraph,ArrayNode):
     sum=0
     i=0
     while i<len(ArrayNode):
-       if (PG.EndAllSolution==0) or (ParametricGraph.AllSolution/len(ArrayNode)>ArrayNode[i].KolSolution): 
-           sum=sum + ProbabilityNode(ParametricGraph,ArrayNode[i])
+       if (PG.EndAllSolution==0) or (ParametricGraph.AllSolution/len(ArrayNode)>ArrayNode[i].KolSolutionAll): 
+           sum=sum + ProbabilityNode(ParametricGraph.AllSolution/len(ArrayNode),ArrayNode[i])
        probability.append(sum)
        i=i+1
     rnd=random.random()
