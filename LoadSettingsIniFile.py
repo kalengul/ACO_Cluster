@@ -88,21 +88,21 @@ def GoNZTypeParametr(typeParametr):
     elif typeParametr==3:
       return Ant.Q 
     elif typeParametr==4:
-      return Ant.alf1  
+      return ParametricGraph.PG.alf1  
     elif typeParametr==5:
-      return Ant.alf2 
+      return ParametricGraph.PG.alf2 
     elif typeParametr==6:
-      return Ant.koef1     
+      return ParametricGraph.PG.koef1     
     elif typeParametr==7:
-      return Ant.koef2 
+      return ParametricGraph.PG.koef2 
     elif typeParametr==8:
       return KolIteration
     elif typeParametr==9:
       return MaxkolIterationAntZero  
     elif typeParametr==10:
-      return Ant.alf3  
+      return ParametricGraph.PG.alf3  
     elif typeParametr==11:
-      return Ant.koef3  
+      return ParametricGraph.PG.koef3  
     
 def EndTypeParametr(typeParametr,Par):
     global KolIteration
@@ -114,19 +114,19 @@ def EndTypeParametr(typeParametr,Par):
     elif typeParametr==3:
       Ant.Q=Par  
     elif typeParametr==4:
-      Ant.alf1=Par   
+      ParametricGraph.PG.alf1=Par   
     elif typeParametr==5:
-      Ant.alf2=Par  
+      ParametricGraph.PG.alf2=Par  
     elif typeParametr==6:
-      Ant.koef1=Par      
+      ParametricGraph.PG.koef1=Par      
     elif typeParametr==7:
-      Ant.koef2=Par  
+      ParametricGraph.PG.koef2=Par  
     elif typeParametr==8:
       KolIteration=Par 
     elif typeParametr==9:
       MaxkolIterationAntZero=Par  
     elif typeParametr==10:
-      Ant.alf3=Par 
+      ParametricGraph.PG.alf3=Par 
     elif typeParametr==11:
-      Ant.koef3=Par 
+      ParametricGraph.PG.koef3=Par 
       
