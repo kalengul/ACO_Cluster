@@ -177,6 +177,7 @@ class stat:
     
     
     def StatIterationAntZero(self,NomIteration):
+      #NomIteration=NomIteration+1
       self.MIterationAntZero=self.MIterationAntZero+NomIteration 
       self.DIterationAntZero=self.DIterationAntZero+NomIteration*NomIteration
        
@@ -209,18 +210,29 @@ class stat:
             self.MEndIs[i]=self.MEndIs[i]+self.EndIS[i]
             i=i+1
         
-    def ProcBestOF(self,OF,NomIteration,NomSolution):
+    def ProcBestOF(self,OF,MaxOptimization,NomIteration,NomSolution):
         i=0
         while i<self.lenProcIS:
-            if (self.BestOF-self.LowOF)*self.ProcIS[i]+self.LowOF<=OF and self.EndIS[i]==0:
-                self.MOFI[i]=self.MOFI[i]+NomIteration
-                self.DOFI[i]=self.DOFI[i]+NomIteration*NomIteration
-                self.MOFS[i]=self.MOFS[i]+NomSolution
-                self.DOFS[i]=self.DOFS[i]+NomSolution*NomSolution
-                self.OFProc[i]=self.OFProc[i]+OF
-                self.KolEndIs[i]=self.KolEndIs[i]+1
-            if (self.BestOF-self.LowOF)*self.ProcIS[i]+self.LowOF<=OF:
-                self.EndIS[i]=self.EndIS[i]+1 
+            if MaxOptimization==1:
+                if (self.BestOF-self.LowOF)*self.ProcIS[i]+self.LowOF<=OF and self.EndIS[i]==0:
+                    self.MOFI[i]=self.MOFI[i]+NomIteration
+                    self.DOFI[i]=self.DOFI[i]+NomIteration*NomIteration
+                    self.MOFS[i]=self.MOFS[i]+NomSolution
+                    self.DOFS[i]=self.DOFS[i]+NomSolution*NomSolution
+                    self.OFProc[i]=self.OFProc[i]+OF
+                    self.KolEndIs[i]=self.KolEndIs[i]+1
+                if (self.BestOF-self.LowOF)*self.ProcIS[i]+self.LowOF<=OF:
+                    self.EndIS[i]=self.EndIS[i]+1 
+            else:
+                if self.BestOF-(self.BestOF-self.LowOF)*self.ProcIS[i]>=OF and self.EndIS[i]==0:
+                    self.MOFI[i]=self.MOFI[i]+NomIteration
+                    self.DOFI[i]=self.DOFI[i]+NomIteration*NomIteration
+                    self.MOFS[i]=self.MOFS[i]+NomSolution
+                    self.DOFS[i]=self.DOFS[i]+NomSolution*NomSolution
+                    self.OFProc[i]=self.OFProc[i]+OF
+                    self.KolEndIs[i]=self.KolEndIs[i]+1
+                if self.BestOF-(self.BestOF-self.LowOF)*self.ProcIS[i]>=OF:
+                    self.EndIS[i]=self.EndIS[i]+1 
             i=i+1
         
     def SbrosStatistic(self):

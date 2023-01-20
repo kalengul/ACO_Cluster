@@ -183,6 +183,55 @@ def Bench1(path):
     OF=4*math.fabs(math.sin(path[0])*math.cos(path[1])*math.exp(math.fabs(math.cos(a))))
     return OF
 
+def Bench1m(path):
+    a1=path[0]**2
+    a2=path[1]**2
+    a=(a1+a2)/200
+    OF=-4*math.fabs(math.sin(path[0])*math.cos(path[1])*math.exp(math.fabs(math.cos(a))))
+    return OF
+
+def Bench3m(path):
+    a1=path[0]**2
+    a2=path[1]**2
+    a=1-(a1+a2)**0.5/math.pi
+    OF=-math.fabs(math.cos(path[0])*math.cos(path[1])*math.exp(math.fabs(math.cos(a))))
+    return OF
+
+def Bench4m(path):
+    a1=path[0]**2
+    a2=path[1]**2
+    a=1-(a1+a2)**0.5/math.pi
+    OF=-((math.cos(path[0])*math.cos(path[1])*math.exp((math.fabs(a))))**2)/30
+    return OF
+
+def Bench5m(path):
+    a1=path[0]**2
+    a2=path[1]**2
+    a=100-(a1+a2)**0.5/math.pi
+    OF=-0.0001*(math.fabs(math.sin(path[0])*math.sin(path[1])*math.exp((math.fabs(a))))+1)**0.1
+    return OF
+
+def Bench6m(path):
+    a1=path[0]**2
+    a2=path[1]**2
+    a=100-(a1+a2)**0.5/math.pi
+    OF=0.0001*(math.fabs(math.sin(path[0])*math.sin(path[1])*math.exp((math.fabs(a))))+1)**0.1
+    return OF
+
+def Bench7m(path):
+    a1=path[0]**2
+    a2=path[1]**2
+    a=100-(a1+a2)**0.5/math.pi
+    OF=(math.fabs(math.sin(path[0])*math.sin(path[1])*math.exp((math.fabs(a))))+1)**-0.1
+    return OF
+
+def Bench8m(path):
+    a1=path[0]**2
+    a2=path[1]**2
+    a=100-(a1+a2)**0.5/math.pi
+    OF=-(math.fabs(math.sin(path[0])*math.sin(path[1])*math.exp((math.fabs(a))))+1)**-0.1
+    return OF
+
 def Bench10(path):
     a1=math.sin(path[0])*math.exp((1-math.cos(path[1]))**2)
     a2=math.cos(path[1])*math.exp((1-math.sin(path[0]))**2)
@@ -249,8 +298,12 @@ def GetObjectivFunction(path,TypeKlaster):
        OF=Klaster3(path) 
     elif TypeKlaster==401:
        OF=Bench1(path) 
+    elif TypeKlaster==4019:
+       OF=Bench1m(path) 
     elif TypeKlaster==404:
        OF=Bench4(path) 
+    elif TypeKlaster==4049:
+       OF=Bench4m(path) 
     elif TypeKlaster==4040:
        OF=Bench4x(path) 
     elif TypeKlaster==4041:
@@ -271,6 +324,8 @@ def GetObjectivFunction(path,TypeKlaster):
        OF=Bench4xo2222(path)
     elif TypeKlaster==410:
        OF=Bench10(path) 
+    elif TypeKlaster==4109:
+       OF=Bench10(path) 
     elif TypeKlaster==990:
        OF=SIRVD1(path) 
     elif TypeKlaster==991:
@@ -279,3 +334,38 @@ def GetObjectivFunction(path,TypeKlaster):
     if VivodKlasterExcel==1:
       SavePathExcel('Cluster.xlsx',path,OF,TypeKlaster)  
     return OF
+
+def GoMin(TypeKlaster):
+    path=[]
+    MinOF=100000
+    path.append(-10)
+    path.append(-10)
+    while path[0]<10:
+        path[1]=-10
+        while path[1]<10:
+            OF=GetObjectivFunction(path,TypeKlaster)
+            #print(path,OF,GetObjectivFunction(path,TypeKlaster))
+            if OF<MinOF:
+                MinOF=OF
+                MinPath=path
+                print('Min',MinPath,MinOF)
+            path[1]=path[1]+0.1
+        path[0]=path[0]+0.1
+    
+def GoMax(TypeKlaster):
+    path=[]
+    MaxPath=[]
+    MaxOF=-100000
+    path.append(-10)
+    path.append(-10)
+    while path[0]<10:
+        path[1]=-10
+        while path[1]<10:
+            OF=GetObjectivFunction(path,TypeKlaster)
+            #print(path,OF,GetObjectivFunction(path,TypeKlaster))
+            if OF>MaxOF:  
+                MaxOF=OF
+                MaxPath=path
+                print('Max',MaxPath,MaxOF)
+            path[1]=path[1]+0.1
+        path[0]=path[0]+0.1

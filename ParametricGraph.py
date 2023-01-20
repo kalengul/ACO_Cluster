@@ -42,6 +42,7 @@ class PG:
         self.MaxIter=0
         self.BestOF=0
         self.LowOF=0
+        self.MaxOptimization=1
         
     def ReadParametrGraphExcelFile(self):
         Excel = win32com.client.Dispatch("Excel.Application")
@@ -50,6 +51,7 @@ class PG:
         # Настройки графа
         self.TypeKlaster = sheet.Cells(2,1).value
         self.KolSolution = sheet.Cells(2,2).value
+        self.MaxOptimization = sheet.Cells(2,3).value
         self.OF = sheet.Cells(1,11).value
         self.MinOF = sheet.Cells(1,12).value
         # Загрузка самого граа

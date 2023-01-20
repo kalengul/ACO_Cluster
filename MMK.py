@@ -18,8 +18,8 @@ import GraphTree as gt
 import SaveMap
 import GoTime
 
-version='1.4.5.8'
-dateversion='10.01.2023'
+version='1.4.5.10'
+dateversion='20.01.2023'
 
 def clearOptimPath():
     global OptimPath
@@ -71,7 +71,7 @@ def GiveAntPheromonAndHash(pg,PathWay,NomAnt):
     if Ant.AntArr[NomAnt].pheromon>maxHashWay:
         maxHashWay=Ant.AntArr[NomAnt].pheromon
         OptimPath=PathWay
-    Stat.ProcBestOF(Ant.AntArr[NomAnt].pheromon,NomIteration,pg.NomSolution)
+    Stat.ProcBestOF(Ant.AntArr[NomAnt].pheromon,pg.MaxOptimization,NomIteration,pg.NomSolution)
 
 def GoPathWayHash(pg,NomAnt):
     PathWay=Hash.goPathStr(Ant.AntArr[NomAnt].way)
@@ -184,7 +184,10 @@ while Par<=Setting.endParametr:
                 if Ant.AntArr[NomAnt].pheromon!=0:
                     NomWay = 0
                     while NomWay<len(Ant.AntArr[NomAnt].way):
-                        wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].pheromon = wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].pheromon + (1-Ant.Ro)*Ant.AntArr[NomAnt].pheromon
+                        if wayPg.pg.MaxOptimization==1:
+                            wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].pheromon = wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].pheromon + (1-Ant.Ro)*Ant.Q*Ant.AntArr[NomAnt].pheromon
+                        else:
+                            wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].pheromon = wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].pheromon + (1-Ant.Ro)*Ant.Q/Ant.AntArr[NomAnt].pheromon
                         wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].KolSolution = wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].KolSolution + 1
                         wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].KolSolutionAll = wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].KolSolutionAll + 1
                         NomWay = NomWay+1
