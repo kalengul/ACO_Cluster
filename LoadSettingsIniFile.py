@@ -4,7 +4,7 @@ Created on Fri Dec  2 15:32:14 2022
 
 @author: Юрий
 """
-import configparser  # импортируем библиотеку
+import configparser  
 
 import ParametricGraph
 import Ant

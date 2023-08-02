@@ -21,7 +21,7 @@ import GoTime
 version='1.4.6'
 dateversion='02.08.2023'
 
-def run_script(NomProc,folder,folderPg,lock_excel):
+def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
     
     def clearOptimPath(OptimPath,maxHashWay):
         OptimPath=''
@@ -79,7 +79,7 @@ def run_script(NomProc,folder,folderPg,lock_excel):
         print(NomProc,KolAntEnd,KolIterationEnd)
         return KolAntEnd,KolIterationEnd
         
-    print(GoTime.now(),NomProc,' Start Program ')     
+    print(GoTime.now(),NomProc,' Start Program ',TextPrint)     
     if os.path.exists(folder+'/setting.ini'):
         print(GoTime.now(),NomProc,' LOAD  '+folder+'/setting.ini')  
         Setting.readSetting(folder+'/setting.ini')
@@ -106,7 +106,7 @@ def run_script(NomProc,folder,folderPg,lock_excel):
     NameFileRes = folder+'/'+'res.xlsx'
     Stat.SaveParametr(version,NameFileRes,Ant.N,Ant.Ro,Ant.Q,pg.PG.alf1,pg.PG.alf2,pg.PG.alf3,pg.PG.koef1,pg.PG.koef2,pg.PG.koef3,pg.PG.typeProbability,pg.PG.EndAllSolution,NameFile,Setting.AddFeromonAntZero,Setting.SbrosGraphAllAntZero,Setting.goNewIterationAntZero,Setting.goGraphTree,gt.SortPheromon,Setting.KolIteration,Setting.KolStatIteration,Setting.MaxkolIterationAntZero,Setting.typeParametr,len(wayPg.pg.ParametricGraph),wayPg.pg.OF,wayPg.pg.MinOF)
     lock_excel.release()
-    print(NomProc,'Go')
+    print(NomProc,'Go',TextPrint)
     while Par<=Setting.endParametr:
         Stat.StartStatistic()
         Stat.StartStatisticGrahTree(len(wayPg.pg.ParametricGraph))
@@ -211,7 +211,7 @@ def run_script(NomProc,folder,folderPg,lock_excel):
             NomStatIteration=NomStatIteration+1
             St.JSONFile.SaveIterJSONFile(Stat,NomStatIteration,Par)
     
-            print(GoTime.now(),NomProc,' END ',(GoTime.DeltStartTime())*(Setting.KolStatIteration-NomStatIteration),' typeParametr=',Setting.typeParametr,Par,' NomStatIteration ',NomStatIteration,"{:8.3f}".format(Stat.MIterationAntZero/NomStatIteration),' Duration: {} '.format(GoTime.DeltStartTime()),' OptimPath ',OptimPath,version)
+            print(GoTime.now(),NomProc,' END ',TextPrint,(GoTime.DeltStartTime())*(Setting.KolStatIteration-NomStatIteration),' typeParametr=',Setting.typeParametr,Par,' NomStatIteration ',NomStatIteration,"{:8.3f}".format(Stat.MIterationAntZero/NomStatIteration),' Duration: {} '.format(GoTime.DeltStartTime()),' OptimPath ',OptimPath,version)
                
         
         St.JSONFile.RemoveJSONFile()
