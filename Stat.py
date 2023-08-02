@@ -33,17 +33,18 @@ class JSONDataAdapter:
         except AttributeError:
             print("Неверная структура")
 class JSONFile:
+    folderJSON=''
     NameFile='currentiter.json'
     def SaveIterJSONFile(Stat,NomStatIteration,Par):
         Stat_json_string=JSONDataAdapter.to_json(Stat)
         json_string=json.dumps([NomStatIteration,Par,Stat_json_string])
         #print(json_string)
-        with open(JSONFile.NameFile, 'w') as f:
+        with open(JSONFile.folderJSON+'/'+JSONFile.NameFile, 'w') as f:
             f.write(json_string)
     
     def LoadIterJSONFileIfExist(Stat,Par):
-       if os.path.exists(JSONFile.NameFile): 
-           with open(JSONFile.NameFile, 'r') as f: 
+       if os.path.exists(JSONFile.folderJSON+'/'+JSONFile.NameFile): 
+           with open(JSONFile.folderJSON+'/'+JSONFile.NameFile, 'r') as f: 
                json_string=json.loads(f.read())
                NomStatIteration=json_string[0]
                Par=json_string[1]
@@ -54,7 +55,7 @@ class JSONFile:
            return 0,Par
        
     def RemoveJSONFile():
-        os.remove(JSONFile.NameFile)
+        os.remove(JSONFile.folderJSON+'/'+JSONFile.NameFile)
              
 
 class stat:
