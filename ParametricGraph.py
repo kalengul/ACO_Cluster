@@ -166,7 +166,7 @@ class ProbabilityWay:
         if self.pg==False:
             self.pg=PG(NameFile)
             self.pg.ReadParametrGraphExcelFile()
-            print(self.pg.NameFilePg)
+#            print(self.pg.NameFilePg)
             NomCurrentPG=len(PG.ArrayAllPG)
             PG.ArrayAllPG.append(self.pg)
             

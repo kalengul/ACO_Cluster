@@ -20,18 +20,6 @@ class JSONDataAdapter:
               result["className"] = o.__class__.__name__
               return result
  
-    @staticmethod
-    def from_json(o,stat):
-        o = json.loads(o)
- 
-        try:
-            stat.MOFI=o["MOFI"]
-            form = Form(o["form"])
-            color = Color(o["color"])
-            figure = Figure(o["title"], form, color)
-            return figure
-        except AttributeError:
-            print("Неверная структура")
 class JSONFile:
     folderJSON=''
     NameFile='currentiter.json'

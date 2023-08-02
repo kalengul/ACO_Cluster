@@ -12,6 +12,7 @@ import VirtualKlaster
 import Stat
 import GraphTree
 
+
 endprint = 0                        # Статистика. Вывод в конце прогона на экран
 AddFeromonAntZero = 0               # Муравьи Zero берут количество феромона из Хэш-таблицы
 SbrosGraphAllAntZero = 1            # Сброс графа решений при выполнении AllAntZero

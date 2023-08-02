@@ -22,7 +22,7 @@ class GraphWay:
         if self.pg==False:
             self.pg=pg.PG(NameFile)
             self.pg.ReadParametrGraphExcelFile()
-            print(self.pg.NameFilePg)
+#            print(self.pg.NameFilePg)
             pg.NomCurrentPG=len(pg.ArrayAllPG)
             pg.ArrayAllPG.append(self.pg)
             

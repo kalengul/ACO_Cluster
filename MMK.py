@@ -8,6 +8,7 @@ Created on Thu Jul  7 15:57:32 2022
 import os
 import multiprocessing
 import time
+import subprocess
 
 
 import LoadSettingsIniFile as Setting
@@ -23,11 +24,12 @@ import GoTime
 version='1.4.6'
 dateversion='02.08.2023'
 
-def run_script(folder,folderPg,lock_excel):
+def run_script(NomProc,folder,folderPg,lock_excel):
     
     def clearOptimPath(OptimPath,maxHashWay):
         OptimPath=''
         maxHashWay=-100000000
+        return OptimPath,maxHashWay
         
     def clearStartIteration(Stat,pg,OptimPath,maxHashWay,NomIteration,KolAntZero,KolAntEnd,KolIterationEnd,NomIterationTime):
         pg.ClearPheromon(1)
@@ -37,12 +39,13 @@ def run_script(folder,folderPg,lock_excel):
         NomIteration = 1
         pg.NomSolution = 0
         KolAntZero=0
-        clearOptimPath(OptimPath,maxHashWay)
+        OptimPath,maxHashWay=clearOptimPath(OptimPath,maxHashWay)
         KolAntEnd=Ant.N
         KolIterationEnd=Setting.KolIteration
         NomIterationTime=Setting.KolIteration/Stat.KolTimeDelEl
         GoTime.setStartTime()
         GoTime.setTimeIteration()
+        return OptimPath,maxHashWay,NomIteration,KolAntZero,KolAntEnd,KolIterationEnd,NomIterationTime
         
     def SaveTimeFromFile(NomIterationTime,NomIteration):
          #Сохранение времени в файл
@@ -71,17 +74,17 @@ def run_script(folder,folderPg,lock_excel):
         if HashWay==0:   
             pg.NomSolution = pg.NomSolution+1
             GiveAntPheromonAndHash(pg,PathWay,NomAnt,OptimPath,maxHashWay)
-        return HashWay
+        return HashWay,OptimPath,maxHashWay
     
     def EndSolution(NomAnt,NomIteration):
         KolAntEnd=NomAnt 
         KolIterationEnd=NomIteration
-        print(KolAntEnd,KolIterationEnd)
+        print(NomProc,KolAntEnd,KolIterationEnd)
         return KolAntEnd,KolIterationEnd
         
-    print(GoTime.now(),' Start Program ')     
+    print(GoTime.now(),NomProc,' Start Program ')     
     if os.path.exists(folder+'/setting.ini'):
-        print(GoTime.now(),' LOAD  '+folder+'/setting.ini')  
+        print(GoTime.now(),NomProc,' LOAD  '+folder+'/setting.ini')  
         Setting.readSetting(folder+'/setting.ini')
     
     OptimPath=''
@@ -92,22 +95,21 @@ def run_script(folder,folderPg,lock_excel):
     KolIterationEnd=0
     NomIterationTime=0
     St.JSONFile.folderJSON=folder
-    clearOptimPath(OptimPath,maxHashWay)
-    print('Go Parametric Graph')
+    OptimPath,maxHashWay=clearOptimPath(OptimPath,maxHashWay)
+    print(NomProc,'Go Parametric Graph')
     # Создание параметрического графа
     NameFile=folderPg+'/'+Setting.NameFileGraph
     #Klaster.TypeKlaster,MaxIter,Stat.BestOF,Stat.LowOF = pg.ReadParametrGraphExcelFile(NameFile)
     Stat=St.stat()
     Par=Setting.GoNZTypeParametr(Setting.typeParametr)
     lock_excel.acquire()
-    print(NameFile)
+    print(NomProc,NameFile)
     wayPg = pg.ProbabilityWay(NameFile)
     wayGT = gt.GraphWay(NameFile)
-    lock_excel.release()
-    #wayPg.pg.PrintParametricGraph(1)
     NameFileRes = folder+'/'+'res.xlsx'
     Stat.SaveParametr(version,NameFileRes,Ant.N,Ant.Ro,Ant.Q,pg.PG.alf1,pg.PG.alf2,pg.PG.alf3,pg.PG.koef1,pg.PG.koef2,pg.PG.koef3,pg.PG.typeProbability,pg.PG.EndAllSolution,NameFile,Setting.AddFeromonAntZero,Setting.SbrosGraphAllAntZero,Setting.goNewIterationAntZero,Setting.goGraphTree,gt.SortPheromon,Setting.KolIteration,Setting.KolStatIteration,Setting.MaxkolIterationAntZero,Setting.typeParametr,len(wayPg.pg.ParametricGraph),wayPg.pg.OF,wayPg.pg.MinOF)
-    print('Go')
+    lock_excel.release()
+    print(NomProc,'Go')
     while Par<=Setting.endParametr:
         Stat.StartStatistic()
         Stat.StartStatisticGrahTree(len(wayPg.pg.ParametricGraph))
@@ -117,7 +119,7 @@ def run_script(folder,folderPg,lock_excel):
         while NomStatIteration<Setting.KolStatIteration:
             GoTime.setPrintTime()
             NomStatIteration,Par=St.JSONFile.LoadIterJSONFileIfExist(Stat,Par)
-            clearStartIteration(Stat,wayPg.pg,OptimPath,maxHashWay,NomIteration,KolAntZero,KolAntEnd,KolIterationEnd,NomIterationTime)
+            OptimPath,maxHashWay,NomIteration,KolAntZero,KolAntEnd,KolIterationEnd,NomIterationTime=clearStartIteration(Stat,wayPg.pg,OptimPath,maxHashWay,NomIteration,KolAntZero,KolAntEnd,KolIterationEnd,NomIterationTime)
             while NomIteration<KolIterationEnd:
                 SaveTimeFromFile(NomIterationTime,NomIteration)
                 #Создание агентов
@@ -132,7 +134,7 @@ def run_script(folder,folderPg,lock_excel):
                         KolAntEnd,KolIterationEnd=EndSolution(NomAnt,NomIteration) 
                     else:
                         # Проверка полученного пути в Хэш-Таблице
-                        HashWay=GoPathWayHash(wayPg.pg,NomAnt,OptimPath,maxHashWay)
+                        HashWay,OptimPath,maxHashWay=GoPathWayHash(wayPg.pg,NomAnt,OptimPath,maxHashWay)
                         if HashWay!=0:
                             # Такой путь уже есть в Хэш-таблице
                             if Setting.AddFeromonAntZero==0:
@@ -154,7 +156,7 @@ def run_script(folder,folderPg,lock_excel):
                                         KolAntEnd,KolIterationEnd=EndSolution(NomAnt,NomIteration) 
                                         HashWay=10
                                     else:
-                                        HashWay=GoPathWayHash(wayPg.pg,NomAnt,OptimPath,maxHashWay)
+                                        HashWay,OptimPath,maxHashWay=GoPathWayHash(wayPg.pg,NomAnt,OptimPath,maxHashWay)
                                 Stat.StatIterationAntZero(kolIterationAntZero)
                             
                             #Если путь не найден, то обход графа в виде дерева 
@@ -165,7 +167,7 @@ def run_script(folder,folderPg,lock_excel):
                               except StopIteration:
                                   KolAntEnd,KolIterationEnd=EndSolution(NomAnt,NomIteration) 
                               else:
-                                  HashWay=GoPathWayHash(wayGT.pg,NomAnt,OptimPath,maxHashWay)
+                                  HashWay,OptimPath,maxHashWay=GoPathWayHash(wayGT.pg,NomAnt,OptimPath,maxHashWay)
                                   Stat.StatIterationAntZero(gt.KolIterWay) 
                                   Stat.StatIterationAntZeroGraphTree(gt.NomElKolIterWay)
                         # Переход к следующему агенту
@@ -212,7 +214,7 @@ def run_script(folder,folderPg,lock_excel):
             NomStatIteration=NomStatIteration+1
             St.JSONFile.SaveIterJSONFile(Stat,NomStatIteration,Par)
     
-            print(GoTime.now(),' END ',(GoTime.DeltStartTime())*(Setting.KolStatIteration-NomStatIteration),' typeParametr=',Setting.typeParametr,Par,' NomStatIteration ',NomStatIteration,"{:8.3f}".format(Stat.MIterationAntZero/NomStatIteration),' Duration: {} '.format(GoTime.DeltStartTime()),' OptimPath ',OptimPath,version)
+            print(GoTime.now(),NomProc,' END ',(GoTime.DeltStartTime())*(Setting.KolStatIteration-NomStatIteration),' typeParametr=',Setting.typeParametr,Par,' NomStatIteration ',NomStatIteration,"{:8.3f}".format(Stat.MIterationAntZero/NomStatIteration),' Duration: {} '.format(GoTime.DeltStartTime()),' OptimPath ',OptimPath,version)
                
         
         St.JSONFile.RemoveJSONFile()
@@ -226,17 +228,18 @@ def run_script(folder,folderPg,lock_excel):
 
 if __name__ == '__main__':
     lock_excel = multiprocessing.Lock()
+    KolProcess = int(input('Количество процессов: '))
     # Создаем список процессов
     folderPg=os.getcwd()+'/ParametricGraph'
     processes = []
-    for i in range(2):
+    for i in range(KolProcess):
         folder=os.getcwd()+'/Program Process '+str(i)
-        run_script(folder,folderPg,lock_excel)
-#        p = multiprocessing.Process(target=run_script, args=(folder,folderPg,lock_excel))
-#        processes.append(p)
-        print('Start process'+str(i))
-#        p.start()  
+#        run_script(i,folder,folderPg,lock_excel)
+        p = multiprocessing.Process(target=run_script, args=(i,folder,folderPg,lock_excel))
+        processes.append(p)
+#        print('Start process'+str(i))
+        p.start()
     # Ждем завершения всех процессов
-#    for p in processes:
-#        p.join()
-    time.sleep(5)
+    for p in processes:
+        p.join()
+    time.sleep(15)
