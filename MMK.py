@@ -6,7 +6,7 @@ Created on Thu Jul  7 15:57:32 2022
 """
 
 import os
-
+from colorama import init, Fore
 
 import LoadSettingsIniFile as Setting
 import ParametricGraph as pg
@@ -18,10 +18,19 @@ import GraphTree as gt
 import SaveMap
 import GoTime
 
-version='1.4.6'
-dateversion='02.08.2023'
+version='1.4.6.1'
+dateversion='03.08.2023'
 
 def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
+    
+    def colored_print(NomProc):
+        if NomProc==0 or NomProc==7: print(Fore.RED, end=" ")
+        if NomProc==1 or NomProc==8: print(Fore.GREEN, end=" ")
+        if NomProc==2 or NomProc==9: print(Fore.YELLOW, end=" ")
+        if NomProc==3 or NomProc==10: print(Fore.BLUE, end=" ")
+        if NomProc==4 or NomProc==11: print(Fore.MAGENTA, end=" ")
+        if NomProc==5 or NomProc==12: print(Fore.CYAN, end=" ")
+        if NomProc==6 or NomProc==13: print(Fore.WHITE, end=" ")
     
     def clearOptimPath(OptimPath,maxHashWay):
         OptimPath=''
@@ -78,9 +87,12 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
         KolIterationEnd=NomIteration
         print(NomProc,KolAntEnd,KolIterationEnd)
         return KolAntEnd,KolIterationEnd
-        
+    init() # инициализация модуля colorama
+    
+    colored_print(NomProc)
     print(GoTime.now(),NomProc,' Start Program ',TextPrint)     
     if os.path.exists(folder+'/setting.ini'):
+        colored_print(NomProc)
         print(GoTime.now(),NomProc,' LOAD  '+folder+'/setting.ini')  
         Setting.readSetting(folder+'/setting.ini')
     
@@ -93,6 +105,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
     NomIterationTime=0
     St.JSONFile.folderJSON=folder
     OptimPath,maxHashWay=clearOptimPath(OptimPath,maxHashWay)
+    colored_print(NomProc)
     print(NomProc,'Go Parametric Graph')
     # Создание параметрического графа
     NameFile=folderPg+'/'+Setting.NameFileGraph
@@ -100,12 +113,14 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
     Stat=St.stat()
     Par=Setting.GoNZTypeParametr(Setting.typeParametr)
     lock_excel.acquire()
+    colored_print(NomProc)
     print(NomProc,NameFile)
     wayPg = pg.ProbabilityWay(NameFile)
     wayGT = gt.GraphWay(NameFile)
     NameFileRes = folder+'/'+'res.xlsx'
     Stat.SaveParametr(version,NameFileRes,Ant.N,Ant.Ro,Ant.Q,pg.PG.alf1,pg.PG.alf2,pg.PG.alf3,pg.PG.koef1,pg.PG.koef2,pg.PG.koef3,pg.PG.typeProbability,pg.PG.EndAllSolution,NameFile,Setting.AddFeromonAntZero,Setting.SbrosGraphAllAntZero,Setting.goNewIterationAntZero,Setting.goGraphTree,gt.SortPheromon,Setting.KolIteration,Setting.KolStatIteration,Setting.MaxkolIterationAntZero,Setting.typeParametr,len(wayPg.pg.ParametricGraph),wayPg.pg.OF,wayPg.pg.MinOF)
     lock_excel.release()
+    colored_print(NomProc)
     print(NomProc,'Go',TextPrint)
     while Par<=Setting.endParametr:
         Stat.StartStatistic()
@@ -211,6 +226,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
             NomStatIteration=NomStatIteration+1
             St.JSONFile.SaveIterJSONFile(Stat,NomStatIteration,Par)
     
+            colored_print(NomProc)
             print(GoTime.now(),NomProc,' END ',TextPrint,(GoTime.DeltStartTime())*(Setting.KolStatIteration-NomStatIteration),' typeParametr=',Setting.typeParametr,Par,' NomStatIteration ',NomStatIteration,"{:8.3f}".format(Stat.MIterationAntZero/NomStatIteration),' Duration: {} '.format(GoTime.DeltStartTime()),' OptimPath ',OptimPath,version)
                
         
