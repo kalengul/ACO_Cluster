@@ -82,6 +82,10 @@ class stat:
         self.SumProcAntZero = 0
         self.MTime = 0
         self.DTime = 0
+        self.MSocketTime = 0
+        self.DSocketTime = 0
+        self.MClusterTime = 0
+        self.DClusterTime = 0
 
         self.MIterationAntZero = 0
         self.DIterationAntZero = 0
@@ -162,7 +166,16 @@ class stat:
     def SaveTimeIteration(self,time1):
         self.MTime=self.MTime+time1
         self.DTime=self.DTime+time1*time1
-        #print(MTime)
+        
+    def SaveTimeSocket(self,time1):
+        self.MSocketTime=self.MSocketTime+time1
+        self.DSocketTime=self.DSocketTime+time1*time1
+        print(self.MSocketTime)
+        print('Cluster',self.MClusterTime)
+
+    def SaveTimeCluster(self,time1):
+        self.MClusterTime=self.MClusterTime+time1
+        self.DClusterTime=self.DClusterTime+time1*time1
     
     
     def StatIterationAntZero(self,NomIteration):
@@ -175,8 +188,6 @@ class stat:
        while i<len(self.NomElGraphTree): 
          self.NomElGraphTree[i]=self.NomElGraphTree[i]+KolGraphTree[i] 
          i=i+1
-      # print(NomElGraphTree,KolGraphTree)
-     #  print(MIterationAntZero)
     
     
     def StatAllAntZero(self,NomIteration,NomSolution):

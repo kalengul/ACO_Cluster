@@ -26,6 +26,10 @@ shagParametr = 5
 typeParametr = 1
 GoSaveMap2=0
 NameFileGraph='test1.xlsx'
+SocketCluster=0
+SocketIp='127.0.0.1'
+SocketPort=8080
+SocketClusterTime=0
 
 def readSetting(NameFile):
     global endprint
@@ -42,6 +46,10 @@ def readSetting(NameFile):
     global NameFileGraph
     global KolTimeDelEl
     global GoSaveMap2
+    global SocketCluster
+    global SocketIp
+    global SocketPort
+    global SocketClusterTime
     config = configparser.ConfigParser()  # создаём объекта парсера
     config.read(NameFile)  # читаем конфиг
     endprint=int(config["setting_global"]["endprint"])  
@@ -78,6 +86,10 @@ def readSetting(NameFile):
     VirtualKlaster.VivodKlasterExcel=int(config["VirtualKlaster"]["VivodKlasterExcel"]) 
     Stat.lenProcIS=int(config["Stat"]["lenProcIS"]) 
     Stat.KolTimeDelEl=int(config["Stat"]["KolTimeDelEl"]) 
+    SocketCluster=int(config["Cluster"]["SocketCluster"]) 
+#    SocketIp=config["Cluster"]["SocketIp"]
+#    SocketPort=int(config["Cluster"]["SocketPort"]) 
+    SocketClusterTime=float(config["Cluster"]["SocketClusterTime"])
 
 def GoNZTypeParametr(typeParametr):
     global KolIteration

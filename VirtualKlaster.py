@@ -9,6 +9,8 @@ import math
 import SIRVD
 import os
 import win32com.client #Для загрузки из Excel
+import time
+import LoadSettingsIniFile as Setting
 
 VivodKlasterExcel = 0
 
@@ -280,7 +282,7 @@ def SIRVD2(path):
     OF=((10000000000-OF)/1000000000-9.9)*10
     return OF
 
-def GetObjectivFunction(path,TypeKlaster):
+def GetObjectivFunction(path,TypeKlaster,SocketClusterTime):
     OF=0
     if TypeKlaster==1:
        OF=Klaster1(path)
@@ -332,7 +334,9 @@ def GetObjectivFunction(path,TypeKlaster):
        OF=SIRVD2(path) 
 #    print(OF, path,TypeKlaster)
     if VivodKlasterExcel==1:
-      SavePathExcel('Cluster.xlsx',path,OF,TypeKlaster)  
+      SavePathExcel('Cluster.xlsx',path,OF,TypeKlaster) 
+#    print(SocketClusterTime)
+    time.sleep(SocketClusterTime/1000)
     return OF
 
 def GoMin(TypeKlaster):

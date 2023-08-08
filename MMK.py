@@ -17,9 +17,10 @@ import Stat as St
 import GraphTree as gt
 import SaveMap
 import GoTime
+import ClientSocket
 
-version='1.4.6.1'
-dateversion='03.08.2023'
+version='1.4.6.2'
+dateversion='07.08.2023'
 
 def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
     
@@ -64,7 +65,10 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
     def GiveAntPheromonAndHash(pg,PathWay,NomAnt,OptimPath,maxHashWay):
         # Получение нового пути в графе
         # Получения значения целевой функции
-        Ant.AntArr[NomAnt].pheromon = Klaster.GetObjectivFunction(pg.GetWayGraphValue(Ant.AntArr[NomAnt].way),pg.TypeKlaster)
+        if Setting.SocketCluster==0:
+            Ant.AntArr[NomAnt].pheromon = Klaster.GetObjectivFunction(pg.GetWayGraphValue(Ant.AntArr[NomAnt].way),pg.TypeKlaster,Setting.SocketClusterTime)
+        elif Setting.SocketCluster==1:
+            Ant.AntArr[NomAnt].pheromon = ClientSocket.SocketSendOF(Stat,pg.GetWayGraphValue(Ant.AntArr[NomAnt].way),pg.TypeKlaster)
         # Добавление нового ключа в Хэш-таблицу
         Hash.addPath(PathWay,Ant.AntArr[NomAnt].pheromon)
         if Setting.GoSaveMap2==1:
@@ -73,13 +77,14 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
             maxHashWay=Ant.AntArr[NomAnt].pheromon
             OptimPath=PathWay
         Stat.ProcBestOF(Ant.AntArr[NomAnt].pheromon,pg.MaxOptimization,NomIteration,pg.NomSolution)
+        return OptimPath,maxHashWay
     
     def GoPathWayHash(pg,NomAnt,OptimPath,maxHashWay):
         PathWay=Hash.goPathStr(Ant.AntArr[NomAnt].way)
         HashWay = Hash.getPath(PathWay)
         if HashWay==0:   
             pg.NomSolution = pg.NomSolution+1
-            GiveAntPheromonAndHash(pg,PathWay,NomAnt,OptimPath,maxHashWay)
+            OptimPath,maxHashWay=GiveAntPheromonAndHash(pg,PathWay,NomAnt,OptimPath,maxHashWay)
         return HashWay,OptimPath,maxHashWay
     
     def EndSolution(NomAnt,NomIteration):
@@ -109,7 +114,6 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
     print(NomProc,'Go Parametric Graph')
     # Создание параметрического графа
     NameFile=folderPg+'/'+Setting.NameFileGraph
-    #Klaster.TypeKlaster,MaxIter,Stat.BestOF,Stat.LowOF = pg.ReadParametrGraphExcelFile(NameFile)
     Stat=St.stat()
     Par=Setting.GoNZTypeParametr(Setting.typeParametr)
     lock_excel.acquire()
@@ -123,6 +127,8 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
     colored_print(NomProc)
     print(NomProc,'Go',TextPrint)
     while Par<=Setting.endParametr:
+        if Setting.SocketCluster==1:
+           ClientSocket.ConnectSocket(Stat)
         Stat.StartStatistic()
         Stat.StartStatisticGrahTree(len(wayPg.pg.ParametricGraph))
         if Setting.GoSaveMap2==1:
@@ -227,8 +233,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
             St.JSONFile.SaveIterJSONFile(Stat,NomStatIteration,Par)
     
             colored_print(NomProc)
-            print(GoTime.now(),NomProc,' END ',TextPrint,(GoTime.DeltStartTime())*(Setting.KolStatIteration-NomStatIteration),' typeParametr=',Setting.typeParametr,Par,' NomStatIteration ',NomStatIteration,"{:8.3f}".format(Stat.MIterationAntZero/NomStatIteration),' Duration: {} '.format(GoTime.DeltStartTime()),' OptimPath ',OptimPath,version)
-               
+            print(GoTime.now(),NomProc,' END ',TextPrint,(GoTime.DeltStartTime())*(Setting.KolStatIteration-NomStatIteration),' typeParametr=',Setting.typeParametr,Par,' NomStatIteration ',NomStatIteration,"{:8.3f}".format(Stat.MIterationAntZero/NomStatIteration),' Duration: {} '.format(GoTime.DeltStartTime()),' OptimPath ',OptimPath,version) 
         
         St.JSONFile.RemoveJSONFile()
         lock_excel.acquire()
@@ -239,3 +244,5 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
         Par=Par+Setting.shagParametr
         Setting.EndTypeParametr(Setting.typeParametr,Par)
 
+        if Setting.SocketCluster==1:
+            ClientSocket.SocketEnd(Stat)
