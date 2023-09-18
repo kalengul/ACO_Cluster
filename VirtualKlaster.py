@@ -241,6 +241,28 @@ def Bench10(path):
     OF=a+(path[0]-path[1])**2
     return OF
 
+def BenchRozenbrok(path):
+    alf=100
+    OF=-alf*(path[1]-path[0]*path[0])*(path[1]-path[0]*path[0])-(1-path[0])*(1-path[0])
+    return OF
+
+def BenchMultiFunction(path):
+    OF=path[0]*math.sin(4*math.pi*path[0])+path[1]*math.sin(4*math.pi*path[1])
+    return OF
+
+def BenchRozenbrokx10(path):
+    alf=100
+    x1=path[0]*(path[1]+path[2]+path[3]+path[4]+path[5])
+    x2=path[6]*(path[7]+path[8]+path[9]+path[10]+path[11])
+    OF=-alf*(x2-x1*x1)*(x2-x1*x1)-(1-x1)*(1-x1)
+    return OF
+
+def BenchMultiFunctionx10(path):
+    x1=path[0]*(path[1]+path[2]+path[3]+path[4]+path[5])
+    x2=path[6]*(path[7]+path[8]+path[9]+path[10]+path[11])
+    OF=x1*math.sin(4*math.pi*x1)+x2*math.sin(4*math.pi*x2)
+    return OF
+
 def SIRVD1(path):
     SIRVD.Susceptible = 107137780
     SIRVD.Infected = 3609122
@@ -328,6 +350,14 @@ def GetObjectivFunction(path,TypeKlaster,SocketClusterTime):
        OF=Bench10(path) 
     elif TypeKlaster==4109:
        OF=Bench10(path) 
+    elif TypeKlaster==980:
+       OF=BenchRozenbrok(path) 
+    elif TypeKlaster==981:
+       OF=BenchMultiFunction(path) 
+    elif TypeKlaster==9800:
+       OF=BenchRozenbrokx10(path) 
+    elif TypeKlaster==9810:
+       OF=BenchMultiFunctionx10(path) 
     elif TypeKlaster==990:
        OF=SIRVD1(path) 
     elif TypeKlaster==991:

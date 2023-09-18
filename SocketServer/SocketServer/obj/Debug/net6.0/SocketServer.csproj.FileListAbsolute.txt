@@ -1,0 +1,5 @@
+D:\Programs\ACO_Cluster\SocketServer\SocketServer\obj\Debug\net6.0\SocketServer.csproj.AssemblyReference.cache
+D:\Programs\ACO_Cluster\SocketServer\SocketServer\obj\Debug\net6.0\SocketServer.GeneratedMSBuildEditorConfig.editorconfig
+D:\Programs\ACO_Cluster\SocketServer\SocketServer\obj\Debug\net6.0\SocketServer.AssemblyInfoInputs.cache
+D:\Programs\ACO_Cluster\SocketServer\SocketServer\obj\Debug\net6.0\SocketServer.AssemblyInfo.cs
+D:\Programs\ACO_Cluster\SocketServer\SocketServer\obj\Debug\net6.0\SocketServer.csproj.CoreCompileInputs.cache

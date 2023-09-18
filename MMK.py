@@ -19,8 +19,8 @@ import SaveMap
 import GoTime
 import ClientSocket
 
-version='1.4.6.2'
-dateversion='07.08.2023'
+version='1.4.6.3'
+dateversion='18.09.2023'
 
 def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
     
