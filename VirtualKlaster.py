@@ -250,6 +250,7 @@ def BenchMultiFunction(path):
     OF=path[0]*math.sin(4*math.pi*path[0])+path[1]*math.sin(4*math.pi*path[1])
     return OF
 
+
 def BenchRozenbrokx10(path):
     alf=100
     x1=path[0]*(path[1]+path[2]+path[3]+path[4]+path[5])
