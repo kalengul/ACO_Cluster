@@ -250,6 +250,14 @@ def BenchMultiFunction(path):
     OF=path[0]*math.sin(4*math.pi*path[0])+path[1]*math.sin(4*math.pi*path[1])
     return OF
 
+def BenchBirdFunction(path):
+    OF=-math.sin(path[0])*math.exp((1-math.cos(path[1]))*(1-math.cos(path[1])))-math.cos(path[1])*math.exp((1-math.sin(path[0]))*(1-math.sin(path[0])))-(path[0]-path[1])*(path[0]-path[1])
+    return OF
+
+def BenchShevefeliaFunction(path):
+    OF=-abs(path[0])-abs(path[1])-abs(path[0])*abs(path[1])
+    return OF
+
 
 def BenchRozenbrokx10(path):
     alf=100
@@ -355,6 +363,10 @@ def GetObjectivFunction(path,TypeKlaster,SocketClusterTime):
        OF=BenchRozenbrok(path) 
     elif TypeKlaster==981:
        OF=BenchMultiFunction(path) 
+    elif TypeKlaster==982:
+      OF=BenchBirdFunction(path) 
+    elif TypeKlaster==983:
+      OF=BenchShevefeliaFunction(path) 
     elif TypeKlaster==9800:
        OF=BenchRozenbrokx10(path) 
     elif TypeKlaster==9810:
