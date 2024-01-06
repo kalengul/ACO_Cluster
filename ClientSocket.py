@@ -33,7 +33,7 @@ def SocketSendOF(Stat,way,TypeKlaster):
         else:
             data+=tmp
     Stat.SaveTimeCluster((GoTime.DeltClusterTime()).total_seconds())
-    data=float(data)
+    data=data.decode('utf-8')
     return data
 
 def SocketEnd(Stat):

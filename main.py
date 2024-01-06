@@ -18,12 +18,13 @@ if __name__ == '__main__':
     kol_process = int(input('Количество процессов: ')) 
     
     # Создаем процесс для кластер-сервера
-    p = multiprocessing.Process(target=server_cluster.run_server_cluster) 
-    p.start()
+    #p = multiprocessing.Process(target=server_cluster.run_server_cluster) 
+    #p.start()
     
     # Создаем список процессов для ММК
     folder_pg = os.getcwd() + '/ParametricGraph' # определяем путь к папке с параметрическими графами
     processes = [] 
+    print(os.getcwd())
     
     for i in range(kol_process): 
         folder = os.getcwd() + '/Program Process ' + str(i) # определяем путь к папке с данными ММК для текущего процесса (файлы Setting.ini и результатов)

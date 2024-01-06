@@ -40,6 +40,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
         
     def clearStartIteration(Stat,pg,OptimPath,maxHashWay,NomIteration,KolAntZero,KolAntEnd,KolIterationEnd,NomIterationTime):
         pg.ClearPheromon(1)
+        Ant.createElitAgent()
         Hash.HashPath.clear()
         Hash.MaxPath.clear()
         Stat.SbrosStatistic()
@@ -69,6 +70,8 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
             Ant.AntArr[NomAnt].pheromon = Klaster.GetObjectivFunction(pg.GetWayGraphValue(Ant.AntArr[NomAnt].way),pg.TypeKlaster,Setting.SocketClusterTime)
         elif Setting.SocketCluster==1:
             Ant.AntArr[NomAnt].pheromon = ClientSocket.SocketSendOF(Stat,pg.GetWayGraphValue(Ant.AntArr[NomAnt].way),pg.TypeKlaster)
+        # Элитные агенты, добавление в массив
+        Ant.addElitAgent(Ant.AntArr[NomAnt])
         # Добавление нового ключа в Хэш-таблицу
         Hash.addPath(PathWay,Ant.AntArr[NomAnt].pheromon)
         if Setting.GoSaveMap2==1:
@@ -92,6 +95,20 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
         KolIterationEnd=NomIteration
         print(NomProc,KolAntEnd,KolIterationEnd)
         return KolAntEnd,KolIterationEnd
+    
+    def AddPheromonAnt(ant, addKolSolution = True):
+        if ant.pheromon!=0:
+            NomWay = 0
+            while NomWay<len(ant.way):
+                if wayPg.pg.MaxOptimization==1:
+                    wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].pheromon = wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].pheromon + (1-Ant.Ro)*Ant.Q*ant.pheromon
+                else:
+                    wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].pheromon = wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].pheromon + (1-Ant.Ro)*Ant.Q/ant.pheromon
+                if addKolSolution:
+                    wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].KolSolution = wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].KolSolution + 1
+                    wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].KolSolutionAll = wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].KolSolutionAll + 1
+                NomWay = NomWay+1
+    
     init() # инициализация модуля colorama
     
     colored_print(NomProc)
@@ -205,16 +222,11 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                 # Добавление феромона
                 NomAnt=0
                 while NomAnt<KolAntEnd:
-                    if Ant.AntArr[NomAnt].pheromon!=0:
-                        NomWay = 0
-                        while NomWay<len(Ant.AntArr[NomAnt].way):
-                            if wayPg.pg.MaxOptimization==1:
-                                wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].pheromon = wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].pheromon + (1-Ant.Ro)*Ant.Q*Ant.AntArr[NomAnt].pheromon
-                            else:
-                                wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].pheromon = wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].pheromon + (1-Ant.Ro)*Ant.Q/Ant.AntArr[NomAnt].pheromon
-                            wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].KolSolution = wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].KolSolution + 1
-                            wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].KolSolutionAll = wayPg.pg.ParametricGraph[NomWay].node[Ant.AntArr[NomAnt].way[NomWay]].KolSolutionAll + 1
-                            NomWay = NomWay+1
+                    AddPheromonAnt(Ant.AntArr[NomAnt])
+                    NomAnt=NomAnt+1
+                NomAnt=0
+                while NomAnt<Ant.KolElitAgent:
+                    AddPheromonAnt(Ant.ElitAntArr[NomAnt], addKolSolution = False)
                     NomAnt=NomAnt+1
                 
                 
@@ -239,7 +251,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
         lock_excel.acquire()
         Stat.SaveStatisticsExcel(NameFileRes,GoTime.DeltStartTime(),NomStatIteration,OptimPath,Par)
         if Setting.GoSaveMap2==1:
-            SaveMap.PrintElMap2(folder++'/'+'MapFile.xlsx')
+            SaveMap.PrintElMap2(folder+'/'+'MapFile.xlsx')
         lock_excel.release()
         Par=Par+Setting.shagParametr
         Setting.EndTypeParametr(Setting.typeParametr,Par)

@@ -70,6 +70,7 @@ def readSetting(NameFile):
     Ant.N=float(config["ant"]["N"]) 
     Ant.Q=float(config["ant"]["Q"]) 
     Ant.Ro=float(config["ant"]["Ro"]) 
+    Ant.KolElitAgent=int(config["ant"]["KolElitAgent"]) 
     
     ParametricGraph.PG.alf1=float(config["ParametricGraph"]["alf1"]) 
     ParametricGraph.PG.alf2=float(config["ParametricGraph"]["alf2"]) 

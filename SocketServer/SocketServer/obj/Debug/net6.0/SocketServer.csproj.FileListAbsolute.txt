@@ -3,3 +3,13 @@ D:\Programs\ACO_Cluster\SocketServer\SocketServer\obj\Debug\net6.0\SocketServer.
 D:\Programs\ACO_Cluster\SocketServer\SocketServer\obj\Debug\net6.0\SocketServer.AssemblyInfoInputs.cache
 D:\Programs\ACO_Cluster\SocketServer\SocketServer\obj\Debug\net6.0\SocketServer.AssemblyInfo.cs
 D:\Programs\ACO_Cluster\SocketServer\SocketServer\obj\Debug\net6.0\SocketServer.csproj.CoreCompileInputs.cache
+D:\Programs\ACO_Cluster\SocketServer\SocketServer\bin\Debug\net6.0\SocketServer.exe
+D:\Programs\ACO_Cluster\SocketServer\SocketServer\bin\Debug\net6.0\SocketServer.deps.json
+D:\Programs\ACO_Cluster\SocketServer\SocketServer\bin\Debug\net6.0\SocketServer.runtimeconfig.json
+D:\Programs\ACO_Cluster\SocketServer\SocketServer\bin\Debug\net6.0\SocketServer.dll
+D:\Programs\ACO_Cluster\SocketServer\SocketServer\bin\Debug\net6.0\ref\SocketServer.dll
+D:\Programs\ACO_Cluster\SocketServer\SocketServer\bin\Debug\net6.0\SocketServer.pdb
+D:\Programs\ACO_Cluster\SocketServer\SocketServer\obj\Debug\net6.0\SocketServer.dll
+D:\Programs\ACO_Cluster\SocketServer\SocketServer\obj\Debug\net6.0\ref\SocketServer.dll
+D:\Programs\ACO_Cluster\SocketServer\SocketServer\obj\Debug\net6.0\SocketServer.pdb
+D:\Programs\ACO_Cluster\SocketServer\SocketServer\obj\Debug\net6.0\SocketServer.genruntimeconfig.cache

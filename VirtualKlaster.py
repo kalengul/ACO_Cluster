@@ -243,11 +243,11 @@ def Bench10(path):
 
 def BenchRozenbrok(path):
     alf=100
-    OF=-alf*(path[1]-path[0]*path[0])*(path[1]-path[0]*path[0])-(1-path[0])*(1-path[0])
+    OF=-alf*(path[1]-path[0]*path[0])*(path[1]-path[0]*path[0])-(1-path[0])*(1-path[0])+2500
     return OF
 
 def BenchMultiFunction(path):
-    OF=path[0]*math.sin(4*math.pi*path[0])+path[1]*math.sin(4*math.pi*path[1])
+    OF=path[0]*math.sin(4*math.pi*path[0])+path[1]*math.sin(4*math.pi*path[1])+5
     return OF
 
 def BenchBirdFunction(path):
@@ -255,7 +255,7 @@ def BenchBirdFunction(path):
     return OF
 
 def BenchShevefeliaFunction(path):
-    OF=-abs(path[0])-abs(path[1])-abs(path[0])*abs(path[1])
+    OF=-abs(path[0])-abs(path[1])-abs(path[0])*abs(path[1])+120
     return OF
 
 
@@ -263,13 +263,13 @@ def BenchRozenbrokx10(path):
     alf=100
     x1=path[0]*(path[1]+path[2]+path[3]+path[4]+path[5])
     x2=path[6]*(path[7]+path[8]+path[9]+path[10]+path[11])
-    OF=-alf*(x2-x1*x1)*(x2-x1*x1)-(1-x1)*(1-x1)
+    OF=-alf*(x2-x1*x1)*(x2-x1*x1)-(1-x1)*(1-x1)+2500
     return OF
 
 def BenchMultiFunctionx10(path):
     x1=path[0]*(path[1]+path[2]+path[3]+path[4]+path[5])
     x2=path[6]*(path[7]+path[8]+path[9]+path[10]+path[11])
-    OF=x1*math.sin(4*math.pi*x1)+x2*math.sin(4*math.pi*x2)
+    OF=x1*math.sin(4*math.pi*x1)+x2*math.sin(4*math.pi*x2)+5
     return OF
 
 def SIRVD1(path):
