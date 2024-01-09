@@ -246,8 +246,26 @@ def BenchRozenbrok(path):
     OF=-alf*(path[1]-path[0]*path[0])*(path[1]-path[0]*path[0])-(1-path[0])*(1-path[0])+2500
     return OF
 
+def BenchRozenbrokO(path):
+    alf=100
+    OF=-alf*(path[1]-path[0]*path[0])*(path[1]-path[0]*path[0])-(1-path[0])*(1-path[0])
+    return OF
+
+def BenchRozenbrokM(path):
+    alf=100
+    OF=abs(-alf*(path[1]-path[0]*path[0])*(path[1]-path[0]*path[0])-(1-path[0])*(1-path[0]))
+    return OF
+
 def BenchMultiFunction(path):
     OF=path[0]*math.sin(4*math.pi*path[0])+path[1]*math.sin(4*math.pi*path[1])+5
+    return OF
+
+def BenchMultiFunctionO(path):
+    OF=path[0]*math.sin(4*math.pi*path[0])+path[1]*math.sin(4*math.pi*path[1])
+    return OF
+
+def BenchMultiFunctionM(path):
+    OF=abs(path[0]*math.sin(4*math.pi*path[0])+path[1]*math.sin(4*math.pi*path[1]))
     return OF
 
 def BenchBirdFunction(path):
@@ -256,6 +274,14 @@ def BenchBirdFunction(path):
 
 def BenchShevefeliaFunction(path):
     OF=-abs(path[0])-abs(path[1])-abs(path[0])*abs(path[1])+120
+    return OF
+
+def BenchShevefeliaFunctionO(path):
+    OF=-abs(path[0])-abs(path[1])-abs(path[0])*abs(path[1])
+    return OF
+
+def BenchShevefeliaFunctionM(path):
+    OF=abs(-abs(path[0])-abs(path[1])-abs(path[0])*abs(path[1]))
     return OF
 
 
@@ -361,12 +387,24 @@ def GetObjectivFunction(path,TypeKlaster,SocketClusterTime):
        OF=Bench10(path) 
     elif TypeKlaster==980:
        OF=BenchRozenbrok(path) 
+    elif TypeKlaster==9801:
+       OF=BenchRozenbrokO(path) 
+    elif TypeKlaster==9802:
+       OF=BenchRozenbrokM(path) 
     elif TypeKlaster==981:
        OF=BenchMultiFunction(path) 
+    elif TypeKlaster==9811:
+       OF=BenchMultiFunctionO(path) 
+    elif TypeKlaster==9812:
+       OF=BenchMultiFunctionM(path) 
     elif TypeKlaster==982:
       OF=BenchBirdFunction(path) 
     elif TypeKlaster==983:
       OF=BenchShevefeliaFunction(path) 
+    elif TypeKlaster==9831:
+      OF=BenchShevefeliaFunctionO(path) 
+    elif TypeKlaster==9832:
+      OF=BenchShevefeliaFunctionM(path) 
     elif TypeKlaster==9800:
        OF=BenchRozenbrokx10(path) 
     elif TypeKlaster==9810:

@@ -23,56 +23,73 @@ class Server
         bool endServe = true; // флаг окончания обслуживания клиента
         while (endServe)
         { // цикл обслуживания клиента
-            byte[] data = new byte[1024]; // буфер для приема данных от клиента
-            while (!Encoding.ASCII.GetString(data).Contains("\r\n"))
-            { // пока не получен полный пакет данных
-                int bytesReceived = clientEndPoint.Receive(data, data.Length, 0); // получение данных от клиента
-                if (bytesReceived <= 0)
-                { // если соединение разорвано
-                    break;
+            Console.WriteLine($"Сообщение от клиента: {clientEndPoint.RemoteEndPoint} - {DateTime.Now}");
+            lock (arg) // Блокируем сокет для обработки только одним потоком
+            {
+                Console.WriteLine($"Захват блокировки: {clientEndPoint.RemoteEndPoint} - {DateTime.Now}");
+                byte[] data = new byte[1024]; // буфер для приема данных от клиента
+                int totalBytesReceived = 0;
+                while (true)
+                {
+                    byte[] singleByte = new byte[1];
+                    int bytesReceived = clientEndPoint.Receive(singleByte, 0, 1, SocketFlags.None); // получение одного байта данных от клиента
+                    if (bytesReceived <= 0)
+                    { // если соединение разорвано
+                        break;
+                    }
+                    data[totalBytesReceived] = singleByte[0];
+                    totalBytesReceived++;
+                    if (Encoding.ASCII.GetString(data, 0, totalBytesReceived).Contains("\r\n"))
+                    { // если получен полный пакет данных
+                        break;
+                    }
                 }
+
+                string dataString = Encoding.ASCII.GetString(data); // преобразование байтов в строку
+                Console.WriteLine(" -> dataString|" + dataString + "|");
+                string typePacket = dataString.Substring(0, 5); // извлечение типа пакета
+                string payload = dataString.Substring(5); // извлечение полезной нагрузки пакета
+                if (typePacket == "WAYAG")
+                { // если получен пакет с запросом на вычисление целевой функции
+                    string[] payloadSplit = payload.Split('*'); // разделение полезной нагрузки на тип кластера и путь
+                    int nom = int.Parse(payloadSplit[0]);
+                    int typeKlaster = int.Parse(payloadSplit[1]); // преобразование типа кластера в целое число
+                    double[] path = Array.ConvertAll(payloadSplit[2].Split('|'), double.Parse); // преобразование пути в массив чисел с плавающей точкой
+                    double OF = GetObjectivFunction(path, typeKlaster, SocketClusterTime[nom]); // вычисление целевой функции
+                    string stringNumbers = OF.ToString("F32") + "\r\n"; // преобразование результата в строку
+                    clientEndPoint.Send(Encoding.ASCII.GetBytes(stringNumbers)); // отправка результата клиенту
+                }
+                else if (typePacket == "START")
+                {// если получен пакет с запоминанием времени старта
+                    int nom = int.Parse(payload);
+                    StartEnd[nom].Reset(); // обнуляем значение времени
+                    StartEnd[nom].Start(); // запускаем замер заново
+                    Console.WriteLine("Время выполнения: " + StartEnd[nom].Elapsed);
+                }
+                else if (typePacket == "FINSH")
+                {// если получен пакет с ожиданием отправки времени работы кластера
+                    int nom = int.Parse(payload);
+                    StartEnd[nom].Stop();
+                    Console.WriteLine("Время выполнения: " + StartEnd[nom].Elapsed);
+                    string timeElapsedString = StartEnd[nom].Elapsed.ToString(); // преобразование времени выполнения в строку
+                    string timeElapsedMessage = timeElapsedString + "\r\n"; // создание сообщения для отправки
+                    clientEndPoint.Send(Encoding.ASCII.GetBytes(timeElapsedMessage)); // отправка сообщения клиенту
+                }
+                else if (typePacket == "CTIME")
+                { // если получен пакет с временем работы кластера
+                    string[] payloadSplit = payload.Split('*'); // разделение полезной нагрузки на время и номер клиента
+                    int nom = int.Parse(payloadSplit[0]);
+                    SocketClusterTime[nom] = (float)int.Parse(payloadSplit[1]); // сохранение времени работы кластера для данного клиента
+                }
+                else if (typePacket == "CLOSE")
+                { // если получен пакет с запросом на закрытие соединения
+                    endServe = false; // установка флага окончания обслуживания клиента
+                    Console.WriteLine($"Client closed {clientEndPoint.RemoteEndPoint}"); // вывод сообщения о закрытии соединения с клиентом
+                    clientEndPoint.Close(); // закрытие соединения с клиентом
+                }
+               
             }
-            string dataString = Encoding.ASCII.GetString(data); // преобразование байтов в строку
-            Console.WriteLine(dataString);
-            string typePacket = dataString.Substring(0, 5); // извлечение типа пакета
-            string payload = dataString.Substring(5); // извлечение полезной нагрузки пакета
-            Console.WriteLine("|"+payload +"|");
-            Console.WriteLine("|" + typePacket + "|");
-            if (typePacket == "WAYAG")
-            { // если получен пакет с запросом на вычисление целевой функции
-                string[] payloadSplit = payload.Split('*'); // разделение полезной нагрузки на тип кластера и путь
-                int nom = int.Parse(payloadSplit[0]);
-                int typeKlaster = int.Parse(payloadSplit[1]); // преобразование типа кластера в целое число
-                double[] path = Array.ConvertAll(payloadSplit[2].Split('|'), double.Parse); // преобразование пути в массив чисел с плавающей точкой
-                double OF = GetObjectivFunction(path, typeKlaster, SocketClusterTime[nom]); // вычисление целевой функции
-                string stringNumbers = OF.ToString("F32") + "\r\n"; // преобразование результата в строку
-                clientEndPoint.Send(Encoding.ASCII.GetBytes(stringNumbers)); // отправка результата клиенту
-            }
-            else if (typePacket == "START")
-            {// если получен пакет с запоминанием времени старта
-                int nom = int.Parse(payload);
-                StartEnd[nom].Reset(); // обнуляем значение времени
-                StartEnd[nom].Start(); // запускаем замер заново
-                Console.WriteLine("Время выполнения: " + StartEnd[nom].Elapsed);
-            }
-            else if (typePacket == "FINSH")
-            {// если получен пакет с ожиданием отправки времени работы кластера
-                int nom = int.Parse(payload);
-                StartEnd[nom].Stop();
-                Console.WriteLine("Время выполнения: " + StartEnd[nom].Elapsed);
-            }
-            else if (typePacket == "CTIME")
-            { // если получен пакет с временем работы кластера
-                string[] payloadSplit = payload.Split('*'); // разделение полезной нагрузки на время и номер клиента
-                int nom = int.Parse(payloadSplit[0]);
-                SocketClusterTime[nom] = (float)int.Parse(payloadSplit[1]); // сохранение времени работы кластера для данного клиента
-            }
-            else if (typePacket == "CLOSE")
-            { // если получен пакет с запросом на закрытие соединения
-                endServe = false; // установка флага окончания обслуживания клиента
-                Console.WriteLine($"Client closed {clientEndPoint.RemoteEndPoint}"); // вывод сообщения о закрытии соединения с клиентом
-                clientEndPoint.Close(); // закрытие соединения с клиентом
-            }
+            Console.WriteLine($"Освобождение блокировки: {DateTime.Now}");
         }
     }
 
@@ -183,13 +200,13 @@ class Server
     static public double BenchRozenbrok(double[] path)
     {
         double alf = 100;
-        double OF = -alf * (path[1] - path[0] * path[0]) * (path[1] - path[0] * path[0]) - (1 - path[0]) * (1 - path[0]);
+        double OF = -alf * (path[1] - path[0] * path[0]) * (path[1] - path[0] * path[0]) - (1 - path[0]) * (1 - path[0])+2500;
         return OF;
     }
 
     static public double BenchMultiFunction(double[] path)
     {
-        double OF = path[0] * Math.Sin(4 * Math.PI * path[0]) + path[1] * Math.Sin(4 * Math.PI * path[1]);
+        double OF = path[0] * Math.Sin(4 * Math.PI * path[0]) + path[1] * Math.Sin(4 * Math.PI * path[1])+5;
         return OF;
     }
 
@@ -201,7 +218,7 @@ class Server
 
     static public double BenchShevefeliaFunction(double[] path)
     {
-        double OF = -Math.Abs(path[0]) - Math.Abs(path[1]) - Math.Abs(path[0]) * Math.Abs(path[1]);
+        double OF = -Math.Abs(path[0]) - Math.Abs(path[1]) - Math.Abs(path[0]) * Math.Abs(path[1])+120;
         return OF;
     }
 
@@ -210,7 +227,7 @@ class Server
         double alf = 100;
         double x1 = path[0] * (path[1] + path[2] + path[3] + path[4] + path[5]);
         double x2 = path[6] * (path[7] + path[8] + path[9] + path[10] + path[11]);
-        double OF = -alf * (x2 - x1 * x1) * (x2 - x1 * x1) - (1 - x1) * (1 - x1);
+        double OF = -alf * (x2 - x1 * x1) * (x2 - x1 * x1) - (1 - x1) * (1 - x1)+2500;
         return OF;
     }
 
@@ -218,7 +235,7 @@ class Server
     {
         double x1 = path[0] * (path[1] + path[2] + path[3] + path[4] + path[5]);
         double x2 = path[6] * (path[7] + path[8] + path[9] + path[10] + path[11]);
-        double OF = x1 * Math.Sin(4 * Math.PI * x1) + x2 * Math.Sin(4 * Math.PI * x2);
+        double OF = x1 * Math.Sin(4 * Math.PI * x1) + x2 * Math.Sin(4 * Math.PI * x2)+5;
         return OF;
     }
     static public double Klaster2(double[] path)
