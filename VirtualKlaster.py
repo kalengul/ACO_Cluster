@@ -418,6 +418,8 @@ def GetObjectivFunction(path,TypeKlaster,SocketClusterTime):
       SavePathExcel('Cluster.xlsx',path,OF,TypeKlaster) 
 #    print(SocketClusterTime)
     time.sleep(SocketClusterTime/1000)
+    if OF==0:
+        OF=0.1**100
     return OF
 
 def GoMin(TypeKlaster):

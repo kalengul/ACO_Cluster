@@ -26,7 +26,7 @@ shagParametr = 5
 typeParametr = 1
 GoSaveMap2=0
 NameFileGraph='test1.xlsx'
-SocketCluster=0
+SocketKolCluster=0
 SocketIp='127.0.0.1'
 SocketPort=8080
 SocketClusterTime=0
@@ -46,10 +46,7 @@ def readSetting(NameFile):
     global NameFileGraph
     global KolTimeDelEl
     global GoSaveMap2
-    global SocketCluster
-    global SocketIp
-    global SocketPort
-    global SocketClusterTime
+
     config = configparser.ConfigParser()  # создаём объекта парсера
     config.read(NameFile)  # читаем конфиг
     endprint=int(config["setting_global"]["endprint"])  
@@ -71,6 +68,7 @@ def readSetting(NameFile):
     Ant.Q=float(config["ant"]["Q"]) 
     Ant.Ro=float(config["ant"]["Ro"]) 
     Ant.KolElitAgent=int(config["ant"]["KolElitAgent"]) 
+    Ant.DeltZeroPheromon=int(config["ant"]["DeltZeroPheromon"])
     
     ParametricGraph.PG.alf1=float(config["ParametricGraph"]["alf1"]) 
     ParametricGraph.PG.alf2=float(config["ParametricGraph"]["alf2"]) 
@@ -86,11 +84,23 @@ def readSetting(NameFile):
     
     VirtualKlaster.VivodKlasterExcel=int(config["VirtualKlaster"]["VivodKlasterExcel"]) 
     Stat.lenProcIS=int(config["Stat"]["lenProcIS"]) 
-    Stat.KolTimeDelEl=int(config["Stat"]["KolTimeDelEl"]) 
-    SocketCluster=int(config["Cluster"]["SocketCluster"]) 
-#    SocketIp=config["Cluster"]["SocketIp"]
-#    SocketPort=int(config["Cluster"]["SocketPort"]) 
+    Stat.KolTimeDelEl=int(config["Stat"]["KolTimeDelEl"])
+
+
+def readSettingVirtualClaster(NameFile):    
+    global SocketKolCluster
+    global SocketIp
+    global SocketPort
+    global SocketClusterTime
+    
+    config = configparser.ConfigParser()  # создаём объекта парсера
+    config.read(NameFile)  # читаем конфиг
+ 
+    SocketKolCluster=int(config["Cluster"]["SocketKolCluster"]) 
+    SocketIp=config["Cluster"]["SocketIp"]
+    SocketPort=int(config["Cluster"]["SocketPort"]) 
     SocketClusterTime=float(config["Cluster"]["SocketClusterTime"])
+    print(SocketIp,SocketPort)
 
 def GoNZTypeParametr(typeParametr):
     global KolIteration

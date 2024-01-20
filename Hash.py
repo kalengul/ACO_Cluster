@@ -21,9 +21,9 @@ def KolHash():
 
 def getPath (path):
     if HashPath.get(path):
-        return HashPath[path]
+        return True, HashPath[path]
     else:
-        return 0
+        return False, 0
     
 def addPath (path,OF):
   if HashPath.get(path):

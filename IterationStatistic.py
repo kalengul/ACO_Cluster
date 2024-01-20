@@ -4,7 +4,8 @@ Created on Wed Aug  2 21:47:29 2023
 
 @author: Юрий
 """
-import MMK
+
+import SettingProcessMMK as setting_process_MMK # модуль для запуска ММК
 import configparser
 import os
 import GoTime
@@ -59,7 +60,8 @@ def run_script(nom_proc, folder, folder_pg, lock_excel):
             # Сохраняем значение параметра koef1 в конфигурационный файл
             save_parametr(folder, nom_proc, type_config, subtype_config, array_parametr[i])
             text_print=text_print2+' koef1='+array_parametr[i]
-            # Запускаем ММК с заданными параметрами
-            MMK.run_script(text_print, nom_proc, folder, folder_pg, lock_excel)
+            #Запуск настройки процесса ММК
+            setting_process_MMK.run_script(text_print, nom_proc, folder, folder_pg, lock_excel)
+
             i=i+1
         j=j+1

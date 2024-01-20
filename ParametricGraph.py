@@ -30,6 +30,7 @@ class PG:
     koef1 = 1 #1
     koef2 = 1 #1
     koef3 = 0
+    difZero=0
     typeProbability = 3
     EndAllSolution = 0
     NomCurrentPG=0
@@ -125,6 +126,13 @@ class PG:
             i=i+1
         return way
 
+    def AddIterationLayerKolSolution(self):
+        #print('AddIterationLayerKolSolution')
+        NomPar=0
+        while NomPar<len(self.ParametricGraph):
+            self.ParametricGraph[NomPar].AddIterationLayerKolSolution()
+            NomPar=NomPar+1    
+
 class Node:  #Узел графа
     def __init__(self,value):
 
@@ -138,6 +146,7 @@ class Node:  #Узел графа
         self.KolSolutionNorm = 1 
         if allClear==1:
             self.KolSolutionAll=0
+            self.KolSolutionIteration = []
         
     def DecreasePheromon(self,par):
         self.pheromon=self.pheromon*par
@@ -158,7 +167,13 @@ class Parametr:
        while NomEl<len(self.node):
            self.node[NomEl].DecreasePheromon(par)
            NomEl=NomEl+1
-                                
+                          
+   def AddIterationLayerKolSolution(self):
+       NomEl=0
+       while NomEl<len(self.node):
+           self.node[NomEl].KolSolutionIteration.append(0)
+           NomEl=NomEl+1
+            
 class ProbabilityWay:
     def __init__(self,NameFile):  
         global NomCurrentPG
