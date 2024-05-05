@@ -25,6 +25,8 @@ endParametr = 100
 shagParametr = 5
 typeParametr = 1
 GoSaveMap2=0
+GoParallelAnt=0
+KolParallelAnt=0
 NameFileGraph='test1.xlsx'
 SocketKolCluster=0
 SocketIp='127.0.0.1'
@@ -46,6 +48,8 @@ def readSetting(NameFile):
     global NameFileGraph
     global KolTimeDelEl
     global GoSaveMap2
+    global GoParallelAnt
+    global KolParallelAnt
 
     config = configparser.ConfigParser()  # создаём объекта парсера
     config.read(NameFile)  # читаем конфиг
@@ -62,8 +66,10 @@ def readSetting(NameFile):
     MaxkolIterationAntZero=int(config["setting_global"]["MaxkolIterationAntZero"]) 
     KolTimeDelEl=int(config["setting_global"]["KolTimeDelEl"]) 
     NameFileGraph=config["setting_global"]["NameFileGraph"]
-    GoSaveMap2=int(config["setting_global"]["GoSaveMap2"]) 
-    
+    GoSaveMap2=int(config["setting_global"]["GoSaveMap2"])
+    GoParallelAnt = int(config["setting_global"]["GoParallelAnt"])
+    KolParallelAnt = int(config["setting_global"]["KolParallelAnt"])
+
     Ant.N=float(config["ant"]["N"]) 
     Ant.Q=float(config["ant"]["Q"]) 
     Ant.Ro=float(config["ant"]["Ro"]) 

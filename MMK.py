@@ -6,6 +6,10 @@ Created on Thu Jul  7 15:57:32 2022
 """
 
 import os
+import threading
+import concurrent.futures
+import multiprocessing
+import time
 from colorama import init, Fore
 import sys #для максимального отрицательного числа
 
@@ -20,11 +24,11 @@ import SaveMap
 import GoTime
 import ClientSocket
 
-version='1.4.6.7'
-dateversion='19.01.2024'
+version='1.4.7 parallel'
+dateversion='05.05.2024'
 
 def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
-    
+
     def colored_print(NomProc):
         if NomProc==0 or NomProc==7: print(Fore.RED, end=" ")
         if NomProc==1 or NomProc==8: print(Fore.GREEN, end=" ")
@@ -33,7 +37,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
         if NomProc==4 or NomProc==11: print(Fore.MAGENTA, end=" ")
         if NomProc==5 or NomProc==12: print(Fore.CYAN, end=" ")
         if NomProc==6 or NomProc==13: print(Fore.WHITE, end=" ")
-    
+
     def clearoptPathHash(optMax = True):
         optPathHash=''
         if optMax:
@@ -41,7 +45,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
         else:
             optOFHash=+sys.maxsize - 1
         return optPathHash,optOFHash
-        
+
     def clearStartIteration(Stat,pg):
         pg.ClearPheromon(1)
         pg.NomSolution = 0
@@ -57,15 +61,15 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
         GoTime.setStartTime()
         GoTime.setTimeIteration()
         return optPathHash,optOFHash,NomIteration,KolAntEnd,KolIterationEnd,NomIterationTime
-        
+
     def SaveTimeFromFile(NomIterationTime,NomIteration):
          #Сохранение времени в файл
          if (NomIteration == NomIterationTime):
              Stat.SaveTime(NomIteration/Setting.KolIteration*Stat.KolTimeDelEl,(GoTime.DeltTimeIteration()).total_seconds())
             # print(NomIterationTime,datetime.now()-TimeIteration)
-             GoTime.setTimeIteration() 
-             NomIterationTime=NomIterationTime+Setting.KolIteration/Stat.KolTimeDelEl    
-    
+             GoTime.setTimeIteration()
+             NomIterationTime=NomIterationTime+Setting.KolIteration/Stat.KolTimeDelEl
+
     def AddDeltZeroPheromon(pg,delt):
         #Пройти во всем слоям параметрического графа
         NomParametr=0
@@ -80,7 +84,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                     NomSolution=NomSolution+1
                 NomNode=NomNode+1
             NomParametr=NomParametr+1
-    
+
     def GiveAntPheromonAndHash(pg,PathWay,NomAnt,optPathHash,optOFHash):
         # Получение нового пути в графе
         # Получения значения целевой функции
@@ -107,28 +111,28 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
             optPathHash=PathWay
         Stat.ProcBestOF(Ant.AntArr[NomAnt].OF,pg.MaxOptimization,NomIteration,pg.NomSolution)
         return optPathHash,optOFHash
-    
+
     def GoPathWayHash(pg,NomAnt,optPathHash,optOFHash):
         PathWay=Hash.goPathStr(Ant.AntArr[NomAnt].way)
         FindHash, HashWay = Hash.getPath(PathWay)
         #if PathWay==';150;150':
         #    print(FindHash,HashWay,Ant.AntArr[NomAnt].way,NomAnt,Ant.AntArr[NomAnt].OF)
-        if FindHash==False:             
+        if FindHash==False:
             pg.NomSolution = pg.NomSolution+1
 
             optPathHash,optOFHash=GiveAntPheromonAndHash(pg,PathWay,NomAnt,optPathHash,optOFHash)
         return HashWay,optPathHash,optOFHash
-    
+
     def EndSolution(NomAnt,NomIteration):
-        KolAntEnd=NomAnt 
+        KolAntEnd=NomAnt
         KolIterationEnd=NomIteration
         print(NomProc,KolAntEnd,KolIterationEnd)
         return KolAntEnd,KolIterationEnd
-    
+
     def AddPheromonAnt(ant,NomIteration, addKolSolution = True):
         #print(wayPg.pg.AllSolution,wayPg.pg.NomSolution,ant.ignore,ant.way,NomIteration,len(wayPg.pg.ParametricGraph[0].node[0].KolSolutionIteration),addKolSolution,ant.OF, wayPg.pg.difZero,ant.OF+wayPg.pg.difZero)
         if ant.ignore==0:
-           
+
             #print('ant.OF=',ant.OF,'wayPg.pg.difZero=',wayPg.pg.difZero,'=',(1-Ant.Ro)*Ant.Q*(ant.OF+wayPg.pg.difZero))
             NomWay = 0
             while NomWay<len(ant.way):
@@ -148,16 +152,86 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                         wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].KolSolutionIteration[NomIteration-1]=wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].KolSolutionIteration[NomIteration-1]+1
                 #print(NomIteration-1,wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].KolSolutionIteration)
                 NomWay = NomWay+1
-    
+
+    def run_ant(NomAnt, KolAntZero, optPathHash, optOFHash):
+        #print('Start', NomAnt)
+        if GoAnt(NomAnt, KolAntZero, optPathHash, optOFHash):
+            with lock:
+                global KolAntEnd, KolIterationEnd
+                KolAntEnd, KolIterationEnd = EndSolution(NomAnt, NomIteration)
+            #print('optPathHash=',optPathHash, 'optOFHash=',optOFHash)
+        #print('STOP2', NomAnt)
+        sem.release()  # Освобождаем семафор после завершения работы потока
+
+    def GoAnt(NomAnt,KolAntZero,optPathHash, optOFHash):
+        EndIteration = False
+        try:
+            Ant.AntArr[NomAnt].way = next(wayPg)
+        except StopIteration:
+            EndIteration = True
+
+        else:
+            # Проверка полученного пути в Хэш-Таблице
+            HashWay, optPathHash, optOFHash = GoPathWayHash(wayPg.pg, NomAnt, optPathHash, optOFHash)
+            if HashWay != 0:
+                # Такой путь уже есть в Хэш-таблице
+                if Setting.AddFeromonAntZero == 0:
+                    Ant.AntArr[NomAnt].OF = 0
+                    Ant.AntArr[NomAnt].ignore = 1
+                else:
+                    Ant.AntArr[NomAnt].OF = HashWay
+                Stat.KolAntZero = Stat.KolAntZero + 1
+                KolAntZero = KolAntZero + 1
+
+                # Если включены повторные итерации алгоритма
+                if Setting.goNewIterationAntZero == 1:
+                    # Если путь не найден, то продолжать генерацию маршрутов, пока не найдется уникальный
+                    Ant.AntArr[NomAnt].ignore = 0
+                    kolIterationAntZero = 0
+                    while HashWay != 0 and kolIterationAntZero < Setting.MaxkolIterationAntZero:
+                        kolIterationAntZero = kolIterationAntZero + 1
+                        try:
+                            Ant.AntArr[NomAnt].way = next(wayPg)
+                        except StopIteration:
+                            EndIteration = True
+                            return EndIteration,optPathHash, optOFHash
+                            HashWay = 10
+                        else:
+                            HashWay, optPathHash, optOFHash = GoPathWayHash(wayPg.pg, NomAnt, optPathHash, optOFHash)
+                    if kolIterationAntZero == Setting.MaxkolIterationAntZero:
+                        Ant.AntArr[NomAnt].ignore = 1
+                    Stat.StatIterationAntZero(kolIterationAntZero)
+
+                # Если путь не найден, то обход графа в виде дерева
+                if Setting.goGraphTree == 1:
+                    Ant.AntArr[NomAnt].ignore = 0
+                    try:
+                        gt.StartWayGraphTree = Ant.AntArr[NomAnt].way
+                        Ant.AntArr[NomAnt].way = next(wayGT)
+                    except StopIteration:
+                        KolAntEnd, KolIterationEnd = EndSolution(NomAnt, NomIteration)
+                    else:
+                        HashWay, optPathHash, optOFHash = GoPathWayHash(wayGT.pg, NomAnt, optPathHash, optOFHash)
+                        Stat.StatIterationAntZero(gt.KolIterWay)
+                        Stat.StatIterationAntZeroGraphTree(gt.NomElKolIterWay)
+
+        return EndIteration,optPathHash, optOFHash
+
     init() # инициализация модуля colorama
-    
+
+
     colored_print(NomProc)
-    print(GoTime.now(),NomProc,' Start Program ',TextPrint)     
+    print(GoTime.now(),NomProc,' Start Program ',TextPrint)
     if os.path.exists(folder+'/setting.ini'):
         colored_print(NomProc)
-        print(GoTime.now(),NomProc,' LOAD  '+folder+'/setting.ini')  
+        print(GoTime.now(),NomProc,' LOAD  '+folder+'/setting.ini')
         Setting.readSetting(folder+'/setting.ini')
-    
+
+
+    # Устанавливаем максимальное количество потоков
+    sem = threading.Semaphore(Setting.KolParallelAnt)
+    # Создаем блокировку для безопасного доступа к глобальным переменным
+    lock = threading.Lock()
 
     St.JSONFile.folderJSON=folder
     colored_print(NomProc)
@@ -172,7 +246,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
     wayPg = pg.ProbabilityWay(NameFile)
     wayGT = gt.GraphWay(NameFile)
     NameFileRes = folder+'/'+'res.xlsx'
-    Stat.SaveParametr(version,NameFileRes,Ant.N,Ant.Ro,Ant.Q,pg.PG.alf1,pg.PG.alf2,pg.PG.alf3,pg.PG.koef1,pg.PG.koef2,pg.PG.koef3,pg.PG.typeProbability,pg.PG.EndAllSolution,NameFile,Setting.AddFeromonAntZero,Setting.SbrosGraphAllAntZero,Setting.goNewIterationAntZero,Setting.goGraphTree,gt.SortPheromon,Setting.KolIteration,Setting.KolStatIteration,Setting.MaxkolIterationAntZero,Setting.typeParametr,len(wayPg.pg.ParametricGraph),wayPg.pg.OF,wayPg.pg.MinOF)
+    Stat.SaveParametr(version,NameFileRes,Ant.N,Ant.Ro,Ant.Q,Ant.KolElitAgent, Ant.DeltZeroPheromon, pg.PG.alf1,pg.PG.alf2,pg.PG.alf3,pg.PG.koef1,pg.PG.koef2,pg.PG.koef3,pg.PG.typeProbability,pg.PG.EndAllSolution,NameFile,Setting.AddFeromonAntZero,Setting.SbrosGraphAllAntZero,Setting.goNewIterationAntZero,Setting.goGraphTree,gt.SortPheromon,Setting.KolIteration,Setting.KolStatIteration,Setting.MaxkolIterationAntZero,Setting.typeParametr,Setting.GoParallelAnt,Setting.KolParallelAnt,len(wayPg.pg.ParametricGraph),wayPg.pg.OF,wayPg.pg.MinOF)
     lock_excel.release()
     colored_print(NomProc)
     print(NomProc,'Go',TextPrint)
@@ -192,58 +266,67 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                 Ant.CreateAntArray(Ant.N+1)
                 NomAnt=0
                 KolAntZero=0
+                if Setting.GoParallelAnt == 0:
                 # Проход по всем агентам
-                while NomAnt<KolAntEnd:
-                    try:
-                        Ant.AntArr[NomAnt].way=next(wayPg)
-                    except StopIteration:
-                        KolAntEnd,KolIterationEnd=EndSolution(NomAnt,NomIteration) 
-                    else:
-                        # Проверка полученного пути в Хэш-Таблице
-                        HashWay,optPathHash,optOFHash=GoPathWayHash(wayPg.pg,NomAnt,optPathHash,optOFHash)
-                        if HashWay!=0:
-                            # Такой путь уже есть в Хэш-таблице
-                            if Setting.AddFeromonAntZero==0:
-                                Ant.AntArr[NomAnt].OF=0
-                                Ant.AntArr[NomAnt].ignore=1
-                            else:
-                                Ant.AntArr[NomAnt].OF=HashWay
-                            Stat.KolAntZero = Stat.KolAntZero+1
-                            KolAntZero = KolAntZero+1
-                            
-                            #Если включены повторные итерации алгоритма
-                            if Setting.goNewIterationAntZero==1:
-                                #Если путь не найден, то продолжать генерацию маршрутов, пока не найдется уникальный
-                                Ant.AntArr[NomAnt].ignore=0
-                                kolIterationAntZero=0
-                                while HashWay!=0 and kolIterationAntZero<Setting.MaxkolIterationAntZero:
-                                    kolIterationAntZero = kolIterationAntZero+1
-                                    try:
-                                        Ant.AntArr[NomAnt].way=next(wayPg)
-                                    except StopIteration:
-                                        KolAntEnd,KolIterationEnd=EndSolution(NomAnt,NomIteration) 
-                                        HashWay=10
-                                    else:
-                                        HashWay,optPathHash,optOFHash=GoPathWayHash(wayPg.pg,NomAnt,optPathHash,optOFHash)
-                                if kolIterationAntZero==Setting.MaxkolIterationAntZero:
-                                    Ant.AntArr[NomAnt].ignore=1
-                                Stat.StatIterationAntZero(kolIterationAntZero)
-                            
-                            #Если путь не найден, то обход графа в виде дерева 
-                            if Setting.goGraphTree==1:
-                              Ant.AntArr[NomAnt].ignore=0
-                              try:
-                                  gt.StartWayGraphTree=Ant.AntArr[NomAnt].way 
-                                  Ant.AntArr[NomAnt].way=next(wayGT)
-                              except StopIteration:
-                                  KolAntEnd,KolIterationEnd=EndSolution(NomAnt,NomIteration) 
-                              else:
-                                  HashWay,optPathHash,optOFHash=GoPathWayHash(wayGT.pg,NomAnt,optPathHash,optOFHash)
-                                  Stat.StatIterationAntZero(gt.KolIterWay) 
-                                  Stat.StatIterationAntZeroGraphTree(gt.NomElKolIterWay)
-                        # Переход к следующему агенту
-                        NomAnt=NomAnt+1
-                    
+                    while NomAnt<KolAntEnd:
+                        TrueEndGoAnt, optPathHash, optOFHash = GoAnt(NomAnt, KolAntZero, optPathHash, optOFHash)
+                        if TrueEndGoAnt:
+                            KolAntEnd, KolIterationEnd = EndSolution(NomAnt, NomIteration)
+                        else:
+                            # Переход к следующему агенту
+                            NomAnt=NomAnt+1
+                elif (Setting.GoParallelAnt == 1) and (Setting.KolParallelAnt==0):
+                    # Создание ThreadPoolExecutor с KolAntEnd потоками
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=int(KolAntEnd)) as executor:
+                        # Запуск функции GoAnt для каждого потока
+                        future = executor.submit(GoAnt, NomAnt, KolAntZero, optPathHash, optOFHash)
+                        # Ожидание результата и получение его
+                        TrueEndGoAnt, optPathHash, optOFHash = future.result()
+                        if TrueEndGoAnt:
+                            KolAntEnd, KolIterationEnd = EndSolution(NomAnt, NomIteration)
+                elif (Setting.GoParallelAnt == 1) and (Setting.KolParallelAnt!=0):
+                    # Определение количества потоков
+                    max_workers = min(int(Setting.KolParallelAnt), KolAntEnd)
+                    # Использование ThreadPoolExecutor для запуска функции GoAnt в нескольких потоках
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+                        # Список для хранения результатов
+                        results = []
+                        # Запуск функции GoAnt для каждого потока
+                        for NomAnt in range(int(KolAntEnd/Setting.KolParallelAnt)):
+                            future = executor.submit(GoAnt, NomAnt, KolAntZero, optPathHash, optOFHash)
+                            results.append(future)
+                        # Обработка результатов
+                        for future in concurrent.futures.as_completed(results):
+                            TrueEndGoAnt, optPathHash, optOFHash = future.result()
+                            if TrueEndGoAnt:
+                                KolAntEnd, KolIterationEnd = EndSolution(NomAnt, NomIteration)
+                elif (Setting.GoParallelAnt == 2) and (Setting.KolParallelAnt==0):
+                    threads = []
+                    # Запуск функции GoAnt в KolAntEnd потоках
+                    for NomAnt in range(int(KolAntEnd)):
+                        thread = threading.Thread(target=GoAnt, args=(NomAnt, KolAntZero, optPathHash, optOFHash))
+                        threads.append(thread)
+                        thread.start()
+                    # Ожидание завершения всех потоков
+                    for thread in threads:
+                        thread.join()
+                elif (Setting.GoParallelAnt == 3) and (Setting.KolParallelAnt==0):
+                    # Создание ThreadPoolExecutor с KolAntEnd потоками
+                    with concurrent.futures.ProcessPoolExecutor(max_workers=int(KolAntEnd)) as executor:
+                        # Запуск функции GoAnt для каждого процесса
+                        future = executor.submit(GoAnt, NomAnt, KolAntZero, optPathHash, optOFHash)
+                        # Ожидание результата и получение его
+                        #TrueEndGoAnt, optPathHash, optOFHash = future.result()
+                elif (Setting.GoParallelAnt == 4) and (Setting.KolParallelAnt==0):
+                    processes = []
+                    # Запуск функции GoAnt в KolAntEnd процессах
+                    for NomAnt in range(int(KolAntEnd)):
+                        p = multiprocessing.Process(target=GoAnt, args=(NomAnt, KolAntZero, optPathHash, optOFHash))
+                        processes.append(p)
+                        p.start()
+                    # Ждем завершения всех процессов
+                    for p in processes:
+                        p.join()
                 #print('wayPg.pg.AddIterationLayerKolSolution')
                 if Ant.DeltZeroPheromon != 0:
                     wayPg.pg.AddIterationLayerKolSolution()
@@ -251,13 +334,13 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                 Stat.ProcAntZero = Stat.ProcAntZero+KolAntZero/Ant.N
                 if KolAntZero==Ant.N:
                     if Setting.SbrosGraphAllAntZero==1:
-                      wayPg.pg.ClearPheromon(0)  
+                      wayPg.pg.ClearPheromon(0)
                     Stat.KolAllAntZero = Stat.KolAllAntZero+1
                     Stat.StatAllAntZero(NomIteration, wayPg.pg.NomSolution)
-        
+
                 # Испарение феромона
                 wayPg.pg.DecreasePheromon(Ant.Ro)
-                    
+
                 # Добавление феромона
                 NomAnt=0
                 while NomAnt<KolAntEnd:
@@ -267,25 +350,25 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                 while NomAnt<Ant.KolElitAgent:
                     AddPheromonAnt(Ant.ElitAntArr[NomAnt],NomIteration, addKolSolution = False)
                     NomAnt=NomAnt+1
-                
-                
+
+
                 # Переход к следующей итерации
                 if (pg.PG.typeProbability==1) or (pg.PG.typeProbability==3):
                     wayPg.pg.NormPheromon()
                 Ant.DelAllAgent()
                 NomIteration=NomIteration+1
                 #wayPg.pg.PrintParametricGraph(1)
-    
-            
-            
+
+
+
             Stat.EndStatistik(NomIteration, wayPg.pg.NomSolution)
             Stat.SaveTimeIteration((GoTime.DeltStartTime()).total_seconds())
             NomStatIteration=NomStatIteration+1
             St.JSONFile.SaveIterJSONFile(Stat,NomStatIteration,Par)
-    
+
             colored_print(NomProc)
-            print(GoTime.now(),NomProc,' END ',TextPrint,(GoTime.DeltStartTime())*(Setting.KolStatIteration-NomStatIteration),' typeParametr=',Setting.typeParametr,Par,' NomStatIteration ',NomStatIteration,"{:8.3f}".format(Stat.MIterationAntZero/NomStatIteration),' Duration: {} '.format(GoTime.DeltStartTime()),' optPathHash ',optPathHash,version) 
-        
+            print(GoTime.now(),NomProc,' END ',TextPrint,(GoTime.DeltStartTime())*(Setting.KolStatIteration-NomStatIteration),' typeParametr=',Setting.typeParametr,Par,' NomStatIteration ',NomStatIteration,"{:8.3f}".format(Stat.MIterationAntZero/NomStatIteration),' Duration: {} '.format(GoTime.DeltStartTime()),' optPathHash ',optPathHash,version)
+
         St.JSONFile.RemoveJSONFile()
         lock_excel.acquire()
         Stat.SaveStatisticsExcel(NameFileRes,GoTime.DeltStartTime(),NomStatIteration,optPathHash,Par)
