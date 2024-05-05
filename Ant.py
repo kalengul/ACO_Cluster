@@ -20,6 +20,8 @@ class Ant:
        self.way = []
        self.OF = 0
        self.ignore = 0
+       self.ZeroAnt = 0
+       self.kolIterationAntZero = 0
        
 def DelAllAgent():
     NomAnt=0
@@ -27,6 +29,11 @@ def DelAllAgent():
         AntArr[NomAnt].way.clear()
         NomAnt=NomAnt+1
     AntArr.clear()
+
+def AddAntArray():
+    ant=Ant()
+    AntArr.append(ant)
+    return len(AntArr)
 
 def CreateAntArray(n):
     i=1
