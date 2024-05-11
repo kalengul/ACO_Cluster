@@ -14,8 +14,8 @@ import LoadSettingsIniFile as load_settings_ini_file
 def run_script(text_print, nom_proc, folder, folder_pg, lock_excel):
     #Настроить процесс на CPU
     # Устанавливаем аффинити процессу
-    p = psutil.Process(os.getpid())
-    p.cpu_affinity([nom_proc])
+    #p = psutil.Process(os.getpid())
+    #p.cpu_affinity([nom_proc])
     #Подключить необходимое количество сокет-соединений с сервером
     #Загрузка данных из ini файла
     load_settings_ini_file.readSettingVirtualClaster(folder+'/setting.ini')
