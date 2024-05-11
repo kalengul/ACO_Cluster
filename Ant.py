@@ -19,6 +19,7 @@ class Ant:
    def __init__(self):
        self.way = []
        self.OF = 0
+       self.ArrOF = []
        self.ignore = 0
        
 def DelAllAgent():

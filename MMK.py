@@ -9,6 +9,7 @@ import os
 import threading
 import concurrent.futures
 import multiprocessing
+from numba import jit,njit
 import time
 from colorama import init, Fore
 import sys #для максимального отрицательного числа
@@ -24,7 +25,7 @@ import SaveMap
 import GoTime
 import ClientSocket
 
-version='1.4.7 parallel'
+version='1.4.8 parallel'
 dateversion='05.05.2024'
 
 def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
@@ -48,7 +49,6 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
 
     def clearStartIteration(Stat,pg):
         pg.ClearPheromon(1)
-        pg.NomSolution = 0
         Ant.createElitAgent(pg.MaxOptimization==1)
         Hash.HashPath.clear()
         Hash.MaxPath.clear()
@@ -80,7 +80,8 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                 #Пройти по всем элементам массива итераций
                 NomSolution=0
                 while NomSolution<len(pg.ParametricGraph[NomParametr].node[NomNode].KolSolutionIteration):
-                    pg.ParametricGraph[NomParametr].node[NomNode].pheromon=pg.ParametricGraph[NomParametr].node[NomNode].pheromon+((1-Ant.Ro)*Ant.Q)**(len(pg.ParametricGraph[NomParametr].node[NomNode].KolSolutionIteration)-NomSolution)*delt*pg.ParametricGraph[NomParametr].node[NomNode].KolSolutionIteration[NomSolution]
+                    if len(pg.ParametricGraph[NomParametr].node[NomNode].KolSolutionIteration)-NomSolution>0.9:
+                        pg.ParametricGraph[NomParametr].node[NomNode].pheromon=pg.ParametricGraph[NomParametr].node[NomNode].pheromon+pow((1-Ant.Ro)*Ant.Q,((len(pg.ParametricGraph[NomParametr].node[NomNode].KolSolutionIteration)-NomSolution)))*delt*pg.ParametricGraph[NomParametr].node[NomNode].KolSolutionIteration[NomSolution]
                     NomSolution=NomSolution+1
                 NomNode=NomNode+1
             NomParametr=NomParametr+1
@@ -89,13 +90,14 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
         # Получение нового пути в графе
         # Получения значения целевой функции
         if Setting.SocketKolCluster==0:
-            Ant.AntArr[NomAnt].OF = Klaster.GetObjectivFunction(pg.GetWayGraphValue(Ant.AntArr[NomAnt].way),pg.TypeKlaster,Setting.SocketClusterTime)
+            Ant.AntArr[NomAnt].OF,Ant.AntArr[NomAnt].ArrOF = Klaster.GetObjectivFunction(pg.GetWayGraphValue(Ant.AntArr[NomAnt].way),pg.TypeKlaster,Setting.SocketClusterTime)
         #elif Setting.SocketCluster==1:
         #    Ant.AntArr[NomAnt].OF = ClientSocket.SocketSendOF(Stat,pg.GetWayGraphValue(Ant.AntArr[NomAnt].way),pg.TypeKlaster)
         # Добавление нового ключа в Хэш-таблицу
         Hash.addPath(PathWay,Ant.AntArr[NomAnt].OF)
         # Элитные агенты, добавление в массив
-        Ant.addElitAgent(Ant.AntArr[NomAnt],pg.MaxOptimization==1)
+        if Ant.KolElitAgent !=0:
+            Ant.addElitAgent(Ant.AntArr[NomAnt],pg.MaxOptimization==1)
         #Проверка на отрицательный феромон
         if Ant.DeltZeroPheromon != 0:
             if Ant.AntArr[NomAnt].OF+pg.difZero<0:
@@ -105,7 +107,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                 pg.difZero=abs(Ant.AntArr[NomAnt].OF)
 
         if Setting.GoSaveMap2==1:
-            SaveMap.AddElMap2(Ant.AntArr[NomAnt].way[0], Ant.AntArr[NomAnt].way[1], pg.NomSolution)
+            SaveMap.AddElMap2(Ant.AntArr[NomAnt].way[0]*(Ant.AntArr[NomAnt].way[1]+Ant.AntArr[NomAnt].way[2]+Ant.AntArr[NomAnt].way[3]+Ant.AntArr[NomAnt].way[4]+Ant.AntArr[NomAnt].way[5]), Ant.AntArr[NomAnt].way[6]*(Ant.AntArr[NomAnt].way[7]+Ant.AntArr[NomAnt].way[8]+Ant.AntArr[NomAnt].way[9]+Ant.AntArr[NomAnt].way[10]+Ant.AntArr[NomAnt].way[11]), pg.NomSolution)
         if ((pg.MaxOptimization==1) and (Ant.AntArr[NomAnt].OF>optOFHash)) or ((pg.MaxOptimization==0) and (Ant.AntArr[NomAnt].OF<optOFHash)):
             optOFHash=Ant.AntArr[NomAnt].OF
             optPathHash=PathWay
@@ -153,16 +155,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                 #print(NomIteration-1,wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].KolSolutionIteration)
                 NomWay = NomWay+1
 
-    def run_ant(NomAnt, KolAntZero, optPathHash, optOFHash):
-        #print('Start', NomAnt)
-        if GoAnt(NomAnt, KolAntZero, optPathHash, optOFHash):
-            with lock:
-                global KolAntEnd, KolIterationEnd
-                KolAntEnd, KolIterationEnd = EndSolution(NomAnt, NomIteration)
-            #print('optPathHash=',optPathHash, 'optOFHash=',optOFHash)
-        #print('STOP2', NomAnt)
-        sem.release()  # Освобождаем семафор после завершения работы потока
-
+#    @njit(parallel=True)
     def GoAnt(NomAnt,KolAntZero,optPathHash, optOFHash):
         EndIteration = False
         try:
@@ -254,7 +247,8 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
         Stat.StartStatistic()
         Stat.StartStatisticGrahTree(len(wayPg.pg.ParametricGraph))
         if Setting.GoSaveMap2==1:
-            SaveMap.CreateElMap2(len(wayPg.pg.ParametricGraph[0].node), len(wayPg.pg.ParametricGraph[1].node))
+            SaveMap.CreateElMap2(1200, 1200)
+#            SaveMap.CreateElMap2(len(wayPg.pg.ParametricGraph[0].node), len(wayPg.pg.ParametricGraph[1].node))
         NomStatIteration = 0
         while NomStatIteration<Setting.KolStatIteration:
             GoTime.setPrintTime()
@@ -275,25 +269,21 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                         else:
                             # Переход к следующему агенту
                             NomAnt=NomAnt+1
-                elif (Setting.GoParallelAnt == 1) and (Setting.KolParallelAnt==0):
-                    # Создание ThreadPoolExecutor с KolAntEnd потоками
-                    with concurrent.futures.ThreadPoolExecutor(max_workers=int(KolAntEnd)) as executor:
-                        # Запуск функции GoAnt для каждого потока
-                        future = executor.submit(GoAnt, NomAnt, KolAntZero, optPathHash, optOFHash)
-                        # Ожидание результата и получение его
-                        TrueEndGoAnt, optPathHash, optOFHash = future.result()
-                        if TrueEndGoAnt:
-                            KolAntEnd, KolIterationEnd = EndSolution(NomAnt, NomIteration)
-                elif (Setting.GoParallelAnt == 1) and (Setting.KolParallelAnt!=0):
+                elif (Setting.GoParallelAnt == 1):
                     # Определение количества потоков
-                    max_workers = min(int(Setting.KolParallelAnt), KolAntEnd)
+                    if Setting.KolParallelAnt==0:
+                        max_workers=KolAntEnd
+                    else:
+                        max_workers = min(int(Setting.KolParallelAnt), KolAntEnd)
                     # Использование ThreadPoolExecutor для запуска функции GoAnt в нескольких потоках
                     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
                         # Список для хранения результатов
                         results = []
                         # Запуск функции GoAnt для каждого потока
-                        for NomAnt in range(int(KolAntEnd/Setting.KolParallelAnt)):
+                        while NomAnt < KolAntEnd:
                             future = executor.submit(GoAnt, NomAnt, KolAntZero, optPathHash, optOFHash)
+                            # Переход к следующему агенту
+                            NomAnt = NomAnt + 1
                             results.append(future)
                         # Обработка результатов
                         for future in concurrent.futures.as_completed(results):
@@ -337,7 +327,6 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                       wayPg.pg.ClearPheromon(0)
                     Stat.KolAllAntZero = Stat.KolAllAntZero+1
                     Stat.StatAllAntZero(NomIteration, wayPg.pg.NomSolution)
-
                 # Испарение феромона
                 wayPg.pg.DecreasePheromon(Ant.Ro)
 

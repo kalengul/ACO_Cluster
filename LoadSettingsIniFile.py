@@ -111,6 +111,7 @@ def readSettingVirtualClaster(NameFile):
 def GoNZTypeParametr(typeParametr):
     global KolIteration
     global MaxkolIterationAntZero
+    global KolParallelAnt
     if typeParametr==1:
       return Ant.N  
     elif typeParametr==2:
@@ -132,11 +133,14 @@ def GoNZTypeParametr(typeParametr):
     elif typeParametr==10:
       return ParametricGraph.PG.alf3  
     elif typeParametr==11:
-      return ParametricGraph.PG.koef3  
+      return ParametricGraph.PG.koef3
+    elif typeParametr == 12:
+      return KolParallelAnt
     
 def EndTypeParametr(typeParametr,Par):
     global KolIteration
     global MaxkolIterationAntZero
+    global KolParallelAnt
     if typeParametr==1:
       Ant.N=Par   
     elif typeParametr==2:
@@ -158,5 +162,7 @@ def EndTypeParametr(typeParametr,Par):
     elif typeParametr==10:
       ParametricGraph.PG.alf3=Par 
     elif typeParametr==11:
-      ParametricGraph.PG.koef3=Par 
+      ParametricGraph.PG.koef3=Par
+    elif typeParametr==12:
+      KolParallelAnt=Par
       

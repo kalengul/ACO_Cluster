@@ -107,6 +107,8 @@ class PG:
             NomPar=NomPar+1        
 
     def ClearPheromon(self,allClear):
+        self.NomSolution = 0
+        self.difZero = 0
         NomPar=0
         while NomPar<len(self.ParametricGraph):
             self.ParametricGraph[NomPar].ClearAllNode(allClear)

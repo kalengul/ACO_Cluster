@@ -298,6 +298,37 @@ def BenchMultiFunctionx10(path):
     OF=x1*math.sin(4*math.pi*x1)+x2*math.sin(4*math.pi*x2)+5
     return OF
 
+def BenchShafferaFunctionx10(path):
+    x1=path[0]*(path[1]+path[2]+path[3]+path[4]+path[5]+path[6])
+    x2=path[7]*(path[8]+path[9]+path[10]+path[11]+path[12]+path[13])
+    OF=1/2-(math.sin(math.sqrt(x1*x1+x2*x2))*math.sin(math.sqrt(x1*x1+x2*x2))-0.5)/(1+0.001*(x1*x1+x2*x2))
+    return OF
+
+def BenchKornFunctionx10(path):
+    x1=path[0]*(path[1]+path[2]+path[3]+path[4]+path[5])
+    x2=path[6]*(path[7]+path[8]+path[9]+path[10]+path[11])
+    z=complex(x1, x2)
+    OF=1/(1+abs(pow(z,6)-1))
+    return OF
+
+def BenchRastriginFunctionx10(path):
+    x1=path[0]*(path[1]+path[2]+path[3]+path[4]+path[5])
+    x2=path[6]*(path[7]+path[8]+path[9]+path[10]+path[11])
+    OF=-20+(10*math.cos(2*math.pi*x1)-x1*x1)+(10*math.cos(2*math.pi*x2)-x2*x2)
+    return OF
+
+def BenchBirdFunctionx10(path):
+    x1=path[0]*(path[1]+path[2]+path[3]+path[4]+path[5])
+    x2=path[6]*(path[7]+path[8]+path[9]+path[10]+path[11])
+    OF=-math.sin(x1)*math.exp(pow(1-math.cos(x2),2))-math.cos(x2)*math.exp(pow(1-math.sin(x1),2))-pow(x1-x2,2)
+    return OF
+
+def BenchEkliFunctionx10(path):
+    x1=path[0]*(path[1]+path[2]+path[3]+path[4]+path[5]+path[6])
+    x2=path[7]*(path[8]+path[9]+path[10]+path[11]+path[12]+path[13])
+    OF=-math.e+20*math.exp(-math.sqrt((pow(x1,2)+pow(x2,2))/50))+math.exp(1/2*(math.cos(2*math.pi*x1)+math.cos(2*math.pi*x2)))
+    return OF
+
 def SIRVD1(path):
     SIRVD.Susceptible = 107137780
     SIRVD.Infected = 3609122
@@ -341,6 +372,7 @@ def SIRVD2(path):
 
 def GetObjectivFunction(path,TypeKlaster,SocketClusterTime):
     OF=0
+    ArrOf = []
     if TypeKlaster==1:
        OF=Klaster1(path)
     elif TypeKlaster==2:
@@ -408,19 +440,34 @@ def GetObjectivFunction(path,TypeKlaster,SocketClusterTime):
     elif TypeKlaster==9800:
        OF=BenchRozenbrokx10(path) 
     elif TypeKlaster==9810:
-       OF=BenchMultiFunctionx10(path) 
+       OF=BenchMultiFunctionx10(path)
+    elif TypeKlaster==984:
+      OF=BenchShafferaFunctionx10(path)
+    elif TypeKlaster==985:
+      OF=BenchKornFunctionx10(path)
+    elif TypeKlaster==986:
+      OF=BenchRastriginFunctionx10(path)
+    elif TypeKlaster==987:
+      OF=BenchBirdFunctionx10(path)
+    elif TypeKlaster==988:
+      OF=BenchEkliFunctionx10(path)
     elif TypeKlaster==990:
        OF=SIRVD1(path) 
     elif TypeKlaster==991:
-       OF=SIRVD2(path) 
-#    print(OF, path,TypeKlaster)
+       OF=SIRVD2(path)
+    elif TypeKlaster == 5000:
+       OF = BenchBirdFunctionx10(path)
+       ArrOf.append(BenchBirdFunctionx10(path))
+       ArrOf.append(BenchRastriginFunctionx10(path))
+    #print(OF, path,TypeKlaster)
     if VivodKlasterExcel==1:
       SavePathExcel('Cluster.xlsx',path,OF,TypeKlaster) 
 #    print(SocketClusterTime)
-    time.sleep(SocketClusterTime/1000)
+    #time.sleep(SocketClusterTime/1000)
     if OF==0:
         OF=0.1**100
-    return OF
+
+    return OF,ArrOf
 
 def GoMin(TypeKlaster):
     path=[]
