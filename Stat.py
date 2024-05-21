@@ -89,9 +89,65 @@ class stat:
         self.MIterationAntZero = 0
         self.DIterationAntZero = 0
 
+        self.MkolParetto = 0
+        self.MkolParettoElement = 0
+        self.MkolCurrentParettoSearch = 0
+        self.DkolCurrentParettoSearch = 0
+        self.MkolCurrentParettoElement = 0
+        self.MkolComparisonParetoSet = 0
+        self.DkolComparisonParetoSet = 0
+
         self.BestOF = 0
         self.LowOF = 0
         self.StartStatistic()
+
+
+    def save_pareto_set_excel(self,NameFile,TimeParetoSet,AllParetoSet,pathArrParetoSet,AllSolution):
+        Excel = win32com.client.Dispatch("Excel.Application")
+        wb = Excel.Workbooks.Open(NameFile)
+        sheet = wb.ActiveSheet
+        sheet.Cells(1, 1).value = 'TimeParetoSet'
+        sheet.Cells(1, 2).value = (TimeParetoSet).total_seconds()
+        sheet.Cells(1, 3).value = 'AllParetoSet'
+        sheet.Cells(1, 4).value = len(AllParetoSet)
+        sheet.Cells(1, 5).value = 'AllSolution'
+        sheet.Cells(1, 6).value = AllSolution
+        NomParetoSet=0
+        while NomParetoSet<len(AllParetoSet):
+            ElNomParetoSet=0
+            while ElNomParetoSet<len(AllParetoSet[NomParetoSet]):
+                sheet.Cells(2+NomParetoSet, 1+ElNomParetoSet).value = AllParetoSet[NomParetoSet][ElNomParetoSet]
+                ElNomParetoSet=ElNomParetoSet+1
+            ElNomParetoSet = 0
+            while ElNomParetoSet < len(pathArrParetoSet[NomParetoSet]):
+                sheet.Cells(2 + NomParetoSet, 2 + len(AllParetoSet[NomParetoSet]) + ElNomParetoSet).value = pathArrParetoSet[NomParetoSet][ElNomParetoSet]
+                ElNomParetoSet = ElNomParetoSet + 1
+            NomParetoSet=NomParetoSet+1
+        # сохраняем рабочую книгу
+        wb.Save()
+        # закрываем ее
+        wb.Close()
+        # закрываем COM объект
+        Excel.Quit()
+
+    def SaveStatisticsExcelParetto(self,NameFile,koliter,NomC):
+        Excel = win32com.client.Dispatch("Excel.Application")
+        wb = Excel.Workbooks.Open(NameFile)
+        sheet = wb.ActiveSheet
+        NomR = sheet.Cells(1, 1).value
+        sheet.Cells(NomR-1, NomC).value=self.MkolParetto
+        sheet.Cells(NomR-1, NomC+1).value = self.MkolParettoElement
+        sheet.Cells(NomR-1, NomC+2).value = self.MkolCurrentParettoSearch/ koliter
+        sheet.Cells(NomR-1, NomC+3).value = self.DkolCurrentParettoSearch/ koliter
+        sheet.Cells(NomR-1, NomC+4).value = self.MkolCurrentParettoElement
+        sheet.Cells(NomR-1, NomC+5).value = self.MkolComparisonParetoSet/ koliter
+        sheet.Cells(NomR-1, NomC+6).value = self.DkolComparisonParetoSet/ koliter
+        # сохраняем рабочую книгу
+        wb.Save()
+        # закрываем ее
+        wb.Close()
+        # закрываем COM объект
+        Excel.Quit()
 
     def SaveStatisticsExcel(self, NameFile, time, koliter, OptimPath, P):
         Excel = win32com.client.Dispatch("Excel.Application")
@@ -177,7 +233,6 @@ class stat:
         self.DClusterTime = self.DClusterTime + time1 * time1
 
     def StatIterationAntZero(self, NomIteration):
-        # NomIteration=NomIteration+1
         self.MIterationAntZero = self.MIterationAntZero + NomIteration
         self.DIterationAntZero = self.DIterationAntZero + NomIteration * NomIteration
 
@@ -195,12 +250,22 @@ class stat:
             self.DSltnAllAntZero = self.DSltnAllAntZero + NomSolution * NomSolution
             self.EndAllAntZero = 1
 
+    def StatParettoSet(self,kolParetto,kolParettoElement,CurrentParettoSearch,kolCurrentParettoElement,ComparisonParetoSet):
+        self.MkolParetto = kolParetto
+        self.MkolParettoElement = kolParettoElement
+        #print(self.MkolCurrentParettoSearch, self.DkolCurrentParettoSearch)
+        self.MkolCurrentParettoSearch = self.MkolCurrentParettoSearch+CurrentParettoSearch
+        self.DkolCurrentParettoSearch = self.DkolCurrentParettoSearch+CurrentParettoSearch*CurrentParettoSearch
+        #print(self.MkolCurrentParettoSearch, self.DkolCurrentParettoSearch)
+        self.MkolCurrentParettoElement = kolCurrentParettoElement
+        self.MkolComparisonParetoSet = self.MkolComparisonParetoSet + len(ComparisonParetoSet)
+        self.DkolComparisonParetoSet = self.DkolComparisonParetoSet + len(ComparisonParetoSet) * len(ComparisonParetoSet)
+
     def EndStatistik(self, NomIteration, NomSolution):
         self.MSolution = self.MSolution + NomSolution
         self.DSolution = self.DSolution + NomSolution * NomSolution
         self.MIter = self.MIter + NomIteration
         self.DIter = self.DIter + NomIteration * NomIteration
-        #    KolAllAntZero=KolAllAntZero/NomIteration
         self.SumProcAntZero = self.SumProcAntZero + self.ProcAntZero / NomIteration
         i = 0
         while i < self.lenProcIS:
@@ -265,6 +330,13 @@ class stat:
         self.DIterationAntZero = 0
         self.MTime = 0
         self.DTime = 0
+        self.MkolParetto = 0
+        self.MkolParettoElement = 0
+        self.MkolCurrentParettoSearch = 0
+        self.DkolCurrentParettoSearch = 0
+        self.MkolCurrentParettoElement = 0
+        self.MkolComparisonParetoSet = 0
+        self.DkolComparisonParetoSet = 0
         self.EndIS.clear()
         self.MOFI.clear()
         self.DOFI.clear()
