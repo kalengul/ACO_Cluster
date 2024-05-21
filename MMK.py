@@ -24,9 +24,10 @@ import GraphTree as gt
 import SaveMap
 import GoTime
 import ClientSocket
+import GoParetto
 
-version='1.4.8 parallel'
-dateversion='05.05.2024'
+version='1.4.9 Paretto'
+dateversion='21.05.2024'
 
 def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
 
@@ -70,7 +71,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
              GoTime.setTimeIteration()
              NomIterationTime=NomIterationTime+Setting.KolIteration/Stat.KolTimeDelEl
 
-    def AddDeltZeroPheromon(pg,delt):
+    def AddDeltZeroPheromon(pg,delt,NomPheromon):
         #Пройти во всем слоям параметрического графа
         NomParametr=0
         while NomParametr<len(pg.ParametricGraph):
@@ -81,16 +82,26 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                 NomSolution=0
                 while NomSolution<len(pg.ParametricGraph[NomParametr].node[NomNode].KolSolutionIteration):
                     if len(pg.ParametricGraph[NomParametr].node[NomNode].KolSolutionIteration)-NomSolution>0.9:
-                        pg.ParametricGraph[NomParametr].node[NomNode].pheromon=pg.ParametricGraph[NomParametr].node[NomNode].pheromon+pow((1-Ant.Ro)*Ant.Q,((len(pg.ParametricGraph[NomParametr].node[NomNode].KolSolutionIteration)-NomSolution)))*delt*pg.ParametricGraph[NomParametr].node[NomNode].KolSolutionIteration[NomSolution]
+                        if NomPheromon==None:
+                            pg.ParametricGraph[NomParametr].node[NomNode].pheromon=pg.ParametricGraph[NomParametr].node[NomNode].pheromon+pow((1-Ant.Ro)*Ant.Q,((len(pg.ParametricGraph[NomParametr].node[NomNode].KolSolutionIteration)-NomSolution)))*delt*pg.ParametricGraph[NomParametr].node[NomNode].KolSolutionIteration[NomSolution]
+                        else:
+                            pg.ParametricGraph[NomParametr].node[NomNode].ArrPheromon[NomPheromon] = \
+                            pg.ParametricGraph[NomParametr].node[NomNode].ArrPheromon[NomPheromon] + pow((1 - Ant.Ro) * Ant.Q, ((len(
+                                pg.ParametricGraph[NomParametr].node[NomNode].KolSolutionIteration) - NomSolution))) * delt * \
+                            pg.ParametricGraph[NomParametr].node[NomNode].KolSolutionIteration[NomSolution]
                     NomSolution=NomSolution+1
                 NomNode=NomNode+1
             NomParametr=NomParametr+1
 
     def GiveAntPheromonAndHash(pg,PathWay,NomAnt,optPathHash,optOFHash):
+        global ParetoSet,kolParetoSet
         # Получение нового пути в графе
         # Получения значения целевой функции
         if Setting.SocketKolCluster==0:
-            Ant.AntArr[NomAnt].OF,Ant.AntArr[NomAnt].ArrOF = Klaster.GetObjectivFunction(pg.GetWayGraphValue(Ant.AntArr[NomAnt].way),pg.TypeKlaster,Setting.SocketClusterTime)
+            Ant.AntArr[NomAnt].OF,Ant.AntArr[NomAnt].ArrOF = Klaster.GetObjectivFunction(pg.GetWayGraphValue(Ant.AntArr[NomAnt].way),pg.TypeKlaster,Setting.SocketClusterTime, pg.typeProbability-30)
+        if (pg.typeProbability >= 30) and (pg.typeProbability < 40):
+            ParetoSet,kolParetoSet= GoParetto.update_pareto_set(ParetoSet,kolParetoSet, None, PathWay, Ant.AntArr[NomAnt].ArrOF)
+        #print(Ant.AntArr[NomAnt].OF,Ant.AntArr[NomAnt].ArrOF)
         #elif Setting.SocketCluster==1:
         #    Ant.AntArr[NomAnt].OF = ClientSocket.SocketSendOF(Stat,pg.GetWayGraphValue(Ant.AntArr[NomAnt].way),pg.TypeKlaster)
         # Добавление нового ключа в Хэш-таблицу
@@ -102,13 +113,22 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
         if Ant.DeltZeroPheromon != 0:
             if Ant.AntArr[NomAnt].OF+pg.difZero<0:
                 #Учет смещения в каждой вершине параметрического графа
-                AddDeltZeroPheromon(pg,abs(pg.difZero+Ant.AntArr[NomAnt].OF))
+                AddDeltZeroPheromon(pg,abs(pg.difZero+Ant.AntArr[NomAnt].OF),None)
                 #Установка нового значения смещения
                 pg.difZero=abs(Ant.AntArr[NomAnt].OF)
-
+            NomPareto=0
+            while NomPareto<len(Ant.AntArr[NomAnt].ArrOF):
+                if Ant.AntArr[NomAnt].ArrOF[NomPareto] + pg.ArrDifZero[NomPareto] < 0:
+                    # Учет смещения в каждой вершине параметрического графа
+                    AddDeltZeroPheromon(pg, abs(pg.ArrDifZero[NomPareto] + Ant.AntArr[NomAnt].ArrOF[NomPareto]),NomPareto)
+                    # Установка нового значения смещения
+                    pg.ArrDifZero[NomPareto] = abs(Ant.AntArr[NomAnt].ArrOF[NomPareto])
+                NomPareto=NomPareto+1
+        #print(Ant.AntArr[NomAnt].way,Ant.AntArr[NomAnt].ArrOF,pg.ArrDifZero)
         if Setting.GoSaveMap2==1:
             SaveMap.AddElMap2(Ant.AntArr[NomAnt].way[0]*(Ant.AntArr[NomAnt].way[1]+Ant.AntArr[NomAnt].way[2]+Ant.AntArr[NomAnt].way[3]+Ant.AntArr[NomAnt].way[4]+Ant.AntArr[NomAnt].way[5]), Ant.AntArr[NomAnt].way[6]*(Ant.AntArr[NomAnt].way[7]+Ant.AntArr[NomAnt].way[8]+Ant.AntArr[NomAnt].way[9]+Ant.AntArr[NomAnt].way[10]+Ant.AntArr[NomAnt].way[11]), pg.NomSolution)
-        if ((pg.MaxOptimization==1) and (Ant.AntArr[NomAnt].OF>optOFHash)) or ((pg.MaxOptimization==0) and (Ant.AntArr[NomAnt].OF<optOFHash)):
+        if ((pg.MaxOptimization==1) and (Ant.AntArr[NomAnt].OF>optOFHash)) or \
+                ((pg.MaxOptimization==0) and (Ant.AntArr[NomAnt].OF<optOFHash)):
             optOFHash=Ant.AntArr[NomAnt].OF
             optPathHash=PathWay
         Stat.ProcBestOF(Ant.AntArr[NomAnt].OF,pg.MaxOptimization,NomIteration,pg.NomSolution)
@@ -140,9 +160,18 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
             while NomWay<len(ant.way):
                 if wayPg.pg.MaxOptimization==1:
                     wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].pheromon = wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].pheromon + (1-Ant.Ro)*Ant.Q*(ant.OF+wayPg.pg.difZero)
+                    nomDifZer = 0
+                    while nomDifZer < len(wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].ArrPheromon):
+                        wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].ArrPheromon[nomDifZer] = wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].ArrPheromon[nomDifZer] + (1-Ant.Ro)*Ant.Q*(ant.ArrOF[nomDifZer]+wayPg.pg.ArrDifZero[nomDifZer])
+                        nomDifZer = nomDifZer + 1
                 else:
                     if ant.OF+wayPg.pg.difZero!=0:
                         wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].pheromon = wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].pheromon + (1-Ant.Ro)*Ant.Q/(ant.OF+wayPg.pg.difZero)
+                    nomDifZer = 0
+                    while nomDifZer < len(wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].ArrPheromon):
+                        if (ant.ArrOF[nomDifZer]+wayPg.pg.ArrDifZero[nomDifZer]) != 0:
+                            wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].ArrPheromon[nomDifZer] = wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].ArrPheromon[nomDifZer] + (1-Ant.Ro)*Ant.Q/(ant.ArrOF[nomDifZer]+wayPg.pg.ArrDifZero[nomDifZer])
+                        nomDifZer = nomDifZer + 1
                 if addKolSolution:
                     wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].KolSolution = wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].KolSolution + 1
                     wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].KolSolutionAll = wayPg.pg.ParametricGraph[NomWay].node[ant.way[NomWay]].KolSolutionAll + 1
@@ -208,10 +237,11 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                         Stat.StatIterationAntZero(gt.KolIterWay)
                         Stat.StatIterationAntZeroGraphTree(gt.NomElKolIterWay)
 
-        return EndIteration,optPathHash, optOFHash
+        return EndIteration,KolAntZero,optPathHash, optOFHash
 
     init() # инициализация модуля colorama
-
+    KolParetto = 2
+    global ParetoSet, kolParetoSet
 
     colored_print(NomProc)
     print(GoTime.now(),NomProc,' Start Program ',TextPrint)
@@ -219,12 +249,6 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
         colored_print(NomProc)
         print(GoTime.now(),NomProc,' LOAD  '+folder+'/setting.ini')
         Setting.readSetting(folder+'/setting.ini')
-
-
-    # Устанавливаем максимальное количество потоков
-    sem = threading.Semaphore(Setting.KolParallelAnt)
-    # Создаем блокировку для безопасного доступа к глобальным переменным
-    lock = threading.Lock()
 
     St.JSONFile.folderJSON=folder
     colored_print(NomProc)
@@ -236,11 +260,14 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
     lock_excel.acquire()
     colored_print(NomProc)
     print(NomProc,NameFile)
-    wayPg = pg.ProbabilityWay(NameFile)
+    wayPg = pg.ProbabilityWay(NameFile,KolParetto)
     wayGT = gt.GraphWay(NameFile)
     NameFileRes = folder+'/'+'res.xlsx'
     Stat.SaveParametr(version,NameFileRes,Ant.N,Ant.Ro,Ant.Q,Ant.KolElitAgent, Ant.DeltZeroPheromon, pg.PG.alf1,pg.PG.alf2,pg.PG.alf3,pg.PG.koef1,pg.PG.koef2,pg.PG.koef3,pg.PG.typeProbability,pg.PG.EndAllSolution,NameFile,Setting.AddFeromonAntZero,Setting.SbrosGraphAllAntZero,Setting.goNewIterationAntZero,Setting.goGraphTree,gt.SortPheromon,Setting.KolIteration,Setting.KolStatIteration,Setting.MaxkolIterationAntZero,Setting.typeParametr,Setting.GoParallelAnt,Setting.KolParallelAnt,len(wayPg.pg.ParametricGraph),wayPg.pg.OF,wayPg.pg.MinOF)
     lock_excel.release()
+    print(NomProc,'Go ParetoSet')
+    if (pg.PG.typeProbability>=30) and (pg.PG.typeProbability<40):
+        GoParetto.CreateAllParetoSet(wayPg.pg.ParametricGraph, wayPg.pg.TypeKlaster, wayPg.pg.typeProbability-30,Stat,folder+'/'+'ParetoSet.xlsx',lock_excel)
     colored_print(NomProc)
     print(NomProc,'Go',TextPrint)
     while Par<=Setting.endParametr:
@@ -252,6 +279,8 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
         NomStatIteration = 0
         while NomStatIteration<Setting.KolStatIteration:
             GoTime.setPrintTime()
+            ParetoSet = []
+            kolParetoSet=0
             NomStatIteration,Par=St.JSONFile.LoadIterJSONFileIfExist(Stat,Par)
             optPathHash,optOFHash,NomIteration,KolAntEnd,KolIterationEnd,NomIterationTime=clearStartIteration(Stat,wayPg.pg)
             while NomIteration<KolIterationEnd:
@@ -260,10 +289,10 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                 Ant.CreateAntArray(Ant.N+1)
                 NomAnt=0
                 KolAntZero=0
-                if Setting.GoParallelAnt == 0:
+                if (Setting.GoParallelAnt == 0):
                 # Проход по всем агентам
                     while NomAnt<KolAntEnd:
-                        TrueEndGoAnt, optPathHash, optOFHash = GoAnt(NomAnt, KolAntZero, optPathHash, optOFHash)
+                        TrueEndGoAnt, KolAntZero, optPathHash, optOFHash = GoAnt(NomAnt, KolAntZero, optPathHash, optOFHash)
                         if TrueEndGoAnt:
                             KolAntEnd, KolIterationEnd = EndSolution(NomAnt, NomIteration)
                         else:
@@ -287,7 +316,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                             results.append(future)
                         # Обработка результатов
                         for future in concurrent.futures.as_completed(results):
-                            TrueEndGoAnt, optPathHash, optOFHash = future.result()
+                            TrueEndGoAnt, KolAntZero, optPathHash, optOFHash = future.result()
                             if TrueEndGoAnt:
                                 KolAntEnd, KolIterationEnd = EndSolution(NomAnt, NomIteration)
                 elif (Setting.GoParallelAnt == 2) and (Setting.KolParallelAnt==0):
@@ -317,7 +346,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                     # Ждем завершения всех процессов
                     for p in processes:
                         p.join()
-                #print('wayPg.pg.AddIterationLayerKolSolution')
+
                 if Ant.DeltZeroPheromon != 0:
                     wayPg.pg.AddIterationLayerKolSolution()
                 #Все агенты не нашли новых путей в графе
@@ -342,7 +371,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
 
 
                 # Переход к следующей итерации
-                if (pg.PG.typeProbability==1) or (pg.PG.typeProbability==3):
+                if (pg.PG.typeProbability==1) or (pg.PG.typeProbability==3) or (pg.PG.typeProbability>=30) and (pg.PG.typeProbability<40):
                     wayPg.pg.NormPheromon()
                 Ant.DelAllAgent()
                 NomIteration=NomIteration+1
@@ -353,14 +382,18 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
             Stat.EndStatistik(NomIteration, wayPg.pg.NomSolution)
             Stat.SaveTimeIteration((GoTime.DeltStartTime()).total_seconds())
             NomStatIteration=NomStatIteration+1
-            St.JSONFile.SaveIterJSONFile(Stat,NomStatIteration,Par)
-
+            if (pg.PG.typeProbability >= 30) and (pg.PG.typeProbability < 40):
+                Stat.StatParettoSet(len(GoParetto.AllParetoSet), GoParetto.AllSolution, len(ParetoSet), kolParetoSet, GoParetto.ComparisonParetoSet(ParetoSet))
+            St.JSONFile.SaveIterJSONFile(Stat, NomStatIteration, Par)
             colored_print(NomProc)
+            print(len(ParetoSet),kolParetoSet)
             print(GoTime.now(),NomProc,' END ',TextPrint,(GoTime.DeltStartTime())*(Setting.KolStatIteration-NomStatIteration),' typeParametr=',Setting.typeParametr,Par,' NomStatIteration ',NomStatIteration,"{:8.3f}".format(Stat.MIterationAntZero/NomStatIteration),' Duration: {} '.format(GoTime.DeltStartTime()),' optPathHash ',optPathHash,version)
 
         St.JSONFile.RemoveJSONFile()
         lock_excel.acquire()
         Stat.SaveStatisticsExcel(NameFileRes,GoTime.DeltStartTime(),NomStatIteration,optPathHash,Par)
+        if (pg.PG.typeProbability >= 30) and (pg.PG.typeProbability < 40):
+            Stat.SaveStatisticsExcelParetto(NameFileRes,NomStatIteration,252)
         if Setting.GoSaveMap2==1:
             SaveMap.PrintElMap2(folder+'/'+'MapFile.xlsx')
         lock_excel.release()

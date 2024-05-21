@@ -36,6 +36,7 @@ class GraphWay:
             way=GoPathGraphTreeHorizontal(self.pg,StartWayGraphTree)
         else:
             way=GoPathGraphTreeNode(self.pg,StartWayGraphTree)
+        print(way)
         if way!=[]:
             return way
         else:
@@ -99,6 +100,7 @@ def GoPathGraphTreeNode(pg,StartWay):
     HashWay = Hash.getPath(PathWay)
     nomWay=0
     CreateArr=1
+    print('StartWay=',StartWay)
     while nomWay<len(StartWay) and HashWay!=0:
         if CreateArr==1:
             CreateArrayNomWay(pg,StartWay,nomWay)
