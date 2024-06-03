@@ -31,6 +31,7 @@ class PG:
     koef2 = 1 #1
     koef3 = 0
     difZero=0
+    KoefLineSummPareto=0
     ArrDifZero=[]
     typeProbability = 3
     EndAllSolution = 0
@@ -290,10 +291,11 @@ def ProbabilityNode(AllSolution,Node):
         Probability=(Node.pheromon**PG.alf1)*(1/(kolSolution**PG.alf2))
     elif PG.typeProbability==3:
         Probability=PG.koef1*(Node.pheromonNorm**PG.alf1)+PG.koef2*(1/(kolSolution))**PG.alf2+PG.koef3*(Node.KolSolutionAll/(AllSolution))**PG.alf3
-    elif (PG.typeProbability>=30) and (PG.typeProbability<40):
+    elif (PG.typeProbability>=30) and (PG.typeProbability<35):
         Probability = PG.koef1 * (Node.ArrPheromonNorm[PG.typeProbability-30] ** PG.alf1) + PG.koef2 * (1 / (kolSolution)) ** PG.alf2 + PG.koef3 * (Node.KolSolutionAll / (AllSolution)) ** PG.alf3
         #print(Node.pheromonNorm,Node.ArrPheromonNorm,PG.typeProbability-30,Probability)
-
+    elif (PG.typeProbability ==36):
+        Probability = PG.koef1 * ((Node.ArrPheromonNorm[0]*(PG.KoefLineSummPareto)+Node.ArrPheromonNorm[1]*(1-PG.KoefLineSummPareto)) ** PG.alf1) + PG.koef2 * (1 / (kolSolution)) ** PG.alf2 + PG.koef3 * (Node.KolSolutionAll / (AllSolution)) ** PG.alf3
     if Probability==0:
         Probability=0.00000001
     return Probability

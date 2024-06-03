@@ -26,8 +26,8 @@ import GoTime
 import ClientSocket
 import GoParetto
 
-version='1.4.9 Paretto'
-dateversion='21.05.2024'
+version='1.4.9.1 Paretto'
+dateversion='03.06.2024'
 
 def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
 
@@ -383,7 +383,10 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
             Stat.SaveTimeIteration((GoTime.DeltStartTime()).total_seconds())
             NomStatIteration=NomStatIteration+1
             if (pg.PG.typeProbability >= 30) and (pg.PG.typeProbability < 40):
+                lock_excel.acquire()
                 Stat.StatParettoSet(len(GoParetto.AllParetoSet), GoParetto.AllSolution, len(ParetoSet), kolParetoSet, GoParetto.ComparisonParetoSet(ParetoSet))
+                Stat.save_pareto_set_excel(folder+'/'+'ParetoSet600.xlsx', GoTime.DeltStartTime(), GoParetto.ComparisonParetoSet(ParetoSet), [], pg.PG.typeProbability)
+                lock_excel.release()
             St.JSONFile.SaveIterJSONFile(Stat, NomStatIteration, Par)
             colored_print(NomProc)
             print(len(ParetoSet),kolParetoSet)

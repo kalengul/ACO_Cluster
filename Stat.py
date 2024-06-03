@@ -113,16 +113,18 @@ class stat:
         sheet.Cells(1, 5).value = 'AllSolution'
         sheet.Cells(1, 6).value = AllSolution
         NomParetoSet=0
-        while NomParetoSet<len(AllParetoSet):
-            ElNomParetoSet=0
-            while ElNomParetoSet<len(AllParetoSet[NomParetoSet]):
-                sheet.Cells(2+NomParetoSet, 1+ElNomParetoSet).value = AllParetoSet[NomParetoSet][ElNomParetoSet]
-                ElNomParetoSet=ElNomParetoSet+1
-            ElNomParetoSet = 0
-            while ElNomParetoSet < len(pathArrParetoSet[NomParetoSet]):
-                sheet.Cells(2 + NomParetoSet, 2 + len(AllParetoSet[NomParetoSet]) + ElNomParetoSet).value = pathArrParetoSet[NomParetoSet][ElNomParetoSet]
-                ElNomParetoSet = ElNomParetoSet + 1
-            NomParetoSet=NomParetoSet+1
+        if len(AllParetoSet)>0:
+            while NomParetoSet<len(AllParetoSet):
+                ElNomParetoSet=0
+                while ElNomParetoSet<len(AllParetoSet[NomParetoSet]):
+                    sheet.Cells(2+NomParetoSet, 1+ElNomParetoSet).value = AllParetoSet[NomParetoSet][ElNomParetoSet]
+                    ElNomParetoSet=ElNomParetoSet+1
+                ElNomParetoSet = 0
+                if len(pathArrParetoSet)>0:
+                    while ElNomParetoSet < len(pathArrParetoSet[NomParetoSet]):
+                        sheet.Cells(2 + NomParetoSet, 2 + len(AllParetoSet[NomParetoSet]) + ElNomParetoSet).value = pathArrParetoSet[NomParetoSet][ElNomParetoSet]
+                        ElNomParetoSet = ElNomParetoSet + 1
+                NomParetoSet=NomParetoSet+1
         # сохраняем рабочую книгу
         wb.Save()
         # закрываем ее

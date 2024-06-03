@@ -511,7 +511,10 @@ def GetObjectivFunction(path, TypeKlaster, SocketClusterTime, TypeProbability):
         # OF = BenchRastriginFunctionx10(path)
         ArrOf.append(BenchBirdFunctionx10(path))
         ArrOf.append(BenchRastriginFunctionx10(path))
-        OF=ArrOf[TypeProbability]
+        if TypeProbability==6:
+            OF = ArrOf[0]
+        else:
+            OF=ArrOf[TypeProbability]
     # print(OF, path,TypeKlaster)
     if VivodKlasterExcel == 1:
         SavePathExcel('Cluster.xlsx', path, OF, TypeKlaster)
