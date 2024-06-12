@@ -26,8 +26,8 @@ import GoTime
 import ClientSocket
 import GoParetto
 
-version='1.4.9.1 Paretto'
-dateversion='03.06.2024'
+version='1.4.9.2 Paretto'
+dateversion='12.06.2024'
 
 def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
 
@@ -292,6 +292,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                 if (Setting.GoParallelAnt == 0):
                 # Проход по всем агентам
                     while NomAnt<KolAntEnd:
+                        wayPg.NomArr=NomAnt % KolParetto
                         TrueEndGoAnt, KolAntZero, optPathHash, optOFHash = GoAnt(NomAnt, KolAntZero, optPathHash, optOFHash)
                         if TrueEndGoAnt:
                             KolAntEnd, KolIterationEnd = EndSolution(NomAnt, NomIteration)

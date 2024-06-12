@@ -511,7 +511,7 @@ def GetObjectivFunction(path, TypeKlaster, SocketClusterTime, TypeProbability):
         # OF = BenchRastriginFunctionx10(path)
         ArrOf.append(BenchBirdFunctionx10(path))
         ArrOf.append(BenchRastriginFunctionx10(path))
-        if TypeProbability==6:
+        if (TypeProbability==6) or (TypeProbability==7):
             OF = ArrOf[0]
         else:
             OF=ArrOf[TypeProbability]

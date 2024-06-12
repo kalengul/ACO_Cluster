@@ -60,11 +60,11 @@ class PG:
         self.TypeKlaster = sheet.Cells(2,1).value
         self.KolSolution = sheet.Cells(2,2).value
         self.MaxOptimization = sheet.Cells(2,3).value
-        KolOF = sheet.Cells(2, 4).value
-        if KolOF==None:
-            KolOF=0
+        self.KolOF = sheet.Cells(2, 4).value
+        if self.KolOF==None:
+            self.KolOF=0
         else:
-            KolOF=int(KolOF)
+            self.KolOF=int(self.KolOF)
         self.OF = sheet.Cells(1,11).value
         self.MinOF = sheet.Cells(1,12).value
         # Загрузка самого графа
@@ -76,7 +76,7 @@ class PG:
             j=5
             val = sheet.Cells(j,i).value
             while val != None :
-                new_node=Node(val,KolOF)
+                new_node=Node(val,self.KolOF)
                 parametr_array.append(new_node)
                 j=j+1
                 val = sheet.Cells(j,i).value
@@ -233,6 +233,7 @@ class ProbabilityWay:
         if self.pg==False:
             self.pg=PG(NameFile,KolDifZero)
             self.pg.ReadParametrGraphExcelFile()
+            self.NomArr=0
 #            print(self.pg.NameFilePg)
             NomCurrentPG=len(PG.ArrayAllPG)
             PG.ArrayAllPG.append(self.pg)
@@ -250,10 +251,10 @@ class ProbabilityWay:
             # Окончание движения агента
             while NomParametr<len(self.pg.ParametricGraph):
                 # Получение вершины из слоя
-                way.append(GoAntNextNode(self.pg,self.pg.ParametricGraph[NomParametr].node))
+                way.append(GoAntNextNode(self.pg,self.pg.ParametricGraph[NomParametr].node,self.NomArr))
                 # Выбор следующего слоя
                 NomParametr = NextNode(NomParametr)
-            #print(way)
+            #print(self.NomArr,way)
             return way
         else:
             raise StopIteration
@@ -279,7 +280,7 @@ def NextNode(nom):
     nom=nom+1
     return nom
 
-def ProbabilityNode(AllSolution,Node):
+def ProbabilityNode(AllSolution,Node,NomArr):
     kolSolution= Node.KolSolution
     if kolSolution==0:
         kolSolution=0.5
@@ -296,17 +297,19 @@ def ProbabilityNode(AllSolution,Node):
         #print(Node.pheromonNorm,Node.ArrPheromonNorm,PG.typeProbability-30,Probability)
     elif (PG.typeProbability ==36):
         Probability = PG.koef1 * ((Node.ArrPheromonNorm[0]*(PG.KoefLineSummPareto)+Node.ArrPheromonNorm[1]*(1-PG.KoefLineSummPareto)) ** PG.alf1) + PG.koef2 * (1 / (kolSolution)) ** PG.alf2 + PG.koef3 * (Node.KolSolutionAll / (AllSolution)) ** PG.alf3
+    elif (PG.typeProbability == 37):
+        Probability = PG.koef1 * (Node.ArrPheromonNorm[NomArr] ** PG.alf1) + PG.koef2 * (1 / (kolSolution)) ** PG.alf2 + PG.koef3 * (Node.KolSolutionAll / (AllSolution)) ** PG.alf3
     if Probability==0:
         Probability=0.00000001
     return Probability
        
-def GoAntNextNode(ParametricGraph,ArrayNode):
+def GoAntNextNode(ParametricGraph,ArrayNode,NomArr):
     probability = []
     sum=0
     i=0
     while i<len(ArrayNode):
        if (PG.EndAllSolution==0) or (ParametricGraph.AllSolution/len(ArrayNode)>ArrayNode[i].KolSolutionAll): 
-           sum=sum + ProbabilityNode(ParametricGraph.AllSolution/len(ArrayNode),ArrayNode[i])
+           sum=sum + ProbabilityNode(ParametricGraph.AllSolution/len(ArrayNode),ArrayNode[i],NomArr)
        probability.append(sum)
        i=i+1
     rnd=random.random()
