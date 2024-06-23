@@ -32,6 +32,7 @@ SocketKolCluster=0
 SocketIp='127.0.0.1'
 SocketPort=8080
 SocketClusterTime=0
+KolParetto = 2
 
 def readSetting(NameFile):
     global endprint
@@ -50,6 +51,7 @@ def readSetting(NameFile):
     global GoSaveMap2
     global GoParallelAnt
     global KolParallelAnt
+    global KolParetto
 
     config = configparser.ConfigParser()  # создаём объекта парсера
     config.read(NameFile)  # читаем конфиг
@@ -69,6 +71,7 @@ def readSetting(NameFile):
     GoSaveMap2=int(config["setting_global"]["GoSaveMap2"])
     GoParallelAnt = int(config["setting_global"]["GoParallelAnt"])
     KolParallelAnt = int(config["setting_global"]["KolParallelAnt"])
+    KolParetto = int(config["setting_global"]["KolParetto"])
 
     Ant.N=float(config["ant"]["N"]) 
     Ant.Q=float(config["ant"]["Q"]) 

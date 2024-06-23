@@ -357,8 +357,10 @@ def BenchKornFunctionx10(path):
 
 
 def BenchRastriginFunctionx10(path):
-    x1 = path[0] * (path[1] + path[2] + path[3] + path[4] + path[5])
-    x2 = path[6] * (path[7] + path[8] + path[9] + path[10] + path[11])
+    i0=0
+    i1=6
+    x1 = path[i0] * (path[i0+1] + path[i0+2] + path[i0+3] + path[i0+4] + path[i0+5])
+    x2 = path[i1] * (path[i1+1] + path[i1+2] + path[i1+3] + path[i1+4] + path[i1+5])
     OF = -20 + (10 * math.cos(2 * math.pi * x1) - x1 * x1) + (10 * math.cos(2 * math.pi * x2) - x2 * x2)
     return OF
 
@@ -374,6 +376,144 @@ def BenchBirdFunctionx10(path):
 def BenchEkliFunctionx10(path):
     x1 = path[0] * (path[1] + path[2] + path[3] + path[4] + path[5] + path[6])
     x2 = path[7] * (path[8] + path[9] + path[10] + path[11] + path[12] + path[13])
+    OF = -math.e + 20 * math.exp(-math.sqrt((pow(x1, 2) + pow(x2, 2)) / 50)) + math.exp(
+        1 / 2 * (math.cos(2 * math.pi * x1) + math.cos(2 * math.pi * x2)))
+    return OF
+
+
+def BenchRozenbrokxPareto(path):
+    alf = 100
+    i0=0
+    i1=int(len(path)/2)
+    sum=0
+    i=0
+    while i<i1-2:
+        sum=sum+path[i0+i+1]
+        i=i+1
+    x1 = path[i0] * (sum)
+    sum=0
+    i=0
+    while i<i1-2:
+        sum=sum+path[i1+i+1]
+        i=i+1
+    x2 = path[i1] * (sum)
+    OF = -alf * (x2 - x1 * x1) * (x2 - x1 * x1) - (1 - x1) * (1 - x1)
+    return OF
+
+
+def BenchMultiFunctionPareto(path):
+    i0=0
+    i1=int(len(path)/2)
+    sum=0
+    i=0
+    while i<i1-2:
+        sum=sum+path[i0+i+1]
+        i=i+1
+    x1 = path[i0] * (sum)
+    sum=0
+    i=0
+    while i<i1-2:
+        sum=sum+path[i1+i+1]
+        i=i+1
+    x2 = path[i1] * (sum)
+    OF = x1 * math.sin(4 * math.pi * x1) + x2 * math.sin(4 * math.pi * x2)
+    return OF
+
+
+def BenchShafferaFunctionPareto(path):
+    i0=0
+    i1=int(len(path)/2)
+    sum=0
+    i=0
+    while i<i1-2:
+        sum=sum+path[i0+i+1]
+        i=i+1
+    x1 = path[i0] * (sum)
+    sum=0
+    i=0
+    while i<i1-2:
+        sum=sum+path[i1+i+1]
+        i=i+1
+    x2 = path[i1] * (sum)
+    OF = 1 / 2 - (math.sin(math.sqrt(x1 * x1 + x2 * x2)) * math.sin(math.sqrt(x1 * x1 + x2 * x2)) - 0.5) / (
+                1 + 0.001 * (x1 * x1 + x2 * x2))
+    return OF
+
+
+def BenchKornFunctionPareto(path):
+    i0=0
+    i1=int(len(path)/2)
+    sum=0
+    i=0
+    while i<i1-2:
+        sum=sum+path[i0+i+1]
+        i=i+1
+    x1 = path[i0] * (sum)
+    sum=0
+    i=0
+    while i<i1-2:
+        sum=sum+path[i1+i+1]
+        i=i+1
+    x2 = path[i1] * (sum)
+    z = complex(x1, x2)
+    OF = 1 / (1 + abs(pow(z, 6) - 1))
+    return OF
+
+
+def BenchRastriginFunctionPareto(path):
+    i0=0
+    i1=int(len(path)/2)
+    sum=0
+    i=0
+    while i<i1-2:
+        sum=sum+path[i0+i+1]
+        i=i+1
+    x1 = path[i0] * (sum)
+    sum=0
+    i=0
+    while i<i1-2:
+        sum=sum+path[i1+i+1]
+        i=i+1
+    x2 = path[i1] * (sum)
+    OF = -20 + (10 * math.cos(2 * math.pi * x1) - x1 * x1) + (10 * math.cos(2 * math.pi * x2) - x2 * x2)
+    return OF
+
+
+def BenchBirdFunctionPareto(path):
+    i0=0
+    i1=int(len(path)/2)
+    sum=0
+    i=0
+    while i<i1-2:
+        sum=sum+path[i0+i+1]
+        i=i+1
+    x1 = path[i0] * (sum)
+    sum=0
+    i=0
+    while i<i1-2:
+        sum=sum+path[i1+i+1]
+        i=i+1
+    x2 = path[i1] * (sum)
+    OF = -math.sin(x1) * math.exp(pow(1 - math.cos(x2), 2)) - math.cos(x2) * math.exp(pow(1 - math.sin(x1), 2)) - pow(
+        x1 - x2, 2)
+    return OF
+
+
+def BenchEkliFunctionPareto(path):
+    i0=0
+    i1=int(len(path)/2)
+    sum=0
+    i=0
+    while i<i1-2:
+        sum=sum+path[i0+i+1]
+        i=i+1
+    x1 = path[i0] * (sum)
+    sum=0
+    i=0
+    while i<i1-2:
+        sum=sum+path[i1+i+1]
+        i=i+1
+    x2 = path[i1] * (sum)
     OF = -math.e + 20 * math.exp(-math.sqrt((pow(x1, 2) + pow(x2, 2)) / 50)) + math.exp(
         1 / 2 * (math.cos(2 * math.pi * x1) + math.cos(2 * math.pi * x2)))
     return OF
@@ -509,8 +649,20 @@ def GetObjectivFunction(path, TypeKlaster, SocketClusterTime, TypeProbability):
         OF = SIRVD2(path)
     elif TypeKlaster == 5000:
         # OF = BenchRastriginFunctionx10(path)
-        ArrOf.append(BenchBirdFunctionx10(path))
-        ArrOf.append(BenchRastriginFunctionx10(path))
+        ArrOf.append(BenchRozenbrokxPareto(path))
+        ArrOf.append(BenchBirdFunctionPareto(path))
+        ArrOf.append(BenchRastriginFunctionPareto(path))
+        if (TypeProbability==6) or (TypeProbability==7):
+            OF = ArrOf[0]
+        else:
+            OF=ArrOf[TypeProbability]
+    elif TypeKlaster == 5001:
+        # OF = BenchRastriginFunctionx10(path)
+        ArrOf.append(BenchRozenbrokxPareto(path))
+        ArrOf.append(BenchBirdFunctionPareto(path))
+        ArrOf.append(BenchRastriginFunctionPareto(path))
+        ArrOf.append(BenchEkliFunctionPareto(path))
+        ArrOf.append(BenchKornFunctionPareto(path))
         if (TypeProbability==6) or (TypeProbability==7):
             OF = ArrOf[0]
         else:
