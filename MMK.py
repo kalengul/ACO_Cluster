@@ -26,8 +26,8 @@ import GoTime
 import ClientSocket
 import GoParetto
 
-version='1.4.9.2 Paretto'
-dateversion='12.06.2024'
+version='1.4.9.3 Paretto'
+dateversion='23.06.2024'
 
 def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
 
@@ -53,7 +53,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
         Ant.createElitAgent(pg.MaxOptimization==1)
         Hash.HashPath.clear()
         Hash.MaxPath.clear()
-        Stat.SbrosStatistic()
+        Stat.SbrosStatistic(Setting.KolParetto)
         NomIteration = 1
         optPathHash,optOFHash=clearoptPathHash(pg.MaxOptimization==1)
         KolAntEnd=Ant.N
@@ -132,6 +132,10 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
             optOFHash=Ant.AntArr[NomAnt].OF
             optPathHash=PathWay
         Stat.ProcBestOF(Ant.AntArr[NomAnt].OF,pg.MaxOptimization,NomIteration,pg.NomSolution)
+        NomPareto = 0
+        while NomPareto < len(Ant.AntArr[NomAnt].ArrOF):
+            Stat.ProcBestOFArray(Ant.AntArr[NomAnt].ArrOF[NomPareto],NomPareto,pg.MaxOptimization,NomIteration,pg.NomSolution)
+            NomPareto = NomPareto + 1
         return optPathHash,optOFHash
 
     def GoPathWayHash(pg,NomAnt,optPathHash,optOFHash):
@@ -194,6 +198,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
 
         else:
             # Проверка полученного пути в Хэш-Таблице
+            kolIterationAntZero = 0
             HashWay, optPathHash, optOFHash = GoPathWayHash(wayPg.pg, NomAnt, optPathHash, optOFHash)
             if HashWay != 0:
                 # Такой путь уже есть в Хэш-таблице
@@ -209,7 +214,6 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                 if Setting.goNewIterationAntZero == 1:
                     # Если путь не найден, то продолжать генерацию маршрутов, пока не найдется уникальный
                     Ant.AntArr[NomAnt].ignore = 0
-                    kolIterationAntZero = 0
                     while HashWay != 0 and kolIterationAntZero < Setting.MaxkolIterationAntZero:
                         kolIterationAntZero = kolIterationAntZero + 1
                         try:
@@ -222,8 +226,6 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                             HashWay, optPathHash, optOFHash = GoPathWayHash(wayPg.pg, NomAnt, optPathHash, optOFHash)
                     if kolIterationAntZero == Setting.MaxkolIterationAntZero:
                         Ant.AntArr[NomAnt].ignore = 1
-                    Stat.StatIterationAntZero(kolIterationAntZero)
-
                 # Если путь не найден, то обход графа в виде дерева
                 if Setting.goGraphTree == 1:
                     Ant.AntArr[NomAnt].ignore = 0
@@ -237,10 +239,10 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                         Stat.StatIterationAntZero(gt.KolIterWay)
                         Stat.StatIterationAntZeroGraphTree(gt.NomElKolIterWay)
 
-        return EndIteration,KolAntZero,optPathHash, optOFHash
+        return EndIteration,KolAntZero,optPathHash, optOFHash, kolIterationAntZero
 
     init() # инициализация модуля colorama
-    KolParetto = 2
+
     global ParetoSet, kolParetoSet
 
     colored_print(NomProc)
@@ -252,26 +254,26 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
 
     St.JSONFile.folderJSON=folder
     colored_print(NomProc)
-    print(NomProc,'Go Parametric Graph')
+    print(GoTime.now(),NomProc,'Go Parametric Graph')
     # Создание параметрического графа
     NameFile=folderPg+'/'+Setting.NameFileGraph
-    Stat=St.stat()
+    Stat=St.stat(Setting.KolParetto)
     Par=Setting.GoNZTypeParametr(Setting.typeParametr)
     lock_excel.acquire()
     colored_print(NomProc)
-    print(NomProc,NameFile)
-    wayPg = pg.ProbabilityWay(NameFile,KolParetto)
+    print(GoTime.now(),NomProc,NameFile)
+    wayPg = pg.ProbabilityWay(NameFile,Setting.KolParetto)
     wayGT = gt.GraphWay(NameFile)
     NameFileRes = folder+'/'+'res.xlsx'
-    Stat.SaveParametr(version,NameFileRes,Ant.N,Ant.Ro,Ant.Q,Ant.KolElitAgent, Ant.DeltZeroPheromon, pg.PG.alf1,pg.PG.alf2,pg.PG.alf3,pg.PG.koef1,pg.PG.koef2,pg.PG.koef3,pg.PG.typeProbability,pg.PG.EndAllSolution,NameFile,Setting.AddFeromonAntZero,Setting.SbrosGraphAllAntZero,Setting.goNewIterationAntZero,Setting.goGraphTree,gt.SortPheromon,Setting.KolIteration,Setting.KolStatIteration,Setting.MaxkolIterationAntZero,Setting.typeParametr,Setting.GoParallelAnt,Setting.KolParallelAnt,len(wayPg.pg.ParametricGraph),wayPg.pg.OF,wayPg.pg.MinOF)
+    Stat.SaveParametr(version,NameFileRes,Ant.N,Ant.Ro,Ant.Q,Ant.KolElitAgent, Ant.DeltZeroPheromon, pg.PG.alf1,pg.PG.alf2,pg.PG.alf3,pg.PG.koef1,pg.PG.koef2,pg.PG.koef3,pg.PG.typeProbability,pg.PG.EndAllSolution,NameFile,Setting.AddFeromonAntZero,Setting.SbrosGraphAllAntZero,Setting.goNewIterationAntZero,Setting.goGraphTree,gt.SortPheromon,Setting.KolIteration,Setting.KolStatIteration,Setting.MaxkolIterationAntZero,Setting.typeParametr,Setting.GoParallelAnt,Setting.KolParallelAnt,len(wayPg.pg.ParametricGraph),wayPg.pg.KoefLineSummPareto,Setting.KolParetto,wayPg.pg.OF,wayPg.pg.MinOF)
     lock_excel.release()
-    print(NomProc,'Go ParetoSet')
+    print(GoTime.now(),NomProc,'Go ParetoSet')
     if (pg.PG.typeProbability>=30) and (pg.PG.typeProbability<40):
         GoParetto.CreateAllParetoSet(wayPg.pg.ParametricGraph, wayPg.pg.TypeKlaster, wayPg.pg.typeProbability-30,Stat,folder+'/'+'ParetoSet.xlsx',lock_excel)
     colored_print(NomProc)
-    print(NomProc,'Go',TextPrint)
+    print(GoTime.now(),NomProc,'Go',TextPrint)
     while Par<=Setting.endParametr:
-        Stat.StartStatistic()
+        Stat.StartStatistic(Setting.KolParetto)
         Stat.StartStatisticGrahTree(len(wayPg.pg.ParametricGraph))
         if Setting.GoSaveMap2==1:
             SaveMap.CreateElMap2(1200, 1200)
@@ -281,6 +283,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
             GoTime.setPrintTime()
             ParetoSet = []
             kolParetoSet=0
+            kolIterationAntZero = 0
             NomStatIteration,Par=St.JSONFile.LoadIterJSONFileIfExist(Stat,Par)
             optPathHash,optOFHash,NomIteration,KolAntEnd,KolIterationEnd,NomIterationTime=clearStartIteration(Stat,wayPg.pg)
             while NomIteration<KolIterationEnd:
@@ -292,8 +295,9 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                 if (Setting.GoParallelAnt == 0):
                 # Проход по всем агентам
                     while NomAnt<KolAntEnd:
-                        wayPg.NomArr=NomAnt % KolParetto
-                        TrueEndGoAnt, KolAntZero, optPathHash, optOFHash = GoAnt(NomAnt, KolAntZero, optPathHash, optOFHash)
+                        wayPg.NomArr=NomAnt % Setting.KolParetto
+                        TrueEndGoAnt, KolAntZero, optPathHash, optOFHash, kolAntZero = GoAnt(NomAnt, KolAntZero, optPathHash, optOFHash)
+                        kolIterationAntZero=kolIterationAntZero+kolAntZero
                         if TrueEndGoAnt:
                             KolAntEnd, KolIterationEnd = EndSolution(NomAnt, NomIteration)
                         else:
@@ -356,7 +360,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                     if Setting.SbrosGraphAllAntZero==1:
                       wayPg.pg.ClearPheromon(0)
                     Stat.KolAllAntZero = Stat.KolAllAntZero+1
-                    Stat.StatAllAntZero(NomIteration, wayPg.pg.NomSolution)
+                    #Stat.StatAllAntZero(NomIteration, wayPg.pg.NomSolution)
                 # Испарение феромона
                 wayPg.pg.DecreasePheromon(Ant.Ro)
 
@@ -379,14 +383,14 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                 #wayPg.pg.PrintParametricGraph(1)
 
 
-
+            Stat.StatIterationAntZero(kolIterationAntZero)
             Stat.EndStatistik(NomIteration, wayPg.pg.NomSolution)
             Stat.SaveTimeIteration((GoTime.DeltStartTime()).total_seconds())
             NomStatIteration=NomStatIteration+1
             if (pg.PG.typeProbability >= 30) and (pg.PG.typeProbability < 40):
                 lock_excel.acquire()
                 Stat.StatParettoSet(len(GoParetto.AllParetoSet), GoParetto.AllSolution, len(ParetoSet), kolParetoSet, GoParetto.ComparisonParetoSet(ParetoSet))
-                Stat.save_pareto_set_excel(folder+'/'+'ParetoSet600.xlsx', GoTime.DeltStartTime(), GoParetto.ComparisonParetoSet(ParetoSet), [], pg.PG.typeProbability)
+                #Stat.save_pareto_set_excel(folder+'/'+'ParetoSet600.xlsx', GoTime.DeltStartTime(), GoParetto.ComparisonParetoSet(ParetoSet), [], pg.PG.typeProbability)
                 lock_excel.release()
             St.JSONFile.SaveIterJSONFile(Stat, NomStatIteration, Par)
             colored_print(NomProc)
@@ -395,9 +399,9 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
 
         St.JSONFile.RemoveJSONFile()
         lock_excel.acquire()
-        Stat.SaveStatisticsExcel(NameFileRes,GoTime.DeltStartTime(),NomStatIteration,optPathHash,Par)
+        Stat.SaveStatisticsExcel(NameFileRes,Ant.N, Setting.KolParetto,GoTime.DeltStartTime(),NomStatIteration,optPathHash,Par)
         if (pg.PG.typeProbability >= 30) and (pg.PG.typeProbability < 40):
-            Stat.SaveStatisticsExcelParetto(NameFileRes,NomStatIteration,252)
+            Stat.SaveStatisticsExcelParetto(NameFileRes,NomStatIteration,31)
         if Setting.GoSaveMap2==1:
             SaveMap.PrintElMap2(folder+'/'+'MapFile.xlsx')
         lock_excel.release()

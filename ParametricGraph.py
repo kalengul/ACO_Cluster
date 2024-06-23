@@ -52,7 +52,7 @@ class PG:
             nomDifZer=nomDifZer+1
 
         
-    def ReadParametrGraphExcelFile(self):
+    def ReadParametrGraphExcelFile(self,KolOF):
         Excel = win32com.client.Dispatch("Excel.Application")
         wb = Excel.Workbooks.Open(self.NameFilePg)
         sheet = wb.ActiveSheet
@@ -60,13 +60,16 @@ class PG:
         self.TypeKlaster = sheet.Cells(2,1).value
         self.KolSolution = sheet.Cells(2,2).value
         self.MaxOptimization = sheet.Cells(2,3).value
-        self.KolOF = sheet.Cells(2, 4).value
-        if self.KolOF==None:
-            self.KolOF=0
+        if KolOF==None:
+            KolOF=0
         else:
-            self.KolOF=int(self.KolOF)
+            KolOF=int(KolOF)
         self.OF = sheet.Cells(1,11).value
         self.MinOF = sheet.Cells(1,12).value
+        self.ArrOF=[]
+        self.ArrOF.append(self.OF)
+        self.ArrMinOF = []
+        self.ArrMinOF.append(self.MinOF)
         # Загрузка самого графа
         i=1
         val = sheet.Cells(4,1).value
@@ -76,7 +79,7 @@ class PG:
             j=5
             val = sheet.Cells(j,i).value
             while val != None :
-                new_node=Node(val,self.KolOF)
+                new_node=Node(val,KolOF)
                 parametr_array.append(new_node)
                 j=j+1
                 val = sheet.Cells(j,i).value
@@ -227,12 +230,12 @@ class Parametr:
            NomEl=NomEl+1
             
 class ProbabilityWay:
-    def __init__(self,NameFile,KolDifZero):
+    def __init__(self,NameFile,KolPareto):
         global NomCurrentPG
         self.pg,NomCurrentPG=SearchPGName(NameFile)
         if self.pg==False:
-            self.pg=PG(NameFile,KolDifZero)
-            self.pg.ReadParametrGraphExcelFile()
+            self.pg=PG(NameFile,KolPareto)
+            self.pg.ReadParametrGraphExcelFile(KolPareto)
             self.NomArr=0
 #            print(self.pg.NameFilePg)
             NomCurrentPG=len(PG.ArrayAllPG)
@@ -292,7 +295,7 @@ def ProbabilityNode(AllSolution,Node,NomArr):
         Probability=(Node.pheromon**PG.alf1)*(1/(kolSolution**PG.alf2))
     elif PG.typeProbability==3:
         Probability=PG.koef1*(Node.pheromonNorm**PG.alf1)+PG.koef2*(1/(kolSolution))**PG.alf2+PG.koef3*(Node.KolSolutionAll/(AllSolution))**PG.alf3
-    elif (PG.typeProbability>=30) and (PG.typeProbability<35):
+    elif (PG.typeProbability>=30) and (PG.typeProbability<=35):
         Probability = PG.koef1 * (Node.ArrPheromonNorm[PG.typeProbability-30] ** PG.alf1) + PG.koef2 * (1 / (kolSolution)) ** PG.alf2 + PG.koef3 * (Node.KolSolutionAll / (AllSolution)) ** PG.alf3
         #print(Node.pheromonNorm,Node.ArrPheromonNorm,PG.typeProbability-30,Probability)
     elif (PG.typeProbability ==36):

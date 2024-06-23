@@ -1,3 +1,5 @@
+import sys
+
 import VirtualKlaster
 import GoTime
 import Stat
@@ -36,6 +38,8 @@ def CreateAllParetoSet(ParametricGraph, TypeKlaster, TypeProbability,Stat,NameFi
     FirstPath = []
     NomNodePath = []
     NomPar = 0
+    BestOF=-sys.maxsize
+    LowOf=sys.maxsize
     while NomPar < len(ParametricGraph):
         FirstPath.append(ParametricGraph[NomPar].node[0].val)
         NomNodePath.append(0)
@@ -48,12 +52,13 @@ def CreateAllParetoSet(ParametricGraph, TypeKlaster, TypeProbability,Stat,NameFi
     while NomPar < len(ParametricGraph):
         NomNodePath[NomPar]=NomNodePath[NomPar]+1
         EndNomNodePath=False
-        #print('NomNodePath=',NomNodePath)
         while (NomPar < len(ParametricGraph)) and (NomNodePath[NomPar]>len(ParametricGraph[NomPar].node)-1):
             NomNodePath[NomPar]=0
             NomPar=NomPar+1
             if NomPar < len(ParametricGraph):
                 NomNodePath[NomPar]=NomNodePath[NomPar]+1
+                if NomPar >= len(ParametricGraph) - 4:
+                    print(GoTime.now(),'len(AllParetoSet)=', len(AllParetoSet),'NomPar=', NomPar, 'NomNodePath=', NomNodePath)
                 EndNomNodePath=True
             else:
                 EndNomNodePath = False
@@ -68,6 +73,15 @@ def CreateAllParetoSet(ParametricGraph, TypeKlaster, TypeProbability,Stat,NameFi
             Path.append(ParametricGraph[NomParPath].node[NomNodePath[NomParPath]].val)
             NomParPath=NomParPath+1
         OF, ArrOf = VirtualKlaster.GetObjectivFunction(Path, TypeKlaster, SocketClusterTime, TypeProbability)
+        j=0
+        while j<len(ArrOf):
+            if ArrOf[j]>Stat.ArrBestOF[j]:
+                Stat.ArrBestOF[j] = ArrOf[j]
+            if ArrOf[j]<Stat.ArrLowOF[j]:
+                Stat.ArrLowOF[j] = ArrOf[j]
+            j=j+1
+        BestOF = -sys.maxsize
+        LowOf = sys.maxsize
         #print('Path, ArrOf ', Path, ArrOf)
         # Проверка вхождения ArrOf в AllParetoSet
         AllParetoSet,AllSolution = update_pareto_set(AllParetoSet,AllSolution,pathArrParetoSet, Path, ArrOf)

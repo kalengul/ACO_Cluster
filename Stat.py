@@ -4,6 +4,7 @@ Created on Fri Jul 29 19:14:48 2022
 
 @author: Юрий
 """
+import sys
 
 import win32com.client  # Для загрузки из Excel
 import json
@@ -48,7 +49,7 @@ class JSONFile:
 
 class stat:
 
-    def __init__(self):
+    def __init__(self,KolPareto):
         self.MOFI = []
         self.DOFI = []
         self.MOFS = []
@@ -58,11 +59,19 @@ class stat:
         self.MEndIs = []
         self.OFProc = []
         self.KolEndIs = []
+        self.ArrEndIS= []
+        self.ArrMOFI= []
+        self.ArrDOFI= []
+        self.ArrMOFS= []
+        self.ArrDOFS= []
+        self.ArrOFProc= []
+        self.ArrKolEndIs= []
+        self.ArrMEndIs = []
         self.NomElGraphTree = []
         self.ArrTime = []
         self.DArrTime = []
 
-        self.lenProcIS = 24
+        self.lenProcIS = 8
         self.KolTimeDelEl = 10
 
         self.MSolution = 0
@@ -99,10 +108,48 @@ class stat:
 
         self.BestOF = 0
         self.LowOF = 0
-        self.StartStatistic()
+        self.ArrBestOF = []
+        self.ArrLowOF = []
+        j = 0
+        while j < KolPareto:
+            self.ArrBestOF.append(-sys.maxsize)
+            self.ArrLowOF.append(sys.maxsize)
+            j = j + 1
+        self.StartStatistic(KolPareto)
 
+    def load_pareto_set_excel(self,NameFile,KolPareto):
+        AllParetoSet = []
+        pathArrParetoSet = []
+        AllSolution = 0
+        NomParetoSet = 0
+        Excel = win32com.client.Dispatch("Excel.Application")
+        wb = Excel.Workbooks.Open(NameFile)
+        sheet = wb.ActiveSheet
+        st=sheet.Cells(2+NomParetoSet, 1).value
+        while st!=None:
+            ElParetoSet=[]
+            NomEl=0
+            while NomEl<KolPareto:
+                st = sheet.Cells(2 + NomParetoSet, 1+NomEl).value
+                ElParetoSet.append(float(st))
+                NomEl=NomEl+1
+            AllParetoSet.append(ElParetoSet)
+            ElpathArrParetoSet=[]
 
-    def save_pareto_set_excel(self,NameFile,TimeParetoSet,AllParetoSet,pathArrParetoSet,AllSolution):
+            NomParetoSet=NomParetoSet+1
+            st = sheet.Cells(2 + NomParetoSet, 1).value
+#TimeParetoSet	39,136248	AllParetoSet	1040	AllSolution	1960001
+#-1	-2,718281828	0	-1	0	0	-1	0	0	0	0	0	-1	0	0	0	0	0	0
+
+        # сохраняем рабочую книгу
+        wb.Save()
+        # закрываем ее
+        wb.Close()
+        # закрываем COM объект
+        Excel.Quit()
+        return AllParetoSet, pathArrParetoSet, AllSolution
+
+    def save_pareto_set_excel(self, NameFile, TimeParetoSet, AllParetoSet, pathArrParetoSet, AllSolution):
         Excel = win32com.client.Dispatch("Excel.Application")
         wb = Excel.Workbooks.Open(NameFile)
         sheet = wb.ActiveSheet
@@ -112,19 +159,20 @@ class stat:
         sheet.Cells(1, 4).value = len(AllParetoSet)
         sheet.Cells(1, 5).value = 'AllSolution'
         sheet.Cells(1, 6).value = AllSolution
-        NomParetoSet=0
-        if len(AllParetoSet)>0:
-            while NomParetoSet<len(AllParetoSet):
-                ElNomParetoSet=0
-                while ElNomParetoSet<len(AllParetoSet[NomParetoSet]):
-                    sheet.Cells(2+NomParetoSet, 1+ElNomParetoSet).value = AllParetoSet[NomParetoSet][ElNomParetoSet]
-                    ElNomParetoSet=ElNomParetoSet+1
+        NomParetoSet = 0
+        if len(AllParetoSet) > 0:
+            while NomParetoSet < len(AllParetoSet):
                 ElNomParetoSet = 0
-                if len(pathArrParetoSet)>0:
+                while ElNomParetoSet < len(AllParetoSet[NomParetoSet]):
+                    sheet.Cells(2 + NomParetoSet, 1 + ElNomParetoSet).value = AllParetoSet[NomParetoSet][ElNomParetoSet]
+                    ElNomParetoSet = ElNomParetoSet + 1
+                ElNomParetoSet = 0
+                if len(pathArrParetoSet) > 0:
                     while ElNomParetoSet < len(pathArrParetoSet[NomParetoSet]):
-                        sheet.Cells(2 + NomParetoSet, 2 + len(AllParetoSet[NomParetoSet]) + ElNomParetoSet).value = pathArrParetoSet[NomParetoSet][ElNomParetoSet]
+                        sheet.Cells(2 + NomParetoSet, 1 + len(AllParetoSet[NomParetoSet]) + 2 + ElNomParetoSet).value = \
+                        pathArrParetoSet[NomParetoSet][ElNomParetoSet]
                         ElNomParetoSet = ElNomParetoSet + 1
-                NomParetoSet=NomParetoSet+1
+                NomParetoSet = NomParetoSet + 1
         # сохраняем рабочую книгу
         wb.Save()
         # закрываем ее
@@ -132,18 +180,18 @@ class stat:
         # закрываем COM объект
         Excel.Quit()
 
-    def SaveStatisticsExcelParetto(self,NameFile,koliter,NomC):
+    def SaveStatisticsExcelParetto(self, NameFile, koliter, NomC):
         Excel = win32com.client.Dispatch("Excel.Application")
         wb = Excel.Workbooks.Open(NameFile)
         sheet = wb.ActiveSheet
         NomR = sheet.Cells(1, 1).value
-        sheet.Cells(NomR-1, NomC).value=self.MkolParetto
-        sheet.Cells(NomR-1, NomC+1).value = self.MkolParettoElement
-        sheet.Cells(NomR-1, NomC+2).value = self.MkolCurrentParettoSearch/ koliter
-        sheet.Cells(NomR-1, NomC+3).value = self.DkolCurrentParettoSearch/ koliter
-        sheet.Cells(NomR-1, NomC+4).value = self.MkolCurrentParettoElement
-        sheet.Cells(NomR-1, NomC+5).value = self.MkolComparisonParetoSet/ koliter
-        sheet.Cells(NomR-1, NomC+6).value = self.DkolComparisonParetoSet/ koliter
+        sheet.Cells(NomR - 1, NomC).value = self.MkolParetto
+        sheet.Cells(NomR - 1, NomC + 1).value = self.MkolParettoElement
+        sheet.Cells(NomR - 1, NomC + 2).value = self.MkolCurrentParettoSearch / koliter
+        sheet.Cells(NomR - 1, NomC + 3).value = self.DkolCurrentParettoSearch / koliter
+        sheet.Cells(NomR - 1, NomC + 4).value = self.MkolCurrentParettoElement
+        sheet.Cells(NomR - 1, NomC + 5).value = self.MkolComparisonParetoSet / koliter
+        sheet.Cells(NomR - 1, NomC + 6).value = self.DkolComparisonParetoSet / koliter
         # сохраняем рабочую книгу
         wb.Save()
         # закрываем ее
@@ -151,54 +199,87 @@ class stat:
         # закрываем COM объект
         Excel.Quit()
 
-    def SaveStatisticsExcel(self, NameFile, time, koliter, OptimPath, P):
+    def SaveStatisticsExcel(self, NameFile, KolAnt, KolPareto, time, koliter, OptimPath, P):
         Excel = win32com.client.Dispatch("Excel.Application")
         wb = Excel.Workbooks.Open(NameFile)
         sheet = wb.ActiveSheet
-        NomR = sheet.Cells(1, 1).value
+        NomR = int(sheet.Cells(1, 1).value)
         sheet.Cells(NomR, 1).value = P
-        sheet.Cells(NomR, 2).value = self.MSolution / koliter
-        sheet.Cells(NomR, 3).value = self.DSolution / koliter
-        sheet.Cells(NomR, 11).value = self.MIter / koliter
-        sheet.Cells(NomR, 12).value = self.DIter / koliter
-        sheet.Cells(NomR, 13).value = self.MIterAllAntZero / koliter
-        sheet.Cells(NomR, 14).value = self.DIterAllAntZero / koliter
-        sheet.Cells(NomR, 18).value = self.KolAllAntZero / koliter
-        sheet.Cells(NomR, 19).value = self.KolAntZero / koliter
-        sheet.Cells(NomR, 20).value = self.SumProcAntZero / koliter
-        sheet.Cells(NomR, 21).value = str(time)
-        sheet.Cells(NomR, 23).value = self.MIterationAntZero / koliter
-        sheet.Cells(NomR, 24).value = self.DIterationAntZero / koliter
-        sheet.Cells(NomR, 28).value = self.MSltnAllAntZero / koliter
-        sheet.Cells(NomR, 29).value = self.DSltnAllAntZero / koliter
+        sheet.Cells(NomR, 2).value = koliter
+        sheet.Cells(NomR, 3).value = KolAnt
 
-        i = 0
-        while i < self.lenProcIS:
-            if self.KolEndIs[i] != 0:
-                sheet.Cells(NomR, 34 + i * 2).value = self.MOFI[i] / self.KolEndIs[i]
-                sheet.Cells(NomR, 34 + i * 2 + 1).value = self.DOFI[i] / self.KolEndIs[i]
-                sheet.Cells(NomR, 34 + i * 2 + 2 * self.lenProcIS + 4).value = self.MOFS[i] / self.KolEndIs[i]
-                sheet.Cells(NomR, 34 + i * 2 + 1 + 2 * self.lenProcIS + 4).value = self.DOFS[i] / self.KolEndIs[i]
-                sheet.Cells(NomR, 34 + i + 4 * self.lenProcIS + 8).value = self.OFProc[i] / self.KolEndIs[i]
-                sheet.Cells(NomR, 34 + i + 5 * self.lenProcIS + 9).value = self.KolEndIs[i]
-                sheet.Cells(NomR, 34 + i + 6 * self.lenProcIS + 10).value = self.MEndIs[i] / self.KolEndIs[i]
-            i = i + 1
-        i = 0
-        while i < len(self.NomElGraphTree):
-            sheet.Cells(NomR, 34 + i + 7 * self.lenProcIS + 11).value = self.NomElGraphTree[i] / koliter
-            i = i + 1
+        sheet.Cells(NomR, 4).value = OptimPath
+        sheet.Cells(NomR, 5).value = self.MTime / koliter
+        sheet.Cells(NomR, 6).value = self.DTime / koliter
+        sheet.Cells(NomR, 7).value = '=F'+str(NomR)+'-E'+str(NomR)+'*E'+str(NomR)  #=E5-D5*D5
+        sheet.Cells(NomR, 8).value = '=E' + str(NomR) + '-КОРЕНЬ(G' + str(NomR) + ')/КОРЕНЬ(B' + str(NomR)+')*$B$1' #=D5-КОРЕНЬ(F5)/КОРЕНЬ(B5)*B1
+        sheet.Cells(NomR, 9).value = '=E' + str(NomR) + '+КОРЕНЬ(G' + str(NomR) + ')/КОРЕНЬ(B' + str(NomR)+')*$B$1' #=D5+КОРЕНЬ(F5)/КОРЕНЬ(B5)*B1
+        sheet.Cells(NomR, 10).value = '=E' + str(NomR) + '/(A' + str(NomR) + '*C' + str(NomR)+')' #=D5/(A5*C5)
+        sheet.Cells(NomR, 11).value = '=J' + str(NomR) + '-КОРЕНЬ(G' + str(NomR) + ')/КОРЕНЬ(B' + str(NomR)+')*$B$1' #=I5-КОРЕНЬ(F5)/КОРЕНЬ(B5)*$B$1
+        sheet.Cells(NomR, 12).value = '=J' + str(NomR) + '+КОРЕНЬ(G' + str(NomR) + ')/КОРЕНЬ(B' + str(NomR)+')*$B$1' #=I5+КОРЕНЬ(F5)/КОРЕНЬ(B5)*$B$1
+        sheet.Cells(NomR, 13).value = self.KolAllAntZero / koliter
+        sheet.Cells(NomR, 14).value = self.KolAntZero / koliter
+        sheet.Cells(NomR, 15).value = self.MIterationAntZero / koliter
+        sheet.Cells(NomR, 16).value = self.DIterationAntZero / koliter
+        sheet.Cells(NomR, 17).value = '=P' + str(NomR) + '-O' + str(NomR) + '*O' + str(NomR)  # =E5-D5*D5
+        sheet.Cells(NomR, 18).value = '=O' + str(NomR) + '-КОРЕНЬ(Q' + str(NomR) + ')/КОРЕНЬ(B' + str(
+            NomR) + ')*$B$1'  # =D5-КОРЕНЬ(F5)/КОРЕНЬ(B5)*B1
+        sheet.Cells(NomR, 19).value = '=O' + str(NomR) + '+КОРЕНЬ(Q' + str(NomR) + ')/КОРЕНЬ(B' + str(
+            NomR) + ')*$B$1'  # =D5+КОРЕНЬ(F5)/КОРЕНЬ(B5)*B1
+        sheet.Cells(NomR, 20).value = self.MSolution / koliter
+        sheet.Cells(NomR, 21).value = self.DSolution / koliter
+        sheet.Cells(NomR, 22).value = '=U'+str(NomR)+'-T'+str(NomR)+'*T'+str(NomR)  #=E5-D5*D5
+        sheet.Cells(NomR, 23).value = '=T' + str(NomR) + '-КОРЕНЬ(V' + str(NomR) + ')/КОРЕНЬ(B' + str(NomR)+')*$B$1' #=D5-КОРЕНЬ(F5)/КОРЕНЬ(B5)*B1
+        sheet.Cells(NomR, 24).value = '=T' + str(NomR) + '+КОРЕНЬ(V' + str(NomR) + ')/КОРЕНЬ(B' + str(NomR)+')*$B$1' #=D5+КОРЕНЬ(F5)/КОРЕНЬ(B5)*B1
+        sheet.Cells(NomR, 25).value = '=T' + str(NomR) + '/(A' + str(NomR) + '*C' + str(NomR)+')' #=D5/(A5*C5)
+        sheet.Cells(NomR, 26).value = '=Y' + str(NomR) + '-КОРЕНЬ(V' + str(NomR) + ')/КОРЕНЬ(B' + str(NomR)+')*$B$1' #=I5-КОРЕНЬ(F5)/КОРЕНЬ(B5)*$B$1
+        sheet.Cells(NomR, 27).value = '=Y' + str(NomR) + '+КОРЕНЬ(V' + str(NomR) + ')/КОРЕНЬ(B' + str(NomR)+')*$B$1' #=I5+КОРЕНЬ(F5)/КОРЕНЬ(B5)*$B$1
+        sheet.Cells(NomR, 28).value = self.MIter / koliter
+        sheet.Cells(NomR, 29).value = self.DIter / koliter
 
-        sheet.Cells(NomR, 34 + 7 * self.lenProcIS + len(self.NomElGraphTree) + 12).value = OptimPath
-        sheet.Cells(NomR, 34 + 7 * self.lenProcIS + len(self.NomElGraphTree) + 13).value = self.MTime / koliter
-        sheet.Cells(NomR, 34 + 7 * self.lenProcIS + len(self.NomElGraphTree) + 14).value = self.DTime / koliter
+        NomC=40
+        #sheet.Cells(NomR, 23).value = self.MIterAllAntZero / koliter
+        #sheet.Cells(NomR, 24).value = self.DIterAllAntZero / koliter
 
+        #sheet.Cells(NomR, 30).value = self.SumProcAntZero / koliter
+        #sheet.Cells(NomR, 31).value = str(time)
+
+        #sheet.Cells(NomR, 34).value = self.MSltnAllAntZero / koliter
+        #sheet.Cells(NomR, 35).value = self.DSltnAllAntZero / koliter
         i = 0
-        while i < len(self.ArrTime):
-            sheet.Cells(NomR, 34 + i * 2 + 7 * self.lenProcIS + len(self.NomElGraphTree) + 16).value = self.ArrTime[
-                                                                                                           i] / koliter
-            sheet.Cells(NomR, 34 + i * 2 + 1 + 7 * self.lenProcIS + len(self.NomElGraphTree) + 16).value = \
-            self.DArrTime[i] / koliter
+        while i<KolPareto:
+            j = 0
+            while j < self.lenProcIS:
+                if self.ArrKolEndIs[j][i] != 0:
+                    sheet.Cells(NomR, NomC + j * 2).value = self.ArrMOFI[j][i] / self.ArrKolEndIs[j][i]
+                    sheet.Cells(NomR, NomC + j * 2 + 1).value = self.ArrDOFI[j][i] / self.ArrKolEndIs[j][i]
+                    sheet.Cells(NomR, NomC + j * 2 + 2 * self.lenProcIS + 4).value = self.ArrMOFS[j][i] / self.ArrKolEndIs[j][i]
+                    sheet.Cells(NomR, NomC + j * 2 + 1 + 2 * self.lenProcIS + 4).value = self.ArrDOFS[j][i] / self.ArrKolEndIs[j][i]
+                    sheet.Cells(NomR, NomC + j + 4 * self.lenProcIS + 9).value = self.ArrKolEndIs[j][i] / koliter
+                    sheet.Cells(NomR, NomC + j + 5 * self.lenProcIS + 10).value = self.ArrOFProc[j][i] / self.ArrKolEndIs[j][i]
+                    sheet.Cells(NomR, NomC + j + 6 * self.lenProcIS + 11).value = self.ArrMEndIs[j][i] / self.ArrKolEndIs[j][i]
+                j = j + 1
+                sheet.Cells(NomR, NomC + 4 * self.lenProcIS + 4).value = '=BO' + str(NomR) + '-BN' + str(NomR) + '*BN' + str(NomR)  # =E5-D5*D5
+                sheet.Cells(NomR, NomC + 4 * self.lenProcIS + 5).value = '=BN' + str(NomR) + '-КОРЕНЬ(BP' + str(NomR) + ')/КОРЕНЬ(B' + str(
+                    NomR) + ')*$B$1'  # =D5-КОРЕНЬ(F5)/КОРЕНЬ(B5)*B1
+                sheet.Cells(NomR, NomC + 4 * self.lenProcIS + 6).value = '=BN' + str(NomR) + '+КОРЕНЬ(BP' + str(NomR) + ')/КОРЕНЬ(B' + str(
+                    NomR) + ')*$B$1'  # =D5+КОРЕНЬ(F5)/КОРЕНЬ(B5)*B1
+            NomC = NomC  + 7 * self.lenProcIS + 15
             i = i + 1
+        #i = 0
+        #while i < len(self.NomElGraphTree):
+        #    sheet.Cells(NomR, 34 + i + 7 * self.lenProcIS + 11).value = self.NomElGraphTree[i] / koliter
+        #    i = i + 1
+
+
+
+        #i = 0
+        #while i < len(self.ArrTime):
+        #    sheet.Cells(NomR, 34 + i * 2 + 7 * self.lenProcIS + len(self.NomElGraphTree) + 16).value = self.ArrTime[
+        #                                                                                                   i] / koliter
+        #    sheet.Cells(NomR, 34 + i * 2 + 1 + 7 * self.lenProcIS + len(self.NomElGraphTree) + 16).value = \
+        #        self.DArrTime[i] / koliter
+        #    i = i + 1
 
         sheet.Cells(1, 1).value = NomR + 1
         # сохраняем рабочую книгу
@@ -236,7 +317,8 @@ class stat:
 
     def StatIterationAntZero(self, NomIteration):
         self.MIterationAntZero = self.MIterationAntZero + NomIteration
-        self.DIterationAntZero = self.DIterationAntZero + NomIteration * NomIteration
+        self.DIterationAntZero = self.DIterationAntZero + NomIteration*NomIteration
+
 
     def StatIterationAntZeroGraphTree(self, KolGraphTree):
         i = 0
@@ -252,16 +334,18 @@ class stat:
             self.DSltnAllAntZero = self.DSltnAllAntZero + NomSolution * NomSolution
             self.EndAllAntZero = 1
 
-    def StatParettoSet(self,kolParetto,kolParettoElement,CurrentParettoSearch,kolCurrentParettoElement,ComparisonParetoSet):
+    def StatParettoSet(self, kolParetto, kolParettoElement, CurrentParettoSearch, kolCurrentParettoElement,
+                       ComparisonParetoSet):
         self.MkolParetto = kolParetto
         self.MkolParettoElement = kolParettoElement
-        #print(self.MkolCurrentParettoSearch, self.DkolCurrentParettoSearch)
-        self.MkolCurrentParettoSearch = self.MkolCurrentParettoSearch+CurrentParettoSearch
-        self.DkolCurrentParettoSearch = self.DkolCurrentParettoSearch+CurrentParettoSearch*CurrentParettoSearch
-        #print(self.MkolCurrentParettoSearch, self.DkolCurrentParettoSearch)
+        # print(self.MkolCurrentParettoSearch, self.DkolCurrentParettoSearch)
+        self.MkolCurrentParettoSearch = self.MkolCurrentParettoSearch + CurrentParettoSearch
+        self.DkolCurrentParettoSearch = self.DkolCurrentParettoSearch + CurrentParettoSearch * CurrentParettoSearch
+        # print(self.MkolCurrentParettoSearch, self.DkolCurrentParettoSearch)
         self.MkolCurrentParettoElement = kolCurrentParettoElement
         self.MkolComparisonParetoSet = self.MkolComparisonParetoSet + len(ComparisonParetoSet)
-        self.DkolComparisonParetoSet = self.DkolComparisonParetoSet + len(ComparisonParetoSet) * len(ComparisonParetoSet)
+        self.DkolComparisonParetoSet = self.DkolComparisonParetoSet + len(ComparisonParetoSet) * len(
+            ComparisonParetoSet)
 
     def EndStatistik(self, NomIteration, NomSolution):
         self.MSolution = self.MSolution + NomSolution
@@ -272,6 +356,33 @@ class stat:
         i = 0
         while i < self.lenProcIS:
             self.MEndIs[i] = self.MEndIs[i] + self.EndIS[i]
+            i = i + 1
+
+    def ProcBestOFArray(self, OF, NomArr, MaxOptimization, NomIteration, NomSolution):
+        i = 0
+        #print(self.ArrBestOF,self.ArrLowOF,self.ArrEndIS, self.ArrMOFI)
+        while i < self.lenProcIS:
+            if MaxOptimization == 1:
+                if (self.ArrBestOF[NomArr] - self.ArrLowOF[NomArr]) * self.ProcIS[i] + self.ArrLowOF[NomArr] <= OF and \
+                        self.ArrEndIS[i][NomArr]== 0:
+                    self.ArrMOFI[i][NomArr] = self.ArrMOFI[i][NomArr] + NomIteration
+                    self.ArrDOFI[i][NomArr] = self.ArrDOFI[i][NomArr] + NomIteration * NomIteration
+                    self.ArrMOFS[i][NomArr] = self.ArrMOFS[i][NomArr] + NomSolution
+                    self.ArrDOFS[i][NomArr] = self.ArrDOFS[i][NomArr] + NomSolution * NomSolution
+                    self.ArrOFProc[i][NomArr] = self.ArrOFProc[i][NomArr] + OF
+                    self.ArrKolEndIs[i][NomArr] = self.ArrKolEndIs[i][NomArr] + 1
+                if (self.ArrBestOF[NomArr] - self.ArrLowOF[NomArr]) * self.ProcIS[i] + self.ArrLowOF[NomArr] <= OF:
+                    self.ArrEndIS[i][NomArr] = self.ArrEndIS[i][NomArr] + 1
+            else:
+                if self.ArrBestOF[NomArr] - (self.ArrBestOF[NomArr] - self.ArrLowOF[NomArr]) * self.ProcIS[i] >= OF and self.ArrEndIS[i][NomArr] == 0:
+                    self.ArrMOFI[i][NomArr] = self.ArrMOFI[i][NomArr] + NomIteration
+                    self.ArrDOFI[i][NomArr] = self.ArrDOFI[i][NomArr] + NomIteration * NomIteration
+                    self.ArrMOFS[i][NomArr] = self.ArrMOFS[i][NomArr] + NomSolution
+                    self.ArrDOFS[i][NomArr] = self.ArrDOFS[i][NomArr] + NomSolution * NomSolution
+                    self.ArrOFProc[i][NomArr] = self.ArrOFProc[i][NomArr] + OF
+                    self.ArrKolEndIs[i][NomArr] = self.ArrKolEndIs[i][NomArr] + 1
+                if self.ArrBestOF[NomArr] - (self.ArrBestOF[NomArr] - self.ArrLowOF[NomArr]) * self.ProcIS[i] >= OF:
+                    self.ArrEndIS[i][NomArr] = self.ArrEndIS[i][NomArr] + 1
             i = i + 1
 
     def ProcBestOF(self, OF, MaxOptimization, NomIteration, NomSolution):
@@ -299,13 +410,23 @@ class stat:
                     self.EndIS[i] = self.EndIS[i] + 1
             i = i + 1
 
-    def SbrosStatistic(self):
+    def SbrosStatistic(self,KolPareto):
         self.EndIS.clear()
         self.EndAllAntZero = 0
         i = 0
         while i < self.lenProcIS:
             self.EndIS.append(0)
             i = i + 1
+        self.ArrEndIS.clear()
+        i = 0
+        while i < self.lenProcIS:
+            self.ArrEndIS.append([])
+            j = 0
+            while j < KolPareto:
+                self.ArrEndIS[i].append(0)
+                j=j+1
+            i = i + 1
+
 
     def StartStatisticGrahTree(self, KolEl):
         self.NomElGraphTree.clear()
@@ -314,7 +435,7 @@ class stat:
             self.NomElGraphTree.append(0)
             i = i + 1
 
-    def StartStatistic(self):
+    def StartStatistic(self, KolPareto):
 
         self.MSolution = 0
         self.DSolution = 0
@@ -346,7 +467,15 @@ class stat:
         self.DOFS.clear()
         self.OFProc.clear()
         self.KolEndIs.clear()
+        self.ArrEndIS.clear()
+        self.ArrMOFI.clear()
+        self.ArrDOFI.clear()
+        self.ArrMOFS.clear()
+        self.ArrDOFS.clear()
+        self.ArrOFProc.clear()
+        self.ArrKolEndIs.clear()
         self.ArrTime.clear()
+        self.ArrMEndIs.clear()
         self.EndAllAntZero = 0
         i = 0
         while i < self.lenProcIS:
@@ -358,6 +487,25 @@ class stat:
             self.OFProc.append(0)
             self.KolEndIs.append(0)
             self.MEndIs.append(0)
+            self.ArrEndIS.append([])
+            self.ArrMOFI.append([])
+            self.ArrDOFI.append([])
+            self.ArrMOFS.append([])
+            self.ArrDOFS.append([])
+            self.ArrOFProc.append([])
+            self.ArrKolEndIs.append([])
+            self.ArrMEndIs.append([])
+            j = 0
+            while j < KolPareto:
+                self.ArrEndIS[i].append(0)
+                self.ArrMOFI[i].append(0)
+                self.ArrDOFI[i].append(0)
+                self.ArrMOFS[i].append(0)
+                self.ArrDOFS[i].append(0)
+                self.ArrOFProc[i].append(0)
+                self.ArrKolEndIs[i].append(0)
+                self.ArrMEndIs[i].append(0)
+                j=j+1
             i = i + 1
         i = 0
         while i < self.KolTimeDelEl:
@@ -368,33 +516,18 @@ class stat:
     def SaveParametr(self, version, NameFile, N, Ro, Q, KolElitAgent, DeltZeroPheromon, alf1, alf2, alf3, koef1, koef2,
                      koef3, typeProbability, EndAllSolution, NameFileXL, AddFeromonAntZero, SbrosGraphAllAntZero,
                      goNewIterationAntZero, goGraphTree, SortPheromon, KolIteration, KolStatIteration,
-                     MaxkolIterationAntZero, typeParametr, GoParallelAnt, KolParallelAnt, KolElNomElGraphTree, Best, Low):
+                     MaxkolIterationAntZero, typeParametr, GoParallelAnt, KolParallelAnt, KolElNomElGraphTree, KoefLineSummPareto,
+                     KolPareto, Best, Low):
 
         self.BestOF = Best
         self.LowOF = Low
         self.ProcIS.clear()
         self.ProcIS.append(0.5)
         self.ProcIS.append(0.75)
-        self.ProcIS.append(0.80)
-        self.ProcIS.append(0.81)
-        self.ProcIS.append(0.82)
-        self.ProcIS.append(0.83)
-        self.ProcIS.append(0.84)
-        self.ProcIS.append(0.85)
-        self.ProcIS.append(0.86)
-        self.ProcIS.append(0.87)
-        self.ProcIS.append(0.88)
-        self.ProcIS.append(0.89)
         self.ProcIS.append(0.90)
-        self.ProcIS.append(0.91)
-        self.ProcIS.append(0.92)
-        self.ProcIS.append(0.93)
-        self.ProcIS.append(0.94)
         self.ProcIS.append(0.95)
-        self.ProcIS.append(0.96)
-        self.ProcIS.append(0.97)
-        self.ProcIS.append(0.98)
         self.ProcIS.append(0.99)
+        self.ProcIS.append(0.999)
         self.ProcIS.append(0.9999)
         self.ProcIS.append(1)
 
@@ -453,6 +586,10 @@ class stat:
         sheet.Cells(NomR, 28).value = a
         a = 'KolParallelAnt=' + str(KolParallelAnt)
         sheet.Cells(NomR, 29).value = a
+        a = 'KoefLineSummPareto =' + str(KoefLineSummPareto)
+        sheet.Cells(NomR, 30).value = a
+        a = 'KolPareto =' + str(KolPareto)
+        sheet.Cells(NomR, 31).value = a
 
         NomR = NomR + 1
         if typeParametr == 1:
@@ -473,62 +610,65 @@ class stat:
             sheet.Cells(NomR, 1).value = 'KolIter'
         elif typeParametr == 9:
             sheet.Cells(NomR, 1).value = 'KolIterZero'
-        sheet.Cells(NomR, 2).value = 'M Solution'
-        sheet.Cells(NomR, 3).value = 'La2 Solution'
-        sheet.Cells(NomR, 4).value = 'D Solution'
-        sheet.Cells(NomR, 5).value = 'I(-M)'
-        sheet.Cells(NomR, 6).value = 'I(+M)'
-        sheet.Cells(NomR, 7).value = 'Norm Solution'
-        sheet.Cells(NomR, 8).value = 'Norm I(-M)'
-        sheet.Cells(NomR, 9).value = 'Norm I(+M)'
+        sheet.Cells(NomR, 2).value = 'Kol Stat'
+        sheet.Cells(NomR, 3).value = 'Kol Ant'
+        sheet.Cells(NomR, 4).value = 'OptimPath'
+        sheet.Cells(NomR, 5).value = 'M All Time'
+        sheet.Cells(NomR, 6).value = 'La2 All Time'
+        sheet.Cells(NomR, 7).value = 'D All Time'
+        sheet.Cells(NomR, 8).value = 'I(-M)'
+        sheet.Cells(NomR, 9).value = 'I(+M)'
+        sheet.Cells(NomR, 10).value = 'Norm All Time'
+        sheet.Cells(NomR, 11).value = 'Norm I(-M)'
+        sheet.Cells(NomR, 12).value = 'Norm I(+M)'
+        sheet.Cells(NomR, 13).value = 'KolZeroIteration'
+        sheet.Cells(NomR, 14).value = 'KolZeroAnt'
+        sheet.Cells(NomR, 15).value = 'M DopIterAntZero'
+        sheet.Cells(NomR, 16).value = 'La2 DopIterAntZero'
+        sheet.Cells(NomR, 17).value = 'D DopIterAntZero'
+        sheet.Cells(NomR, 18).value = 'I(-M)'
+        sheet.Cells(NomR, 19).value = 'I(+M)'
+        sheet.Cells(NomR, 20).value = 'M Solution'
+        sheet.Cells(NomR, 21).value = 'La2 Solution'
+        sheet.Cells(NomR, 22).value = 'D Solution'
+        sheet.Cells(NomR, 23).value = 'I(-M)'
+        sheet.Cells(NomR, 24).value = 'I(+M)'
+        sheet.Cells(NomR, 25).value = 'Norm Solution'
+        sheet.Cells(NomR, 26).value = 'Norm I(-M)'
+        sheet.Cells(NomR, 27).value = 'Norm I(+M)'
+        sheet.Cells(NomR, 28).value = 'M Iteration'
+        sheet.Cells(NomR, 29).value = 'La2 Iteration'
 
-        sheet.Cells(NomR, 11).value = 'M Iteration'
-        sheet.Cells(NomR, 12).value = 'La2 Iteration'
-        sheet.Cells(NomR, 13).value = 'M KolIterAntGoZero'
-        sheet.Cells(NomR, 14).value = 'La2 KolIterAntGoZero'
-        sheet.Cells(NomR, 15).value = 'D KolIterAntGoZero'
-        sheet.Cells(NomR, 16).value = 'I(-M)'
-        sheet.Cells(NomR, 17).value = 'I(+M)'
-        sheet.Cells(NomR, 18).value = 'KolAllAntZero'
-        sheet.Cells(NomR, 19).value = 'KolAntZero'
-        sheet.Cells(NomR, 20).value = 'SumProcAntZero'
-        sheet.Cells(NomR, 21).value = 'Time'
-        sheet.Cells(NomR, 23).value = 'M IterAllAntZero'
-        sheet.Cells(NomR, 24).value = 'La2 IterAllAntZero'
-        sheet.Cells(NomR, 25).value = 'D IterAllAntZero'
-        sheet.Cells(NomR, 26).value = 'I(-M)'
-        sheet.Cells(NomR, 27).value = 'I(+M)'
-        sheet.Cells(NomR, 28).value = 'M SolutionAllAntZero'
-        sheet.Cells(NomR, 29).value = 'La2 SolutionAllAntZero'
-        sheet.Cells(NomR, 30).value = 'D SolutionAllAntZero'
-        sheet.Cells(NomR, 31).value = 'I(-M)'
-        sheet.Cells(NomR, 32).value = 'I(+M)'
+        NomC = 40
 
-        i = 0
-        while i < self.lenProcIS:
-            sheet.Cells(NomR, 34 + i * 2).value = 'MIter ' + str(self.ProcIS[i])
-            sheet.Cells(NomR, 34 + i * 2 + 1).value = 'La2Iter ' + str(self.ProcIS[i])
-            sheet.Cells(NomR, 34 + i * 2 + 2 * self.lenProcIS + 4).value = 'MSol ' + str(self.ProcIS[i])
-            sheet.Cells(NomR, 34 + i * 2 + 1 + 2 * self.lenProcIS + 4).value = 'La2Sol ' + str(self.ProcIS[i])
-            sheet.Cells(NomR, 34 + i + 4 * self.lenProcIS + 8).value = 'OptZn ' + str(self.ProcIS[i])
-            sheet.Cells(NomR, 34 + i + 5 * self.lenProcIS + 9).value = 'IterZn ' + str(self.ProcIS[i])
-            sheet.Cells(NomR, 34 + i + 6 * self.lenProcIS + 10).value = 'KolZn ' + str(self.ProcIS[i])
-            i = i + 1
-        i = 0
-        while i < KolElNomElGraphTree:
-            sheet.Cells(NomR, 34 + i + 7 * self.lenProcIS + 11).value = 'LevelGT ' + str(i)
-            i = i + 1
 
-        sheet.Cells(NomR, 34 + 7 * self.lenProcIS + KolElNomElGraphTree + 12).value = 'OptimPath'
-        sheet.Cells(NomR, 34 + 7 * self.lenProcIS + KolElNomElGraphTree + 13).value = 'M All Time'
-        sheet.Cells(NomR, 34 + 7 * self.lenProcIS + KolElNomElGraphTree + 14).value = 'La2 All Time'
+        j = 0
+        while j < KolPareto:
+            i = 0
+            while i < self.lenProcIS:
+                sheet.Cells(NomR, NomC + i * 2).value = 'MIter '+str(j) +' '+ str(self.ProcIS[i])
+                sheet.Cells(NomR, NomC + i * 2 + 1).value = 'La2Iter '+str(j)  +' '+ str(self.ProcIS[i])
+                sheet.Cells(NomR, NomC + i * 2 + 2 * self.lenProcIS + 4).value = 'MSol '+str(j) +' ' + str(self.ProcIS[i])
+                sheet.Cells(NomR, NomC + i * 2 + 1 + 2 * self.lenProcIS + 4).value = 'La2Sol '+str(j) +' ' + str(self.ProcIS[i])
+                sheet.Cells(NomR, NomC + i + 4 * self.lenProcIS + 9).value = 'IterZn '+str(j) +' ' + str(self.ProcIS[i])
+                sheet.Cells(NomR, NomC + i + 5 * self.lenProcIS + 10).value = 'OptZn '+str(j) +' ' + str(self.ProcIS[i])
+                sheet.Cells(NomR, NomC + i + 6 * self.lenProcIS + 11).value = 'KolZn '+str(j) +' ' + str(self.ProcIS[i])
+                i = i + 1
+            NomC=NomC + 7 * self.lenProcIS + 15
+            j = j + 1
+        #i = 0
+        #while i < KolElNomElGraphTree:
+        #    sheet.Cells(NomR, 34 + i + 7 * self.lenProcIS + 11).value = 'LevelGT ' + str(i)
+        #    i = i + 1
 
-        i = 0
-        while i < self.KolTimeDelEl:
-            sheet.Cells(NomR, 34 + i * 2 + 7 * self.lenProcIS + KolElNomElGraphTree + 16).value = 'M Time ' + str(i)
-            sheet.Cells(NomR, 34 + i * 2 + 1 + 7 * self.lenProcIS + KolElNomElGraphTree + 16).value = 'La2 Time ' + str(
-                i)
-            i = i + 1
+
+
+        #i = 0
+        #while i < self.KolTimeDelEl:
+            #sheet.Cells(NomR, 34 + i * 2 + 7 * self.lenProcIS + KolElNomElGraphTree + 16).value = 'M Time ' + str(i)
+            #sheet.Cells(NomR, 34 + i * 2 + 1 + 7 * self.lenProcIS + KolElNomElGraphTree + 16).value = 'La2 Time ' + str(
+            #    i)
+            #i = i + 1
 
         sheet.Cells(1, 1).value = NomR + 1
         # сохраняем рабочую книгу
