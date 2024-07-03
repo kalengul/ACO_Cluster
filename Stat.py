@@ -10,6 +10,8 @@ import win32com.client  # Для загрузки из Excel
 import json
 import os
 
+import GoTime
+
 
 class JSONDataAdapter:
     @staticmethod
@@ -135,18 +137,24 @@ class stat:
                 NomEl=NomEl+1
             AllParetoSet.append(ElParetoSet)
             ElpathArrParetoSet=[]
-
+            NomEl = 0
+            while st!=None:
+                st = sheet.Cells(2 + NomParetoSet, 1 + len(ElParetoSet) + 1 + NomEl).value
+                if st!=None:
+                    ElpathArrParetoSet.append(float(st))
+                NomEl = NomEl + 1
+            pathArrParetoSet.append(ElpathArrParetoSet)
+            #print(NomParetoSet, ElParetoSet, ElpathArrParetoSet)
             NomParetoSet=NomParetoSet+1
             st = sheet.Cells(2 + NomParetoSet, 1).value
-#TimeParetoSet	39,136248	AllParetoSet	1040	AllSolution	1960001
-#-1	-2,718281828	0	-1	0	0	-1	0	0	0	0	0	-1	0	0	0	0	0	0
-
         # сохраняем рабочую книгу
         wb.Save()
         # закрываем ее
         wb.Close()
         # закрываем COM объект
         Excel.Quit()
+        AllSolution=len(AllParetoSet)
+        print(GoTime.now(), 'load_pareto_set_excel', NameFile,AllSolution)
         return AllParetoSet, pathArrParetoSet, AllSolution
 
     def save_pareto_set_excel(self, NameFile, TimeParetoSet, AllParetoSet, pathArrParetoSet, AllSolution):
@@ -169,7 +177,7 @@ class stat:
                 ElNomParetoSet = 0
                 if len(pathArrParetoSet) > 0:
                     while ElNomParetoSet < len(pathArrParetoSet[NomParetoSet]):
-                        sheet.Cells(2 + NomParetoSet, 1 + len(AllParetoSet[NomParetoSet]) + 2 + ElNomParetoSet).value = \
+                        sheet.Cells(2 + NomParetoSet, 1 + len(AllParetoSet[NomParetoSet]) + 1 + ElNomParetoSet).value = \
                         pathArrParetoSet[NomParetoSet][ElNomParetoSet]
                         ElNomParetoSet = ElNomParetoSet + 1
                 NomParetoSet = NomParetoSet + 1
@@ -179,6 +187,7 @@ class stat:
         wb.Close()
         # закрываем COM объект
         Excel.Quit()
+
 
     def SaveStatisticsExcelParetto(self, NameFile, koliter, NomC):
         Excel = win32com.client.Dispatch("Excel.Application")
