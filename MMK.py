@@ -26,8 +26,8 @@ import GoTime
 import ClientSocket
 import GoParetto
 
-version='1.4.9.3 Paretto'
-dateversion='23.06.2024'
+version='1.4.9.4 Paretto'
+dateversion='03.07.2024'
 
 def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
 
@@ -50,7 +50,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
 
     def clearStartIteration(Stat,pg):
         pg.ClearPheromon(1)
-        Ant.createElitAgent(pg.MaxOptimization==1)
+        Ant.createElitAgent(Setting.KolParetto,pg.MaxOptimization==1)
         Hash.HashPath.clear()
         Hash.MaxPath.clear()
         Stat.SbrosStatistic(Setting.KolParetto)
@@ -109,6 +109,11 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
         # Элитные агенты, добавление в массив
         if Ant.KolElitAgent !=0:
             Ant.addElitAgent(Ant.AntArr[NomAnt],pg.MaxOptimization==1)
+            if (pg.typeProbability >= 30) and (pg.typeProbability < 40):
+                nomPareto=0
+                while nomPareto<Setting.KolParetto:
+                    Ant.addElitAgentPareto(Ant.AntArr[NomAnt],nomPareto,pg.MaxOptimization==1)
+                    nomPareto=nomPareto+1
         #Проверка на отрицательный феромон
         if Ant.DeltZeroPheromon != 0:
             if Ant.AntArr[NomAnt].OF+pg.difZero<0:
@@ -269,7 +274,13 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
     lock_excel.release()
     print(GoTime.now(),NomProc,'Go ParetoSet')
     if (pg.PG.typeProbability>=30) and (pg.PG.typeProbability<40):
-        GoParetto.CreateAllParetoSet(wayPg.pg.ParametricGraph, wayPg.pg.TypeKlaster, wayPg.pg.typeProbability-30,Stat,folder+'/'+'ParetoSet.xlsx',lock_excel)
+        NameFileParetoSet=folderPg + '/EnableParetoSet/'+Setting.NameFileGraph[:-5]+str(Setting.KolParetto)+'.xlsx'
+        print(NameFileParetoSet)
+        if os.path.exists(NameFileParetoSet):
+            GoParetto.AllParetoSet, GoParetto.pathArrParetoSet, GoParetto.AllSolution = Stat.load_pareto_set_excel(
+                NameFileParetoSet, Setting.KolParetto)
+        else:
+            GoParetto.CreateAllParetoSet(wayPg.pg.ParametricGraph, wayPg.pg.TypeKlaster, wayPg.pg.typeProbability-30,Stat,folder+'/'+'ParetoSet.xlsx',lock_excel)
     colored_print(NomProc)
     print(GoTime.now(),NomProc,'Go',TextPrint)
     while Par<=Setting.endParametr:
@@ -369,10 +380,20 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                 while NomAnt<KolAntEnd:
                     AddPheromonAnt(Ant.AntArr[NomAnt],NomIteration)
                     NomAnt=NomAnt+1
-                NomAnt=0
-                while NomAnt<Ant.KolElitAgent:
-                    AddPheromonAnt(Ant.ElitAntArr[NomAnt],NomIteration, addKolSolution = False)
-                    NomAnt=NomAnt+1
+
+                if (pg.PG.typeProbability>=30) and (pg.PG.typeProbability<40):
+                    NomPareto=0
+                    while NomPareto<Setting.KolParetto:
+                        NomAnt = 0
+                        while NomAnt < Ant.KolElitAgent:
+                            AddPheromonAnt(Ant.ElitAntArrPareto[NomPareto][NomAnt], NomIteration, addKolSolution=False)
+                            NomAnt = NomAnt + 1
+                        NomPareto=NomPareto+1
+                else:
+                    NomAnt = 0
+                    while NomAnt<Ant.KolElitAgent:
+                        AddPheromonAnt(Ant.ElitAntArr[NomAnt],NomIteration, addKolSolution = False)
+                        NomAnt=NomAnt+1
 
 
                 # Переход к следующей итерации

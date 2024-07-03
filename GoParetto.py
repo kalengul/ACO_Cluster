@@ -74,7 +74,7 @@ def CreateAllParetoSet(ParametricGraph, TypeKlaster, TypeProbability,Stat,NameFi
             NomParPath=NomParPath+1
         OF, ArrOf = VirtualKlaster.GetObjectivFunction(Path, TypeKlaster, SocketClusterTime, TypeProbability)
         j=0
-        while j<len(ArrOf):
+        while j<len(Stat.ArrBestOF):
             if ArrOf[j]>Stat.ArrBestOF[j]:
                 Stat.ArrBestOF[j] = ArrOf[j]
             if ArrOf[j]<Stat.ArrLowOF[j]:

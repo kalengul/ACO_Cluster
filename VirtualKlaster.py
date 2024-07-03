@@ -652,6 +652,8 @@ def GetObjectivFunction(path, TypeKlaster, SocketClusterTime, TypeProbability):
         ArrOf.append(BenchRozenbrokxPareto(path))
         ArrOf.append(BenchBirdFunctionPareto(path))
         ArrOf.append(BenchRastriginFunctionPareto(path))
+        ArrOf.append(BenchEkliFunctionPareto(path))
+        ArrOf.append(BenchKornFunctionPareto(path))
         if (TypeProbability==6) or (TypeProbability==7):
             OF = ArrOf[0]
         else:
@@ -661,8 +663,8 @@ def GetObjectivFunction(path, TypeKlaster, SocketClusterTime, TypeProbability):
         ArrOf.append(BenchRozenbrokxPareto(path))
         ArrOf.append(BenchBirdFunctionPareto(path))
         ArrOf.append(BenchRastriginFunctionPareto(path))
-        #ArrOf.append(BenchEkliFunctionPareto(path))
-        #ArrOf.append(BenchKornFunctionPareto(path))
+        ArrOf.append(BenchEkliFunctionPareto(path))
+        ArrOf.append(BenchKornFunctionPareto(path))
         if (TypeProbability==6) or (TypeProbability==7):
             OF = ArrOf[0]
         else:
