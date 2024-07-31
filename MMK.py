@@ -26,8 +26,8 @@ import GoTime
 import ClientSocket
 import GoParetto
 
-version='1.4.9.4 Paretto'
-dateversion='03.07.2024'
+version='1.4.9.5 Paretto'
+dateversion='31.07.2024'
 
 def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
 

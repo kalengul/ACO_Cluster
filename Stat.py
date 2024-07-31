@@ -127,6 +127,11 @@ class stat:
         Excel = win32com.client.Dispatch("Excel.Application")
         wb = Excel.Workbooks.Open(NameFile)
         sheet = wb.ActiveSheet
+        j = 0
+        while j < len(self.ArrBestOF):
+            self.ArrBestOF[j]=sheet.Cells(1, 8 + j).value
+            self.ArrLowOF[j]=sheet.Cells(1, 8 + j + 1 + len(self.ArrBestOF)).value
+            j = j + 1
         st=sheet.Cells(2+NomParetoSet, 1).value
         while st!=None:
             ElParetoSet=[]
@@ -167,6 +172,11 @@ class stat:
         sheet.Cells(1, 4).value = len(AllParetoSet)
         sheet.Cells(1, 5).value = 'AllSolution'
         sheet.Cells(1, 6).value = AllSolution
+        j=0
+        while j<len(self.ArrBestOF):
+            sheet.Cells(1, 8+j).value = self.ArrBestOF[j]
+            sheet.Cells(1, 8+j+1+len(self.ArrBestOF)).value = self.ArrLowOF[j]
+            j=j+1
         NomParetoSet = 0
         if len(AllParetoSet) > 0:
             while NomParetoSet < len(AllParetoSet):
