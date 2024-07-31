@@ -87,10 +87,11 @@ def CreateAllParetoSet(ParametricGraph, TypeKlaster, TypeProbability,Stat,NameFi
         AllParetoSet,AllSolution = update_pareto_set(AllParetoSet,AllSolution,pathArrParetoSet, Path, ArrOf)
         #print('AllParetoSet= ',AllParetoSet)
     TimeParetoSet=GoTime.now()-StartTime
-    lock_excel.acquire()
+    print('save_all_pareto_set_excel1')
+    #lock_excel.acquire()
     Stat.save_pareto_set_excel(NameFile,TimeParetoSet,AllParetoSet,pathArrParetoSet,AllSolution)
-    lock_excel.release()
-    print('save_all_pareto_set_excel')
+    #lock_excel.release()
+    print('save_all_pareto_set_excel2')
 
 def ComparisonParetoSet(ParetoSet):
     common_elements = set(map(tuple, AllParetoSet)) & set(map(tuple, ParetoSet))
