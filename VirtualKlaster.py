@@ -653,22 +653,22 @@ def GetObjectivFunction(path, TypeKlaster, SocketClusterTime, TypeProbability):
         ArrOf.append(BenchBirdFunctionPareto(path))
         ArrOf.append(BenchRastriginFunctionPareto(path))
         ArrOf.append(BenchEkliFunctionPareto(path))
-        ArrOf.append(BenchKornFunctionPareto(path))
+        #ArrOf.append(BenchKornFunctionPareto(path))
         if (TypeProbability==6) or (TypeProbability==7):
             OF = ArrOf[0]
         else:
             OF=ArrOf[TypeProbability]
-    elif TypeKlaster == 5001:
-        # OF = BenchRastriginFunctionx10(path)
+    elif (TypeKlaster == 5001) or (TypeKlaster == 5005):
         ArrOf.append(BenchRozenbrokxPareto(path))
         ArrOf.append(BenchBirdFunctionPareto(path))
         ArrOf.append(BenchRastriginFunctionPareto(path))
         ArrOf.append(BenchEkliFunctionPareto(path))
-        ArrOf.append(BenchKornFunctionPareto(path))
+        #ArrOf.append(BenchKornFunctionPareto(path))
         if (TypeProbability==6) or (TypeProbability==7):
             OF = ArrOf[0]
         else:
             OF=ArrOf[TypeProbability]
+
     # print(OF, path,TypeKlaster)
     if VivodKlasterExcel == 1:
         SavePathExcel('Cluster.xlsx', path, OF, TypeKlaster)

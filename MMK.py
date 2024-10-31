@@ -26,8 +26,8 @@ import GoTime
 import ClientSocket
 import GoParetto
 
-version='1.4.9.5 Paretto'
-dateversion='31.07.2024'
+version='1.4.9.6'
+dateversion='31.10.2024'
 
 def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
 
@@ -276,16 +276,16 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
     if (pg.PG.typeProbability>=30) and (pg.PG.typeProbability<40):
         NameFileParetoSet=folderPg + '/EnableParetoSet/'+Setting.NameFileGraph[:-5]+str(Setting.KolParetto)+'.xlsx'
         print(NameFileParetoSet)
-        if os.path.exists(NameFileParetoSet):
-            GoParetto.AllParetoSet, GoParetto.pathArrParetoSet, GoParetto.AllSolution = Stat.load_pareto_set_excel(
-                NameFileParetoSet, Setting.KolParetto)
-        else:
-            GoParetto.CreateAllParetoSet(wayPg.pg.ParametricGraph, wayPg.pg.TypeKlaster, wayPg.pg.typeProbability-30,Stat,folder+'/'+'ParetoSet.xlsx',lock_excel)
+        if Setting.GoLoadParetto == 1:
+            if os.path.exists(NameFileParetoSet):
+                GoParetto.AllParetoSet, GoParetto.pathArrParetoSet, GoParetto.AllSolution = Stat.load_pareto_set_excel(NameFileParetoSet, Setting.KolParetto)
+            else:
+                GoParetto.CreateAllParetoSet(wayPg.pg.ParametricGraph, wayPg.pg.TypeKlaster, wayPg.pg.typeProbability-30,Stat,folder+'/'+'ParetoSet.xlsx',lock_excel)
     lock_excel.release()
     colored_print(NomProc)
     print(GoTime.now(),NomProc,'Go',TextPrint)
     while Par<=Setting.endParametr:
-        Stat.StartStatistic(Setting.KolParetto)
+        Stat.StartStatistic(Setting.KolParetto, wayPg.pg.MaxOptimization)
         Stat.StartStatisticGrahTree(len(wayPg.pg.ParametricGraph))
         if Setting.GoSaveMap2==1:
             SaveMap.CreateElMap2(1200, 1200)
@@ -410,10 +410,11 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
             Stat.SaveTimeIteration((GoTime.DeltStartTime()).total_seconds())
             NomStatIteration=NomStatIteration+1
             if (pg.PG.typeProbability >= 30) and (pg.PG.typeProbability < 40):
-                lock_excel.acquire()
-                Stat.StatParettoSet(len(GoParetto.AllParetoSet), GoParetto.AllSolution, len(ParetoSet), kolParetoSet, GoParetto.ComparisonParetoSet(ParetoSet))
+
+                Stat.StatParettoSet(Setting.KolParetto,len(GoParetto.AllParetoSet), GoParetto.AllSolution, len(ParetoSet), kolParetoSet, GoParetto.ComparisonParetoSet(ParetoSet))
+                # lock_excel.acquire()
                 #Stat.save_pareto_set_excel(folder+'/'+'ParetoSet600.xlsx', GoTime.DeltStartTime(), GoParetto.ComparisonParetoSet(ParetoSet), [], pg.PG.typeProbability)
-                lock_excel.release()
+                #lock_excel.release()
             St.JSONFile.SaveIterJSONFile(Stat, NomStatIteration, Par)
             colored_print(NomProc)
             print(len(ParetoSet),kolParetoSet)
