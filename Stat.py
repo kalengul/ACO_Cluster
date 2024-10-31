@@ -11,6 +11,7 @@ import json
 import os
 
 import GoTime
+import LoadSettingsIniFile
 
 
 class JSONDataAdapter:
@@ -81,6 +82,12 @@ class stat:
         self.MIter = 0
         self.DIter = 0
 
+        self.OFIter = []
+        self.MOFIter = []
+        self.DOFIter=[]
+        self.MaxOFIter = []
+        self.MinOFIter = []
+
         self.MIterAllAntZero = 0
         self.DIterAllAntZero = 0
         self.MSltnAllAntZero = 0
@@ -117,7 +124,7 @@ class stat:
             self.ArrBestOF.append(-sys.maxsize)
             self.ArrLowOF.append(sys.maxsize)
             j = j + 1
-        self.StartStatistic(KolPareto)
+        self.StartStatistic(KolPareto,1)
 
     def load_pareto_set_excel(self,NameFile,KolPareto):
         AllParetoSet = []
@@ -286,7 +293,11 @@ class stat:
                     NomR) + ')*$B$1'  # =D5-КОРЕНЬ(F5)/КОРЕНЬ(B5)*B1
                 sheet.Cells(NomR, NomC + 4 * self.lenProcIS + 6).value = '=BN' + str(NomR) + '+КОРЕНЬ(BP' + str(NomR) + ')/КОРЕНЬ(B' + str(
                     NomR) + ')*$B$1'  # =D5+КОРЕНЬ(F5)/КОРЕНЬ(B5)*B1
-            NomC = NomC  + 7 * self.lenProcIS + 15
+            sheet.Cells(NomR, NomC  + 7 * self.lenProcIS+12).value = self.MOFIter[i]/ koliter
+            sheet.Cells(NomR, NomC + 7 * self.lenProcIS + 13).value = self.DOFIter[i] / koliter
+            sheet.Cells(NomR, NomC + 7 * self.lenProcIS + 14).value = self.MinOFIter[i]
+            sheet.Cells(NomR, NomC + 7 * self.lenProcIS + 15).value = self.MaxOFIter[i]
+            NomC = NomC  + 7 * self.lenProcIS + 18
             i = i + 1
         #i = 0
         #while i < len(self.NomElGraphTree):
@@ -356,7 +367,7 @@ class stat:
             self.DSltnAllAntZero = self.DSltnAllAntZero + NomSolution * NomSolution
             self.EndAllAntZero = 1
 
-    def StatParettoSet(self, kolParetto, kolParettoElement, CurrentParettoSearch, kolCurrentParettoElement,
+    def StatParettoSet(self, KolArrayPareto, kolParetto, kolParettoElement, CurrentParettoSearch, kolCurrentParettoElement,
                        ComparisonParetoSet):
         self.MkolParetto = kolParetto
         self.MkolParettoElement = kolParettoElement
@@ -368,6 +379,15 @@ class stat:
         self.MkolComparisonParetoSet = self.MkolComparisonParetoSet + len(ComparisonParetoSet)
         self.DkolComparisonParetoSet = self.DkolComparisonParetoSet + len(ComparisonParetoSet) * len(
             ComparisonParetoSet)
+        NomPareto=0
+        while NomPareto<KolArrayPareto:
+            self.MOFIter[NomPareto] = self.MOFIter [NomPareto]+ self.OFIter[NomPareto]
+            self.DOFIter[NomPareto] = self.DOFIter[NomPareto] + self.OFIter[NomPareto]*self.OFIter[NomPareto]
+            if self.OFIter[NomPareto]<self.MinOFIter[NomPareto]:
+                self.MinOFIter[NomPareto]= self.OFIter[NomPareto]
+            if self.OFIter[NomPareto]>self.MaxOFIter[NomPareto]:
+                self.MaxOFIter[NomPareto] = self.OFIter[NomPareto]
+            NomPareto=NomPareto+1
 
     def EndStatistik(self, NomIteration, NomSolution):
         self.MSolution = self.MSolution + NomSolution
@@ -385,6 +405,8 @@ class stat:
         #print(self.ArrBestOF,self.ArrLowOF,self.ArrEndIS, self.ArrMOFI)
         while i < self.lenProcIS:
             if MaxOptimization == 1:
+                if OF>self.OFIter[NomArr]:
+                    self.OFIter[NomArr]=OF
                 if (self.ArrBestOF[NomArr] - self.ArrLowOF[NomArr]) * self.ProcIS[i] + self.ArrLowOF[NomArr] <= OF and \
                         self.ArrEndIS[i][NomArr]== 0:
                     self.ArrMOFI[i][NomArr] = self.ArrMOFI[i][NomArr] + NomIteration
@@ -396,6 +418,8 @@ class stat:
                 if (self.ArrBestOF[NomArr] - self.ArrLowOF[NomArr]) * self.ProcIS[i] + self.ArrLowOF[NomArr] <= OF:
                     self.ArrEndIS[i][NomArr] = self.ArrEndIS[i][NomArr] + 1
             else:
+                if OF<self.OFIter[NomArr]:
+                    self.OFIter[NomArr]=OF
                 if self.ArrBestOF[NomArr] - (self.ArrBestOF[NomArr] - self.ArrLowOF[NomArr]) * self.ProcIS[i] >= OF and self.ArrEndIS[i][NomArr] == 0:
                     self.ArrMOFI[i][NomArr] = self.ArrMOFI[i][NomArr] + NomIteration
                     self.ArrDOFI[i][NomArr] = self.ArrDOFI[i][NomArr] + NomIteration * NomIteration
@@ -457,7 +481,7 @@ class stat:
             self.NomElGraphTree.append(0)
             i = i + 1
 
-    def StartStatistic(self, KolPareto):
+    def StartStatistic(self, KolPareto, MaxOptimization):
 
         self.MSolution = 0
         self.DSolution = 0
@@ -498,6 +522,24 @@ class stat:
         self.ArrKolEndIs.clear()
         self.ArrTime.clear()
         self.ArrMEndIs.clear()
+        self.OFIter.clear()
+        self.MaxOFIter.clear()
+        self.MinOFIter.clear()
+        self.MOFIter.clear()
+        self.DOFIter.clear()
+
+        j = 0
+        while j < KolPareto:
+            if MaxOptimization == 1:
+                self.OFIter.append(-sys.maxsize - 1)
+            else:
+                self.OFIter.append(sys.maxsize)
+            self.MaxOFIter.append(-sys.maxsize - 1)
+            self.MinOFIter.append(sys.maxsize)
+            self.MOFIter.append(0)
+            self.DOFIter.append(0)
+            j=j+1
+
         self.EndAllAntZero = 0
         i = 0
         while i < self.lenProcIS:
@@ -676,7 +718,11 @@ class stat:
                 sheet.Cells(NomR, NomC + i + 5 * self.lenProcIS + 10).value = 'OptZn '+str(j) +' ' + str(self.ProcIS[i])
                 sheet.Cells(NomR, NomC + i + 6 * self.lenProcIS + 11).value = 'KolZn '+str(j) +' ' + str(self.ProcIS[i])
                 i = i + 1
-            NomC=NomC + 7 * self.lenProcIS + 15
+            sheet.Cells(NomR, NomC + 7 * self.lenProcIS + 12).value = 'MOpt'
+            sheet.Cells(NomR, NomC + 7 * self.lenProcIS + 13).value = 'La2Opt'
+            sheet.Cells(NomR, NomC + 7 * self.lenProcIS + 14).value = 'MinOpt'
+            sheet.Cells(NomR, NomC + 7 * self.lenProcIS + 15).value = 'MaxOpt'
+            NomC = NomC + 7 * self.lenProcIS + 18
             j = j + 1
         #i = 0
         #while i < KolElNomElGraphTree:
