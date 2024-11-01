@@ -285,7 +285,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
     colored_print(NomProc)
     print(GoTime.now(),NomProc,'Go',TextPrint)
     while Par<=Setting.endParametr:
-        Stat.StartStatistic(Setting.KolParetto, wayPg.pg.MaxOptimization)
+        Stat.StartStatistic(Setting.KolParetto)
         Stat.StartStatisticGrahTree(len(wayPg.pg.ParametricGraph))
         if Setting.GoSaveMap2==1:
             SaveMap.CreateElMap2(1200, 1200)

@@ -241,28 +241,28 @@ class stat:
         sheet.Cells(NomR, 5).value = self.MTime / koliter
         sheet.Cells(NomR, 6).value = self.DTime / koliter
         sheet.Cells(NomR, 7).value = '=F'+str(NomR)+'-E'+str(NomR)+'*E'+str(NomR)  #=E5-D5*D5
-        sheet.Cells(NomR, 8).value = '=E' + str(NomR) + '-КОРЕНЬ(G' + str(NomR) + ')/КОРЕНЬ(B' + str(NomR)+')*$B$1' #=D5-КОРЕНЬ(F5)/КОРЕНЬ(B5)*B1
-        sheet.Cells(NomR, 9).value = '=E' + str(NomR) + '+КОРЕНЬ(G' + str(NomR) + ')/КОРЕНЬ(B' + str(NomR)+')*$B$1' #=D5+КОРЕНЬ(F5)/КОРЕНЬ(B5)*B1
+        sheet.Cells(NomR, 8).value = '=E' + str(NomR) + '-SQRT(G' + str(NomR) + ')/SQRT(B' + str(NomR)+')*$B$1' #=D5-SQRT(F5)/SQRT(B5)*B1
+        sheet.Cells(NomR, 9).value = '=E' + str(NomR) + '+SQRT(G' + str(NomR) + ')/SQRT(B' + str(NomR)+')*$B$1' #=D5+SQRT(F5)/SQRT(B5)*B1
         sheet.Cells(NomR, 10).value = '=E' + str(NomR) + '/(A' + str(NomR) + '*C' + str(NomR)+')' #=D5/(A5*C5)
-        sheet.Cells(NomR, 11).value = '=J' + str(NomR) + '-КОРЕНЬ(G' + str(NomR) + ')/КОРЕНЬ(B' + str(NomR)+')*$B$1' #=I5-КОРЕНЬ(F5)/КОРЕНЬ(B5)*$B$1
-        sheet.Cells(NomR, 12).value = '=J' + str(NomR) + '+КОРЕНЬ(G' + str(NomR) + ')/КОРЕНЬ(B' + str(NomR)+')*$B$1' #=I5+КОРЕНЬ(F5)/КОРЕНЬ(B5)*$B$1
+        sheet.Cells(NomR, 11).value = '=J' + str(NomR) + '-SQRT(G' + str(NomR) + ')/SQRT(B' + str(NomR)+')*$B$1' #=I5-SQRT(F5)/SQRT(B5)*$B$1
+        sheet.Cells(NomR, 12).value = '=J' + str(NomR) + '+SQRT(G' + str(NomR) + ')/SQRT(B' + str(NomR)+')*$B$1' #=I5+SQRT(F5)/SQRT(B5)*$B$1
         sheet.Cells(NomR, 13).value = self.KolAllAntZero / koliter
         sheet.Cells(NomR, 14).value = self.KolAntZero / koliter
         sheet.Cells(NomR, 15).value = self.MIterationAntZero / koliter
         sheet.Cells(NomR, 16).value = self.DIterationAntZero / koliter
         sheet.Cells(NomR, 17).value = '=P' + str(NomR) + '-O' + str(NomR) + '*O' + str(NomR)  # =E5-D5*D5
-        sheet.Cells(NomR, 18).value = '=O' + str(NomR) + '-КОРЕНЬ(Q' + str(NomR) + ')/КОРЕНЬ(B' + str(
-            NomR) + ')*$B$1'  # =D5-КОРЕНЬ(F5)/КОРЕНЬ(B5)*B1
-        sheet.Cells(NomR, 19).value = '=O' + str(NomR) + '+КОРЕНЬ(Q' + str(NomR) + ')/КОРЕНЬ(B' + str(
-            NomR) + ')*$B$1'  # =D5+КОРЕНЬ(F5)/КОРЕНЬ(B5)*B1
+        sheet.Cells(NomR, 18).value = '=O' + str(NomR) + '-SQRT(Q' + str(NomR) + ')/SQRT(B' + str(
+            NomR) + ')*$B$1'  # =D5-SQRT(F5)/SQRT(B5)*B1
+        sheet.Cells(NomR, 19).value = '=O' + str(NomR) + '+SQRT(Q' + str(NomR) + ')/SQRT(B' + str(
+            NomR) + ')*$B$1'  # =D5+SQRT(F5)/SQRT(B5)*B1
         sheet.Cells(NomR, 20).value = self.MSolution / koliter
         sheet.Cells(NomR, 21).value = self.DSolution / koliter
         sheet.Cells(NomR, 22).value = '=U'+str(NomR)+'-T'+str(NomR)+'*T'+str(NomR)  #=E5-D5*D5
-        sheet.Cells(NomR, 23).value = '=T' + str(NomR) + '-КОРЕНЬ(V' + str(NomR) + ')/КОРЕНЬ(B' + str(NomR)+')*$B$1' #=D5-КОРЕНЬ(F5)/КОРЕНЬ(B5)*B1
-        sheet.Cells(NomR, 24).value = '=T' + str(NomR) + '+КОРЕНЬ(V' + str(NomR) + ')/КОРЕНЬ(B' + str(NomR)+')*$B$1' #=D5+КОРЕНЬ(F5)/КОРЕНЬ(B5)*B1
+        sheet.Cells(NomR, 23).value = '=T' + str(NomR) + '-SQRT(V' + str(NomR) + ')/SQRT(B' + str(NomR)+')*$B$1' #=D5-SQRT(F5)/SQRT(B5)*B1
+        sheet.Cells(NomR, 24).value = '=T' + str(NomR) + '+SQRT(V' + str(NomR) + ')/SQRT(B' + str(NomR)+')*$B$1' #=D5+SQRT(F5)/SQRT(B5)*B1
         sheet.Cells(NomR, 25).value = '=T' + str(NomR) + '/(A' + str(NomR) + '*C' + str(NomR)+')' #=D5/(A5*C5)
-        sheet.Cells(NomR, 26).value = '=Y' + str(NomR) + '-КОРЕНЬ(V' + str(NomR) + ')/КОРЕНЬ(B' + str(NomR)+')*$B$1' #=I5-КОРЕНЬ(F5)/КОРЕНЬ(B5)*$B$1
-        sheet.Cells(NomR, 27).value = '=Y' + str(NomR) + '+КОРЕНЬ(V' + str(NomR) + ')/КОРЕНЬ(B' + str(NomR)+')*$B$1' #=I5+КОРЕНЬ(F5)/КОРЕНЬ(B5)*$B$1
+        sheet.Cells(NomR, 26).value = '=Y' + str(NomR) + '-SQRT(V' + str(NomR) + ')/SQRT(B' + str(NomR)+')*$B$1' #=I5-SQRT(F5)/SQRT(B5)*$B$1
+        sheet.Cells(NomR, 27).value = '=Y' + str(NomR) + '+SQRT(V' + str(NomR) + ')/SQRT(B' + str(NomR)+')*$B$1' #=I5+SQRT(F5)/SQRT(B5)*$B$1
         sheet.Cells(NomR, 28).value = self.MIter / koliter
         sheet.Cells(NomR, 29).value = self.DIter / koliter
 
@@ -289,10 +289,10 @@ class stat:
                     sheet.Cells(NomR, NomC + j + 6 * self.lenProcIS + 11).value = self.ArrMEndIs[j][i] / self.ArrKolEndIs[j][i]
                 j = j + 1
                 sheet.Cells(NomR, NomC + 4 * self.lenProcIS + 4).value = '=BO' + str(NomR) + '-BN' + str(NomR) + '*BN' + str(NomR)  # =E5-D5*D5
-                sheet.Cells(NomR, NomC + 4 * self.lenProcIS + 5).value = '=BN' + str(NomR) + '-КОРЕНЬ(BP' + str(NomR) + ')/КОРЕНЬ(B' + str(
-                    NomR) + ')*$B$1'  # =D5-КОРЕНЬ(F5)/КОРЕНЬ(B5)*B1
-                sheet.Cells(NomR, NomC + 4 * self.lenProcIS + 6).value = '=BN' + str(NomR) + '+КОРЕНЬ(BP' + str(NomR) + ')/КОРЕНЬ(B' + str(
-                    NomR) + ')*$B$1'  # =D5+КОРЕНЬ(F5)/КОРЕНЬ(B5)*B1
+                sheet.Cells(NomR, NomC + 4 * self.lenProcIS + 5).value = '=BN' + str(NomR) + '-SQRT(BP' + str(NomR) + ')/SQRT(B' + str(
+                    NomR) + ')*$B$1'  # =D5-SQRT(F5)/SQRT(B5)*B1
+                sheet.Cells(NomR, NomC + 4 * self.lenProcIS + 6).value = '=BN' + str(NomR) + '+SQRT(BP' + str(NomR) + ')/SQRT(B' + str(
+                    NomR) + ')*$B$1'  # =D5+SQRT(F5)/SQRT(B5)*B1
             sheet.Cells(NomR, NomC  + 7 * self.lenProcIS+12).value = self.MOFIter[i]/ koliter
             sheet.Cells(NomR, NomC + 7 * self.lenProcIS + 13).value = self.DOFIter[i] / koliter
             sheet.Cells(NomR, NomC + 7 * self.lenProcIS + 14).value = self.MinOFIter[i]
