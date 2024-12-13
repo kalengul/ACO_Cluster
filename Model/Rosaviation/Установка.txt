@@ -1,0 +1,1 @@
+pip install statsmodels pandas numpy matplotlib tensorflow scikit-learn keras
