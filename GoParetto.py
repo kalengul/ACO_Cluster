@@ -38,6 +38,7 @@ def CreateAllParetoSet(ParametricGraph, TypeKlaster, TypeProbability,Stat,NameFi
     FirstPath = []
     NomNodePath = []
     NomPar = 0
+    time_go=GoTime.now()
     BestOF=-sys.maxsize
     LowOf=sys.maxsize
     while NomPar < len(ParametricGraph):
@@ -57,8 +58,9 @@ def CreateAllParetoSet(ParametricGraph, TypeKlaster, TypeProbability,Stat,NameFi
             NomPar=NomPar+1
             if NomPar < len(ParametricGraph):
                 NomNodePath[NomPar]=NomNodePath[NomPar]+1
-                if NomPar >= len(ParametricGraph) - 4:
-                    print(GoTime.now(),'len(AllParetoSet)=', len(AllParetoSet),'NomPar=', NomPar, 'NomNodePath=', NomNodePath)
+                #if NomPar >= len(ParametricGraph) - 4:
+                  #print(GoTime.now()-time_go,'len(AllParetoSet)=', len(AllParetoSet),'NomPar=', NomPar, 'NomNodePath=', NomNodePath)
+                time_go=GoTime.now()
                 EndNomNodePath=True
             else:
                 EndNomNodePath = False

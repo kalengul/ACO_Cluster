@@ -6,7 +6,10 @@ Created on Tue Jul 26 16:22:49 2022
 """
 
 import math
-import SIRVD
+
+import GoTime
+import Model.SIRVD
+import Model.Rosaviation.Rosaviation
 import os
 import win32com.client  # Для загрузки из Excel
 import time
@@ -520,21 +523,21 @@ def BenchEkliFunctionPareto(path):
 
 
 def SIRVD1(path):
-    SIRVD.Susceptible = 107137780
-    SIRVD.Infected = 3609122
-    SIRVD.Recovered = 9192702
-    SIRVD.Vaccinated = 25132827
-    SIRVD.Dead = 30313
-    SIRVD.beta = path[0]
-    SIRVD.gamma = path[1]
-    SIRVD.alpha = path[2]
-    SIRVD.sigma = path[3]
-    SIRVD.delta = path[4]
+    Model.SIRVD.Susceptible = 107137780
+    Model.SIRVD.Infected = 3609122
+    Model.SIRVD.Recovered = 9192702
+    Model.SIRVD.Vaccinated = 25132827
+    Model.SIRVD.Dead = 30313
+    Model.SIRVD.beta = path[0]
+    Model.SIRVD.gamma = path[1]
+    Model.SIRVD.alpha = path[2]
+    Model.SIRVD.sigma = path[3]
+    Model.SIRVD.delta = path[4]
     i = 0
     OF = 0
     while i <= 5:
-        SIRVD.start_next()
-        OF = OF + SIRVD.go_OF_Excel_File(os.getcwd() + '/' + 'SIRVD.xlsx', i)
+        Model.SIRVD.start_next()
+        OF = OF + Model.SIRVD.go_OF_Excel_File(os.getcwd() + '/' + 'SIRVD.xlsx', i)
         i = i + 1
     OF = ((10000000000 - OF) / 1000000000 - 9.9) * 10
     # print(OF)
@@ -542,24 +545,30 @@ def SIRVD1(path):
 
 
 def SIRVD2(path):
-    SIRVD.Susceptible = path[0]
-    SIRVD.Infected = path[1]
-    SIRVD.Recovered = path[2]
-    SIRVD.Vaccinated = path[3]
-    SIRVD.Dead = path[4]
-    SIRVD.beta = path[5]
-    SIRVD.gamma = path[6]
-    SIRVD.alpha = path[7]
-    SIRVD.sigma = path[8]
-    SIRVD.delta = path[9]
+    Model.SIRVD.Susceptible = path[0]
+    Model.SIRVD.Infected = path[1]
+    Model.SIRVD.Recovered = path[2]
+    Model.SIRVD.Vaccinated = path[3]
+    Model.SIRVD.Dead = path[4]
+    Model.SIRVD.beta = path[5]
+    Model.SIRVD.gamma = path[6]
+    Model.SIRVD.alpha = path[7]
+    Model.SIRVD.sigma = path[8]
+    Model.SIRVD.delta = path[9]
     i = 0
     OF = 0
     while i <= 5:
-        SIRVD.start_next()
-        OF = OF + SIRVD.go_OF_Excel_File(os.getcwd() + '/' + 'SIRVD.xlsx', i)
+        Model.SIRVD.start_next()
+        OF = OF + Model.SIRVD.go_OF_Excel_File(os.getcwd() + '/' + 'SIRVD.xlsx', i)
         i = i + 1
     OF = ((10000000000 - OF) / 1000000000 - 9.9) * 10
     return OF
+
+def BenchRosaviation(TypeKlaster,path):
+    if TypeKlaster==6000:
+        return Model.Rosaviation.Rosaviation.goSARIMAX(path)
+    elif TypeKlaster==6001:
+        return Model.Rosaviation.Rosaviation.goSARIMAX_component(path)
 
 
 def GetObjectivFunction(path, TypeKlaster, SocketClusterTime, TypeProbability):
@@ -668,7 +677,15 @@ def GetObjectivFunction(path, TypeKlaster, SocketClusterTime, TypeProbability):
             OF = ArrOf[0]
         else:
             OF=ArrOf[TypeProbability]
-
+    elif (TypeKlaster >= 6000) and (TypeKlaster <= 6010):
+        #Start_Rosaviation_time=GoTime.now()
+        AllOf=BenchRosaviation(TypeKlaster,path)
+        #print(GoTime.now(),GoTime.now()-Start_Rosaviation_time,path,AllOf)
+        i=0
+        while i<len(AllOf):
+            ArrOf.append(AllOf[i])
+            i=i+1
+        OF = ArrOf[0]
     # print(OF, path,TypeKlaster)
     if VivodKlasterExcel == 1:
         SavePathExcel('Cluster.xlsx', path, OF, TypeKlaster)

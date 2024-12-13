@@ -207,6 +207,7 @@ class stat:
         wb.Close()
         # закрываем COM объект
         Excel.Quit()
+        input()
 
 
     def SaveStatisticsExcelParetto(self, NameFile, koliter, NomC):
@@ -381,12 +382,13 @@ class stat:
             ComparisonParetoSet)
         NomPareto=0
         while NomPareto<KolArrayPareto:
-            self.MOFIter[NomPareto] = self.MOFIter [NomPareto]+ self.OFIter[NomPareto]
-            self.DOFIter[NomPareto] = self.DOFIter[NomPareto] + self.OFIter[NomPareto]*self.OFIter[NomPareto]
-            if self.OFIter[NomPareto]<self.MinOFIter[NomPareto]:
-                self.MinOFIter[NomPareto]= self.OFIter[NomPareto]
-            if self.OFIter[NomPareto]>self.MaxOFIter[NomPareto]:
-                self.MaxOFIter[NomPareto] = self.OFIter[NomPareto]
+            if (self.OFIter[NomPareto] != sys.maxsize) and (self.OFIter[NomPareto] != -sys.maxsize):
+                self.MOFIter[NomPareto] = self.MOFIter [NomPareto]+ self.OFIter[NomPareto]
+                self.DOFIter[NomPareto] = self.DOFIter[NomPareto] + self.OFIter[NomPareto]*self.OFIter[NomPareto]
+                if self.OFIter[NomPareto]<self.MinOFIter[NomPareto]:
+                    self.MinOFIter[NomPareto]= self.OFIter[NomPareto]
+                if self.OFIter[NomPareto]>self.MaxOFIter[NomPareto]:
+                    self.MaxOFIter[NomPareto] = self.OFIter[NomPareto]
             NomPareto=NomPareto+1
 
     def EndStatistik(self, NomIteration, NomSolution):
@@ -401,60 +403,62 @@ class stat:
             i = i + 1
 
     def ProcBestOFArray(self, OF, NomArr, MaxOptimization, NomIteration, NomSolution):
-        i = 0
-        #print(self.ArrBestOF,self.ArrLowOF,self.ArrEndIS, self.ArrMOFI)
-        while i < self.lenProcIS:
-            if MaxOptimization == 1:
-                if OF>self.OFIter[NomArr]:
-                    self.OFIter[NomArr]=OF
-                if (self.ArrBestOF[NomArr] - self.ArrLowOF[NomArr]) * self.ProcIS[i] + self.ArrLowOF[NomArr] <= OF and \
-                        self.ArrEndIS[i][NomArr]== 0:
-                    self.ArrMOFI[i][NomArr] = self.ArrMOFI[i][NomArr] + NomIteration
-                    self.ArrDOFI[i][NomArr] = self.ArrDOFI[i][NomArr] + NomIteration * NomIteration
-                    self.ArrMOFS[i][NomArr] = self.ArrMOFS[i][NomArr] + NomSolution
-                    self.ArrDOFS[i][NomArr] = self.ArrDOFS[i][NomArr] + NomSolution * NomSolution
-                    self.ArrOFProc[i][NomArr] = self.ArrOFProc[i][NomArr] + OF
-                    self.ArrKolEndIs[i][NomArr] = self.ArrKolEndIs[i][NomArr] + 1
-                if (self.ArrBestOF[NomArr] - self.ArrLowOF[NomArr]) * self.ProcIS[i] + self.ArrLowOF[NomArr] <= OF:
-                    self.ArrEndIS[i][NomArr] = self.ArrEndIS[i][NomArr] + 1
-            else:
-                if OF<self.OFIter[NomArr]:
-                    self.OFIter[NomArr]=OF
-                if self.ArrBestOF[NomArr] - (self.ArrBestOF[NomArr] - self.ArrLowOF[NomArr]) * self.ProcIS[i] >= OF and self.ArrEndIS[i][NomArr] == 0:
-                    self.ArrMOFI[i][NomArr] = self.ArrMOFI[i][NomArr] + NomIteration
-                    self.ArrDOFI[i][NomArr] = self.ArrDOFI[i][NomArr] + NomIteration * NomIteration
-                    self.ArrMOFS[i][NomArr] = self.ArrMOFS[i][NomArr] + NomSolution
-                    self.ArrDOFS[i][NomArr] = self.ArrDOFS[i][NomArr] + NomSolution * NomSolution
-                    self.ArrOFProc[i][NomArr] = self.ArrOFProc[i][NomArr] + OF
-                    self.ArrKolEndIs[i][NomArr] = self.ArrKolEndIs[i][NomArr] + 1
-                if self.ArrBestOF[NomArr] - (self.ArrBestOF[NomArr] - self.ArrLowOF[NomArr]) * self.ProcIS[i] >= OF:
-                    self.ArrEndIS[i][NomArr] = self.ArrEndIS[i][NomArr] + 1
-            i = i + 1
+        if (OF != sys.maxsize) and (OF != -sys.maxsize):
+            i = 0
+            #print(self.ArrBestOF,self.ArrLowOF,self.ArrEndIS, self.ArrMOFI)
+            while i < self.lenProcIS:
+                if MaxOptimization == 1:
+                    if OF>self.OFIter[NomArr]:
+                        self.OFIter[NomArr]=OF
+                    if (self.ArrBestOF[NomArr] - self.ArrLowOF[NomArr]) * self.ProcIS[i] + self.ArrLowOF[NomArr] <= OF and \
+                            self.ArrEndIS[i][NomArr]== 0:
+                        self.ArrMOFI[i][NomArr] = self.ArrMOFI[i][NomArr] + NomIteration
+                        self.ArrDOFI[i][NomArr] = self.ArrDOFI[i][NomArr] + NomIteration * NomIteration
+                        self.ArrMOFS[i][NomArr] = self.ArrMOFS[i][NomArr] + NomSolution
+                        self.ArrDOFS[i][NomArr] = self.ArrDOFS[i][NomArr] + NomSolution * NomSolution
+                        self.ArrOFProc[i][NomArr] = self.ArrOFProc[i][NomArr] + OF
+                        self.ArrKolEndIs[i][NomArr] = self.ArrKolEndIs[i][NomArr] + 1
+                    if (self.ArrBestOF[NomArr] - self.ArrLowOF[NomArr]) * self.ProcIS[i] + self.ArrLowOF[NomArr] <= OF:
+                        self.ArrEndIS[i][NomArr] = self.ArrEndIS[i][NomArr] + 1
+                else:
+                    if OF<self.OFIter[NomArr]:
+                        self.OFIter[NomArr]=OF
+                    if self.ArrBestOF[NomArr] - (self.ArrBestOF[NomArr] - self.ArrLowOF[NomArr]) * self.ProcIS[i] >= OF and self.ArrEndIS[i][NomArr] == 0:
+                        self.ArrMOFI[i][NomArr] = self.ArrMOFI[i][NomArr] + NomIteration
+                        self.ArrDOFI[i][NomArr] = self.ArrDOFI[i][NomArr] + NomIteration * NomIteration
+                        self.ArrMOFS[i][NomArr] = self.ArrMOFS[i][NomArr] + NomSolution
+                        self.ArrDOFS[i][NomArr] = self.ArrDOFS[i][NomArr] + NomSolution * NomSolution
+                        self.ArrOFProc[i][NomArr] = self.ArrOFProc[i][NomArr] + OF
+                        self.ArrKolEndIs[i][NomArr] = self.ArrKolEndIs[i][NomArr] + 1
+                    if self.ArrBestOF[NomArr] - (self.ArrBestOF[NomArr] - self.ArrLowOF[NomArr]) * self.ProcIS[i] >= OF:
+                        self.ArrEndIS[i][NomArr] = self.ArrEndIS[i][NomArr] + 1
+                i = i + 1
 
     def ProcBestOF(self, OF, MaxOptimization, NomIteration, NomSolution):
-        i = 0
-        while i < self.lenProcIS:
-            if MaxOptimization == 1:
-                if (self.BestOF - self.LowOF) * self.ProcIS[i] + self.LowOF <= OF and self.EndIS[i] == 0:
-                    self.MOFI[i] = self.MOFI[i] + NomIteration
-                    self.DOFI[i] = self.DOFI[i] + NomIteration * NomIteration
-                    self.MOFS[i] = self.MOFS[i] + NomSolution
-                    self.DOFS[i] = self.DOFS[i] + NomSolution * NomSolution
-                    self.OFProc[i] = self.OFProc[i] + OF
-                    self.KolEndIs[i] = self.KolEndIs[i] + 1
-                if (self.BestOF - self.LowOF) * self.ProcIS[i] + self.LowOF <= OF:
-                    self.EndIS[i] = self.EndIS[i] + 1
-            else:
-                if self.BestOF - (self.BestOF - self.LowOF) * self.ProcIS[i] >= OF and self.EndIS[i] == 0:
-                    self.MOFI[i] = self.MOFI[i] + NomIteration
-                    self.DOFI[i] = self.DOFI[i] + NomIteration * NomIteration
-                    self.MOFS[i] = self.MOFS[i] + NomSolution
-                    self.DOFS[i] = self.DOFS[i] + NomSolution * NomSolution
-                    self.OFProc[i] = self.OFProc[i] + OF
-                    self.KolEndIs[i] = self.KolEndIs[i] + 1
-                if self.BestOF - (self.BestOF - self.LowOF) * self.ProcIS[i] >= OF:
-                    self.EndIS[i] = self.EndIS[i] + 1
-            i = i + 1
+        if (OF !=sys.maxsize) and (OF !=-sys.maxsize):
+            i = 0
+            while i < self.lenProcIS:
+                if MaxOptimization == 1:
+                    if (self.BestOF - self.LowOF) * self.ProcIS[i] + self.LowOF <= OF and self.EndIS[i] == 0:
+                        self.MOFI[i] = self.MOFI[i] + NomIteration
+                        self.DOFI[i] = self.DOFI[i] + NomIteration * NomIteration
+                        self.MOFS[i] = self.MOFS[i] + NomSolution
+                        self.DOFS[i] = self.DOFS[i] + NomSolution * NomSolution
+                        self.OFProc[i] = self.OFProc[i] + OF
+                        self.KolEndIs[i] = self.KolEndIs[i] + 1
+                    if (self.BestOF - self.LowOF) * self.ProcIS[i] + self.LowOF <= OF:
+                        self.EndIS[i] = self.EndIS[i] + 1
+                else:
+                    if self.BestOF - (self.BestOF - self.LowOF) * self.ProcIS[i] >= OF and self.EndIS[i] == 0:
+                        self.MOFI[i] = self.MOFI[i] + NomIteration
+                        self.DOFI[i] = self.DOFI[i] + NomIteration * NomIteration
+                        self.MOFS[i] = self.MOFS[i] + NomSolution
+                        self.DOFS[i] = self.DOFS[i] + NomSolution * NomSolution
+                        self.OFProc[i] = self.OFProc[i] + OF
+                        self.KolEndIs[i] = self.KolEndIs[i] + 1
+                    if self.BestOF - (self.BestOF - self.LowOF) * self.ProcIS[i] >= OF:
+                        self.EndIS[i] = self.EndIS[i] + 1
+                i = i + 1
 
     def SbrosStatistic(self,KolPareto):
         self.EndIS.clear()

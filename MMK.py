@@ -25,9 +25,10 @@ import SaveMap
 import GoTime
 import ClientSocket
 import GoParetto
+import Model.Rosaviation.Rosaviation
 
-version='1.4.9.6'
-dateversion='31.10.2024'
+version='1.4.10'
+dateversion='13.12.2024'
 
 def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
 
@@ -243,7 +244,8 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                         HashWay, optPathHash, optOFHash = GoPathWayHash(wayGT.pg, NomAnt, optPathHash, optOFHash)
                         Stat.StatIterationAntZero(gt.KolIterWay)
                         Stat.StatIterationAntZeroGraphTree(gt.NomElKolIterWay)
-
+        if Ant.AntArr[NomAnt].OF==sys.maxsize:
+            Ant.AntArr[NomAnt].ignore = 1
         return EndIteration,KolAntZero,optPathHash, optOFHash, kolIterationAntZero
 
     init() # инициализация модуля colorama
@@ -272,6 +274,8 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
     NameFileRes = folder+'/'+'res.xlsx'
     Stat.SaveParametr(version,NameFileRes,Ant.N,Ant.Ro,Ant.Q,Ant.KolElitAgent, Ant.DeltZeroPheromon, pg.PG.alf1,pg.PG.alf2,pg.PG.alf3,pg.PG.koef1,pg.PG.koef2,pg.PG.koef3,pg.PG.typeProbability,pg.PG.EndAllSolution,NameFile,Setting.AddFeromonAntZero,Setting.SbrosGraphAllAntZero,Setting.goNewIterationAntZero,Setting.goGraphTree,gt.SortPheromon,Setting.KolIteration,Setting.KolStatIteration,Setting.MaxkolIterationAntZero,Setting.typeParametr,Setting.GoParallelAnt,Setting.KolParallelAnt,len(wayPg.pg.ParametricGraph),wayPg.pg.KoefLineSummPareto,Setting.KolParetto,wayPg.pg.OF,wayPg.pg.MinOF)
 
+    if (wayPg.pg.TypeKlaster>=6000) and (wayPg.pg.TypeKlaster<=6010):
+       Model.Rosaviation.Rosaviation.load_data_rosaviation_excel(column_index=0, tren_size=0.75)
     print(GoTime.now(),NomProc,'Go ParetoSet')
     if (pg.PG.typeProbability>=30) and (pg.PG.typeProbability<40):
         NameFileParetoSet=folderPg + '/EnableParetoSet/'+Setting.NameFileGraph[:-5]+str(Setting.KolParetto)+'.xlsx'
@@ -281,11 +285,13 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                 GoParetto.AllParetoSet, GoParetto.pathArrParetoSet, GoParetto.AllSolution = Stat.load_pareto_set_excel(NameFileParetoSet, Setting.KolParetto)
             else:
                 GoParetto.CreateAllParetoSet(wayPg.pg.ParametricGraph, wayPg.pg.TypeKlaster, wayPg.pg.typeProbability-30,Stat,folder+'/'+'ParetoSet.xlsx',lock_excel)
+
     lock_excel.release()
     colored_print(NomProc)
     print(GoTime.now(),NomProc,'Go',TextPrint)
     while Par<=Setting.endParametr:
-        Stat.StartStatistic(Setting.KolParetto)
+        print('Setting.KolParetto,wayPg.pg.MaxOptimization',Setting.KolParetto,wayPg.pg.MaxOptimization)
+        Stat.StartStatistic(Setting.KolParetto,wayPg.pg.MaxOptimization)
         Stat.StartStatisticGrahTree(len(wayPg.pg.ParametricGraph))
         if Setting.GoSaveMap2==1:
             SaveMap.CreateElMap2(1200, 1200)

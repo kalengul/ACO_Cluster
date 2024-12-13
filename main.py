@@ -22,7 +22,7 @@ if __name__ == '__main__':
     #p.start()
     
     # Запуск процесса сокет-сервера на С#
-    subprocess.Popen(['Server/SocketServer.exe'], creationflags=subprocess.CREATE_NEW_CONSOLE)
+    #subprocess.Popen(['Server/SocketServer.exe'], creationflags=subprocess.CREATE_NEW_CONSOLE)
 
     # Создаем список процессов для ММК
     folder_pg = os.getcwd() + '/ParametricGraph' # определяем путь к папке с параметрическими графами
