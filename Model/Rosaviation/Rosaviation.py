@@ -21,6 +21,8 @@ from keras.callbacks import EarlyStopping
 train=None
 test=None
 data=None
+column_index_rosaviation = 13
+
 
 def start_rosaviation():
     os.environ[
@@ -247,7 +249,7 @@ def goSARIMAX(path):
     Q_offset = P_offset + 3 + 1
     Q = path[Q_offset] + path[Q_offset + 1] + path[Q_offset + 1 + 1]  # порядок сезонной скользящей средней
     s = 12  # период сезонности
-    periods_predict = 40
+    periods_predict = 6
     order = (p,d,q)
     seasonal_order = (P,D,Q,s)
     #order = (1,0,1)
@@ -264,8 +266,8 @@ def goSARIMAX(path):
     with open(os.getcwd() + '/Log_file.txt', 'a') as f:
         sys.stdout = f  # Change the standard output to the file we created.
         print(GoTime.now(),GoTime.now()-Time1,periods_predict,order, seasonal_order,res,path)
-    sys.stdout = original_stdout  # Reset the standard output to its original value
-    print(GoTime.now(),GoTime.now()-Time1,periods_predict,order, seasonal_order,res)
+    #sys.stdout = original_stdout  # Reset the standard output to its original value
+    #print(GoTime.now(),GoTime.now()-Time1,periods_predict,order, seasonal_order,res)
     return res
 
 def goSARIMAX_component(path):
@@ -302,7 +304,7 @@ def goSARIMAX_component(path):
 
     # Параметры сезонности и прогнозирования
     s = 12  # период сезонности
-    periods_predict = 40
+    periods_predict = 6
 
     # Формирование кортежей для параметров модели
     order_trend = (p, d, q)
@@ -336,9 +338,9 @@ def goSARIMAX_component(path):
         sys.stdout = f  # Change the standard output to the file we created.
         print(GoTime.now() - Time1, order_trend, seasonal_order_trend,
           order_seasonal, seasonal_order_seasonal, order_resid, seasonal_order_resid,res, path)
-    sys.stdout = original_stdout  # Reset the standard output to its original value
-    print(GoTime.now() - Time1, order_trend, seasonal_order_trend,
-          order_seasonal, seasonal_order_seasonal, order_resid, seasonal_order_resid,res)
+    #sys.stdout = original_stdout  # Reset the standard output to its original value
+    #print(GoTime.now() - Time1, order_trend, seasonal_order_trend,
+    #      order_seasonal, seasonal_order_seasonal, order_resid, seasonal_order_resid,res)
     return res
 
 def load_data_rosaviation_excel(column_index,tren_size):
