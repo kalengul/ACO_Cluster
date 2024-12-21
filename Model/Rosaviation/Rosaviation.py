@@ -21,6 +21,8 @@ from keras.callbacks import EarlyStopping
 train=None
 test=None
 data=None
+column_index_rosaviation = 24
+
 
 def start_rosaviation():
     os.environ[
@@ -247,7 +249,7 @@ def goSARIMAX(path):
     Q_offset = P_offset + 3 + 1
     Q = path[Q_offset] + path[Q_offset + 1] + path[Q_offset + 1 + 1]  # порядок сезонной скользящей средней
     s = 12  # период сезонности
-    periods_predict = 40
+    periods_predict = 6
     order = (p,d,q)
     seasonal_order = (P,D,Q,s)
     #order = (1,0,1)
@@ -302,7 +304,7 @@ def goSARIMAX_component(path):
 
     # Параметры сезонности и прогнозирования
     s = 12  # период сезонности
-    periods_predict = 40
+    periods_predict = 6
 
     # Формирование кортежей для параметров модели
     order_trend = (p, d, q)
