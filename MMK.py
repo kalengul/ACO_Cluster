@@ -275,10 +275,14 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
     Stat.SaveParametr(version,NameFileRes,Ant.N,Ant.Ro,Ant.Q,Ant.KolElitAgent, Ant.DeltZeroPheromon, pg.PG.alf1,pg.PG.alf2,pg.PG.alf3,pg.PG.koef1,pg.PG.koef2,pg.PG.koef3,pg.PG.typeProbability,pg.PG.EndAllSolution,NameFile,Setting.AddFeromonAntZero,Setting.SbrosGraphAllAntZero,Setting.goNewIterationAntZero,Setting.goGraphTree,gt.SortPheromon,Setting.KolIteration,Setting.KolStatIteration,Setting.MaxkolIterationAntZero,Setting.typeParametr,Setting.GoParallelAnt,Setting.KolParallelAnt,len(wayPg.pg.ParametricGraph),wayPg.pg.KoefLineSummPareto,Setting.KolParetto,wayPg.pg.OF,wayPg.pg.MinOF)
 
     if (wayPg.pg.TypeKlaster>=6000) and (wayPg.pg.TypeKlaster<=6010):
-       Model.Rosaviation.Rosaviation.load_data_rosaviation_excel(column_index=1, tren_size=0.75)
+       Model.Rosaviation.Rosaviation.load_data_rosaviation_excel(column_index=Model.Rosaviation.Rosaviation.column_index, tren_size=0.75)
     print(GoTime.now(),NomProc,'Go ParetoSet')
     if (pg.PG.typeProbability>=30) and (pg.PG.typeProbability<40):
-        NameFileParetoSet=folderPg + '/EnableParetoSet/'+Setting.NameFileGraph[:-5]+str(Setting.KolParetto)+'.xlsx'
+        if (wayPg.pg.TypeKlaster >= 6000) and (wayPg.pg.TypeKlaster <= 6010):
+            NameFileParetoSet=folderPg + '/EnableParetoSet/'+Setting.NameFileGraph[:-5]+str(Setting.KolParetto)+'_'+str(Model.Rosaviation.Rosaviation.column_index)+'.xlsx'
+        else:
+            NameFileParetoSet = folderPg + '/EnableParetoSet/' + Setting.NameFileGraph[:-5] + str(
+                Setting.KolParetto) + '.xlsx'
         print(NameFileParetoSet)
         if Setting.GoLoadParetto == 1:
             if os.path.exists(NameFileParetoSet):

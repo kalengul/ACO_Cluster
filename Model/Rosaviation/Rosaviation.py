@@ -21,6 +21,7 @@ from keras.callbacks import EarlyStopping
 train=None
 test=None
 data=None
+column_index = 13
 
 def start_rosaviation():
     os.environ[
@@ -265,7 +266,7 @@ def goSARIMAX(path):
         sys.stdout = f  # Change the standard output to the file we created.
         print(GoTime.now(),GoTime.now()-Time1,periods_predict,order, seasonal_order,res,path)
     sys.stdout = original_stdout  # Reset the standard output to its original value
-    print(GoTime.now(),GoTime.now()-Time1,periods_predict,order, seasonal_order,res)
+    #print(GoTime.now(),GoTime.now()-Time1,periods_predict,order, seasonal_order,res)
     return res
 
 def goSARIMAX_component(path):
@@ -337,8 +338,8 @@ def goSARIMAX_component(path):
         print(GoTime.now() - Time1, order_trend, seasonal_order_trend,
           order_seasonal, seasonal_order_seasonal, order_resid, seasonal_order_resid,res, path)
     sys.stdout = original_stdout  # Reset the standard output to its original value
-    print(GoTime.now() - Time1, order_trend, seasonal_order_trend,
-          order_seasonal, seasonal_order_seasonal, order_resid, seasonal_order_resid,res)
+    #print(GoTime.now() - Time1, order_trend, seasonal_order_trend,
+    #      order_seasonal, seasonal_order_seasonal, order_resid, seasonal_order_resid,res)
     return res
 
 def load_data_rosaviation_excel(column_index,tren_size):
