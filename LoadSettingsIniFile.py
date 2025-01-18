@@ -34,6 +34,8 @@ SocketPort=8080
 SocketClusterTime=0
 KolParetto = 2
 GoLoadParetto = 0
+KolSborStatIteration= 20
+ShagIterationStatistics = 100
 
 def readSetting(NameFile):
     global endprint
@@ -54,6 +56,8 @@ def readSetting(NameFile):
     global KolParallelAnt
     global KolParetto
     global GoLoadParetto
+    global KolSborStatIteration
+    global ShagIterationStatistics
 
     config = configparser.ConfigParser()  # создаём объекта парсера
     config.read(NameFile)  # читаем конфиг
@@ -75,6 +79,8 @@ def readSetting(NameFile):
     KolParallelAnt = int(config["setting_global"]["KolParallelAnt"])
     KolParetto = int(config["setting_global"]["KolParetto"])
     GoLoadParetto = int(config["setting_global"]["GoLoadParetto"])
+    KolSborStatIteration = int(config["setting_global"]["KolSborStatIteration"])
+    ShagIterationStatistics = KolIteration // KolSborStatIteration
 
     Ant.N=float(config["ant"]["N"]) 
     Ant.Q=float(config["ant"]["Q"]) 

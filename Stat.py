@@ -52,7 +52,7 @@ class JSONFile:
 
 class stat:
 
-    def __init__(self,KolPareto):
+    def __init__(self,KolStatIteration,KolPareto):
         self.MOFI = []
         self.DOFI = []
         self.MOFS = []
@@ -71,16 +71,16 @@ class stat:
         self.ArrKolEndIs= []
         self.ArrMEndIs = []
         self.NomElGraphTree = []
-        self.ArrTime = []
-        self.DArrTime = []
+        #self.ArrTime = []
+        #self.DArrTime = []
 
         self.lenProcIS = 8
         self.KolTimeDelEl = 10
 
-        self.MSolution = 0
-        self.DSolution = 0
-        self.MIter = 0
-        self.DIter = 0
+        self.MSolution = []
+        self.DSolution = []
+        self.MIter = []
+        self.DIter = []
 
         self.OFIter = []
         self.MOFIter = []
@@ -88,43 +88,193 @@ class stat:
         self.MaxOFIter = []
         self.MinOFIter = []
 
-        self.MIterAllAntZero = 0
-        self.DIterAllAntZero = 0
-        self.MSltnAllAntZero = 0
-        self.DSltnAllAntZero = 0
-        self.EndAllAntZero = 0
-        self.KolAllAntZero = 0
-        self.KolAntZero = 0
-        self.ProcAntZero = 0
-        self.SumProcAntZero = 0
-        self.MTime = 0
-        self.DTime = 0
-        self.MSocketTime = 0
-        self.DSocketTime = 0
-        self.MClusterTime = 0
-        self.DClusterTime = 0
+        self.MIterAllAntZero = []
+        self.DIterAllAntZero = []
+        self.MSltnAllAntZero = []
+        self.DSltnAllAntZero = []
+        #self.EndAllAntZero = []
+        self.KolAllAntZero = []
+        self.KolAntZero = []
+        self.ProcAntZero = []
+        #self.SumProcAntZero = [0]
+        self.MTime = []
+        self.DTime = []
+        self.MSocketTime = []
+        self.DSocketTime = []
+        self.MClusterTime = []
+        self.DClusterTime = []
 
-        self.MIterationAntZero = 0
-        self.DIterationAntZero = 0
+        self.MIterationAntZero = []
+        self.DIterationAntZero = []
 
-        self.MkolParetto = 0
-        self.MkolParettoElement = 0
-        self.MkolCurrentParettoSearch = 0
-        self.DkolCurrentParettoSearch = 0
-        self.MkolCurrentParettoElement = 0
-        self.MkolComparisonParetoSet = 0
-        self.DkolComparisonParetoSet = 0
+        self.MkolParetto = []
+        self.MkolParettoElement = []
+        self.MkolCurrentParettoSearch = []
+        self.DkolCurrentParettoSearch = []
+        self.MkolCurrentParettoElement = []
+        self.MkolComparisonParetoSet = []
+        self.DkolComparisonParetoSet = []
 
-        self.BestOF = 0
-        self.LowOF = 0
+        self.BestOF = []
+        self.LowOF = []
         self.ArrBestOF = []
         self.ArrLowOF = []
+        self.ArrBestOF.clear()
+        self.ArrLowOF.clear()
         j = 0
         while j < KolPareto:
             self.ArrBestOF.append(-sys.maxsize)
             self.ArrLowOF.append(sys.maxsize)
             j = j + 1
-        self.StartStatistic(KolPareto,1)
+        self.StartStatistic(KolStatIteration,KolPareto,1)
+
+    def StartStatistic(self, KolStatIteration, KolPareto, MaxOptimization):
+            self.MSolution.clear()
+            self.DSolution.clear()
+            self.MIter.clear()
+            self.DIter.clear()
+            self.MIterAllAntZero.clear()
+            self.DIterAllAntZero.clear()
+            self.MSltnAllAntZero.clear()
+            self.DSltnAllAntZero.clear()
+            self.KolAllAntZero.clear()
+            self.KolAntZero.clear()
+            self.ProcAntZero.clear()
+            # self.SumProcAntZero = [0]
+            self.MIterationAntZero.clear()
+            self.DIterationAntZero.clear()
+            self.MTime.clear()
+            self.DTime.clear()
+            self.MkolParetto.clear()
+            self.MkolParettoElement.clear()
+            self.MkolCurrentParettoSearch.clear()
+            self.DkolCurrentParettoSearch.clear()
+            self.MkolCurrentParettoElement.clear()
+            self.MkolComparisonParetoSet.clear()
+            self.DkolComparisonParetoSet.clear()
+            self.OFIter.clear()
+            self.MOFIter.clear()
+            self.DOFIter.clear()
+            self.MaxOFIter.clear()
+            self.MinOFIter.clear()
+            self.MOFI.clear()
+            self.DOFI.clear()
+            self.MOFS.clear()
+            self.DOFS.clear()
+            #self.ProcIS.clear()
+            self.EndIS.clear()
+            self.MEndIs.clear()
+            self.OFProc.clear()
+            self.KolEndIs.clear()
+            self.ArrEndIS.clear()
+            self.ArrMOFI.clear()
+            self.ArrDOFI.clear()
+            self.ArrMOFS.clear()
+            self.ArrDOFS.clear()
+            self.ArrOFProc.clear()
+            self.ArrKolEndIs.clear()
+            self.ArrMEndIs.clear()
+            self.NomElGraphTree.clear()
+            print('KolStatIteration=', KolStatIteration,'BestOF=', self.BestOF,'LowOF=',self.LowOF)
+            NomIteration = 0
+            while NomIteration < KolStatIteration:
+                self.EndIS.append([])
+                self.MOFI.append([])
+                self.DOFI.append([])
+                self.MOFS.append([])
+                self.DOFS.append([])
+                self.OFProc.append([])
+                self.KolEndIs.append([])
+                self.ArrEndIS.append([])
+                self.ArrMOFI.append([])
+                self.ArrDOFI.append([])
+                self.ArrMOFS.append([])
+                self.ArrDOFS.append([])
+                self.ArrOFProc.append([])
+                self.ArrKolEndIs.append([])
+                # self.ArrTime.append([])
+                self.ArrMEndIs.append([])
+                self.MEndIs.append([])
+                self.OFIter.append([])
+                self.MaxOFIter.append([])
+                self.MinOFIter.append([])
+                self.MOFIter.append([])
+                self.DOFIter.append([])
+                self.MSolution.append(0)
+                self.DSolution.append(0)
+                self.MIter.append(0)
+                self.DIter.append(0)
+                self.MIterAllAntZero.append(0)
+                self.DIterAllAntZero.append(0)
+                self.MSltnAllAntZero.append(0)
+                self.DSltnAllAntZero.append(0)
+                self.KolAllAntZero.append(0)
+                self.KolAntZero.append(0)
+                self.ProcAntZero.append(0)
+                # self.SumProcAntZero = [0]
+                self.MIterationAntZero.append(0)
+                self.DIterationAntZero.append(0)
+                self.MTime.append(0)
+                self.DTime.append(0)
+                self.MkolParetto.append(0)
+                self.MkolParettoElement.append(0)
+                self.MkolCurrentParettoSearch.append(0)
+                self.DkolCurrentParettoSearch.append(0)
+                self.MkolCurrentParettoElement.append(0)
+                self.MkolComparisonParetoSet.append(0)
+                self.DkolComparisonParetoSet.append(0)
+                # print(self.EndIS)
+                j = 0
+                while j < KolPareto:
+                    if MaxOptimization == 1:
+                        self.OFIter[NomIteration].append(-sys.maxsize)
+                    else:
+                        self.OFIter[NomIteration].append(sys.maxsize)
+                    self.MaxOFIter[NomIteration].append(-sys.maxsize)
+                    self.MinOFIter[NomIteration].append(sys.maxsize)
+                    self.MOFIter[NomIteration].append(0)
+                    self.DOFIter[NomIteration].append(0)
+                    j = j + 1
+
+                # self.EndAllAntZero.append(0)
+                i = 0
+                while i < self.lenProcIS:
+                    self.EndIS[NomIteration].append(0)
+                    self.MOFI[NomIteration].append(0)
+                    self.DOFI[NomIteration].append(0)
+                    self.MOFS[NomIteration].append(0)
+                    self.DOFS[NomIteration].append(0)
+                    self.OFProc[NomIteration].append(0)
+                    # print(self.KolEndIs,self.MEndIs,NomIteration)
+                    self.KolEndIs[NomIteration].append(0)
+                    self.MEndIs[NomIteration].append(0)
+                    self.ArrEndIS[NomIteration].append([])
+                    self.ArrMOFI[NomIteration].append([])
+                    self.ArrDOFI[NomIteration].append([])
+                    self.ArrMOFS[NomIteration].append([])
+                    self.ArrDOFS[NomIteration].append([])
+                    self.ArrOFProc[NomIteration].append([])
+                    self.ArrKolEndIs[NomIteration].append([])
+                    self.ArrMEndIs[NomIteration].append([])
+                    j = 0
+                    while j < KolPareto:
+                        self.ArrEndIS[NomIteration][i].append(0)
+                        self.ArrMOFI[NomIteration][i].append(0)
+                        self.ArrDOFI[NomIteration][i].append(0)
+                        self.ArrMOFS[NomIteration][i].append(0)
+                        self.ArrDOFS[NomIteration][i].append(0)
+                        self.ArrOFProc[NomIteration][i].append(0)
+                        self.ArrKolEndIs[NomIteration][i].append(0)
+                        self.ArrMEndIs[NomIteration][i].append(0)
+                        j = j + 1
+                    i = i + 1
+                # i = 0
+                # while i < self.KolTimeDelEl:
+                #    self.ArrTime.append(0.0)
+                #    self.DArrTime.append(0.0)
+                #    i = i + 1
+                NomIteration = NomIteration + 1
+            #print('KolStatIteration=', KolStatIteration, 'KolPareto=', KolStatIteration, self.MOFIter)
 
     def load_pareto_set_excel(self,NameFile,KolPareto):
         AllParetoSet = []
@@ -139,6 +289,7 @@ class stat:
             self.ArrBestOF[j]=sheet.Cells(1, 8 + j).value
             self.ArrLowOF[j]=sheet.Cells(1, 8 + j + 1 + len(self.ArrBestOF)).value
             j = j + 1
+        print('ArrBestOF=',self.ArrBestOF,'ArrLowOF=',self.ArrLowOF)
         st=sheet.Cells(2+NomParetoSet, 1).value
         while st!=None:
             ElParetoSet=[]
@@ -210,18 +361,22 @@ class stat:
         input()
 
 
-    def SaveStatisticsExcelParetto(self, NameFile, koliter, NomC):
+    def SaveStatisticsExcelParetto(self, NameFile, KolStatistics, koliter, NomC):
         Excel = win32com.client.Dispatch("Excel.Application")
         wb = Excel.Workbooks.Open(NameFile)
         sheet = wb.ActiveSheet
-        NomR = sheet.Cells(1, 1).value
-        sheet.Cells(NomR - 1, NomC).value = self.MkolParetto
-        sheet.Cells(NomR - 1, NomC + 1).value = self.MkolParettoElement
-        sheet.Cells(NomR - 1, NomC + 2).value = self.MkolCurrentParettoSearch / koliter
-        sheet.Cells(NomR - 1, NomC + 3).value = self.DkolCurrentParettoSearch / koliter
-        sheet.Cells(NomR - 1, NomC + 4).value = self.MkolCurrentParettoElement
-        sheet.Cells(NomR - 1, NomC + 5).value = self.MkolComparisonParetoSet / koliter
-        sheet.Cells(NomR - 1, NomC + 6).value = self.DkolComparisonParetoSet / koliter
+        NomR = sheet.Cells(1, 1).value-KolStatistics+1
+        NomStatistics = 0
+        while NomStatistics < KolStatistics:
+            sheet.Cells(NomR - 1, NomC).value = self.MkolParetto[NomStatistics]
+            sheet.Cells(NomR - 1, NomC + 1).value = self.MkolParettoElement[NomStatistics]
+            sheet.Cells(NomR - 1, NomC + 2).value = self.MkolCurrentParettoSearch[NomStatistics] / koliter
+            sheet.Cells(NomR - 1, NomC + 3).value = self.DkolCurrentParettoSearch[NomStatistics] / koliter
+            sheet.Cells(NomR - 1, NomC + 4).value = self.MkolCurrentParettoElement[NomStatistics]
+            sheet.Cells(NomR - 1, NomC + 5).value = self.MkolComparisonParetoSet[NomStatistics] / koliter
+            sheet.Cells(NomR - 1, NomC + 6).value = self.DkolComparisonParetoSet[NomStatistics] / koliter
+            NomStatistics=NomStatistics+1
+            NomR=NomR+1
         # сохраняем рабочую книгу
         wb.Save()
         # закрываем ее
@@ -229,93 +384,96 @@ class stat:
         # закрываем COM объект
         Excel.Quit()
 
-    def SaveStatisticsExcel(self, NameFile, KolAnt, KolPareto, time, koliter, OptimPath, P):
+    def SaveStatisticsExcel(self, NameFile, KolIterationEnd,KolStatistics, KolAnt, KolPareto, time, koliter, OptimPath, P):
         Excel = win32com.client.Dispatch("Excel.Application")
         wb = Excel.Workbooks.Open(NameFile)
         sheet = wb.ActiveSheet
         NomR = int(sheet.Cells(1, 1).value)
-        sheet.Cells(NomR, 1).value = P
-        sheet.Cells(NomR, 2).value = koliter
-        sheet.Cells(NomR, 3).value = KolAnt
+        NomStatistics=0
+        while NomStatistics<KolStatistics:
+            sheet.Cells(NomR, 1).value = KolIterationEnd // KolStatistics * NomStatistics
+            sheet.Cells(NomR, 2).value = koliter
+            sheet.Cells(NomR, 3).value = KolAnt
 
-        sheet.Cells(NomR, 4).value = OptimPath
-        sheet.Cells(NomR, 5).value = self.MTime / koliter
-        sheet.Cells(NomR, 6).value = self.DTime / koliter
-        sheet.Cells(NomR, 7).value = '=F'+str(NomR)+'-E'+str(NomR)+'*E'+str(NomR)  #=E5-D5*D5
-        sheet.Cells(NomR, 8).value = '=E' + str(NomR) + '-SQRT(G' + str(NomR) + ')/SQRT(B' + str(NomR)+')*$B$1' #=D5-SQRT(F5)/SQRT(B5)*B1
-        sheet.Cells(NomR, 9).value = '=E' + str(NomR) + '+SQRT(G' + str(NomR) + ')/SQRT(B' + str(NomR)+')*$B$1' #=D5+SQRT(F5)/SQRT(B5)*B1
-        sheet.Cells(NomR, 10).value = '=E' + str(NomR) + '/(A' + str(NomR) + '*C' + str(NomR)+')' #=D5/(A5*C5)
-        sheet.Cells(NomR, 11).value = '=J' + str(NomR) + '-SQRT(G' + str(NomR) + ')/SQRT(B' + str(NomR)+')*$B$1' #=I5-SQRT(F5)/SQRT(B5)*$B$1
-        sheet.Cells(NomR, 12).value = '=J' + str(NomR) + '+SQRT(G' + str(NomR) + ')/SQRT(B' + str(NomR)+')*$B$1' #=I5+SQRT(F5)/SQRT(B5)*$B$1
-        sheet.Cells(NomR, 13).value = self.KolAllAntZero / koliter
-        sheet.Cells(NomR, 14).value = self.KolAntZero / koliter
-        sheet.Cells(NomR, 15).value = self.MIterationAntZero / koliter
-        sheet.Cells(NomR, 16).value = self.DIterationAntZero / koliter
-        sheet.Cells(NomR, 17).value = '=P' + str(NomR) + '-O' + str(NomR) + '*O' + str(NomR)  # =E5-D5*D5
-        sheet.Cells(NomR, 18).value = '=O' + str(NomR) + '-SQRT(Q' + str(NomR) + ')/SQRT(B' + str(
-            NomR) + ')*$B$1'  # =D5-SQRT(F5)/SQRT(B5)*B1
-        sheet.Cells(NomR, 19).value = '=O' + str(NomR) + '+SQRT(Q' + str(NomR) + ')/SQRT(B' + str(
-            NomR) + ')*$B$1'  # =D5+SQRT(F5)/SQRT(B5)*B1
-        sheet.Cells(NomR, 20).value = self.MSolution / koliter
-        sheet.Cells(NomR, 21).value = self.DSolution / koliter
-        sheet.Cells(NomR, 22).value = '=U'+str(NomR)+'-T'+str(NomR)+'*T'+str(NomR)  #=E5-D5*D5
-        sheet.Cells(NomR, 23).value = '=T' + str(NomR) + '-SQRT(V' + str(NomR) + ')/SQRT(B' + str(NomR)+')*$B$1' #=D5-SQRT(F5)/SQRT(B5)*B1
-        sheet.Cells(NomR, 24).value = '=T' + str(NomR) + '+SQRT(V' + str(NomR) + ')/SQRT(B' + str(NomR)+')*$B$1' #=D5+SQRT(F5)/SQRT(B5)*B1
-        sheet.Cells(NomR, 25).value = '=T' + str(NomR) + '/(A' + str(NomR) + '*C' + str(NomR)+')' #=D5/(A5*C5)
-        sheet.Cells(NomR, 26).value = '=Y' + str(NomR) + '-SQRT(V' + str(NomR) + ')/SQRT(B' + str(NomR)+')*$B$1' #=I5-SQRT(F5)/SQRT(B5)*$B$1
-        sheet.Cells(NomR, 27).value = '=Y' + str(NomR) + '+SQRT(V' + str(NomR) + ')/SQRT(B' + str(NomR)+')*$B$1' #=I5+SQRT(F5)/SQRT(B5)*$B$1
-        sheet.Cells(NomR, 28).value = self.MIter / koliter
-        sheet.Cells(NomR, 29).value = self.DIter / koliter
+            sheet.Cells(NomR, 4).value = OptimPath
+            sheet.Cells(NomR, 5).value = self.MTime[NomStatistics] / koliter
+            sheet.Cells(NomR, 6).value = self.DTime[NomStatistics] / koliter
+            sheet.Cells(NomR, 7).value = '=F'+str(NomR)+'-E'+str(NomR)+'*E'+str(NomR)  #=E5-D5*D5
+            sheet.Cells(NomR, 8).value = '=E' + str(NomR) + '-SQRT(G' + str(NomR) + ')/SQRT(B' + str(NomR)+')*$B$1' #=D5-SQRT(F5)/SQRT(B5)*B1
+            sheet.Cells(NomR, 9).value = '=E' + str(NomR) + '+SQRT(G' + str(NomR) + ')/SQRT(B' + str(NomR)+')*$B$1' #=D5+SQRT(F5)/SQRT(B5)*B1
+            sheet.Cells(NomR, 10).value = '=E' + str(NomR) + '/(A' + str(NomR) + '*C' + str(NomR)+')' #=D5/(A5*C5)
+            sheet.Cells(NomR, 11).value = '=J' + str(NomR) + '-SQRT(G' + str(NomR) + ')/SQRT(B' + str(NomR)+')*$B$1' #=I5-SQRT(F5)/SQRT(B5)*$B$1
+            sheet.Cells(NomR, 12).value = '=J' + str(NomR) + '+SQRT(G' + str(NomR) + ')/SQRT(B' + str(NomR)+')*$B$1' #=I5+SQRT(F5)/SQRT(B5)*$B$1
+            sheet.Cells(NomR, 13).value = self.KolAllAntZero[NomStatistics] / koliter
+            sheet.Cells(NomR, 14).value = self.KolAntZero[NomStatistics] / koliter
+            sheet.Cells(NomR, 15).value = self.MIterationAntZero[NomStatistics] / koliter
+            sheet.Cells(NomR, 16).value = self.DIterationAntZero[NomStatistics] / koliter
+            sheet.Cells(NomR, 17).value = '=P' + str(NomR) + '-O' + str(NomR) + '*O' + str(NomR)  # =E5-D5*D5
+            sheet.Cells(NomR, 18).value = '=O' + str(NomR) + '-SQRT(Q' + str(NomR) + ')/SQRT(B' + str(
+                NomR) + ')*$B$1'  # =D5-SQRT(F5)/SQRT(B5)*B1
+            sheet.Cells(NomR, 19).value = '=O' + str(NomR) + '+SQRT(Q' + str(NomR) + ')/SQRT(B' + str(
+                NomR) + ')*$B$1'  # =D5+SQRT(F5)/SQRT(B5)*B1
+            sheet.Cells(NomR, 20).value = self.MSolution[NomStatistics] / koliter
+            sheet.Cells(NomR, 21).value = self.DSolution[NomStatistics] / koliter
+            sheet.Cells(NomR, 22).value = '=U'+str(NomR)+'-T'+str(NomR)+'*T'+str(NomR)  #=E5-D5*D5
+            sheet.Cells(NomR, 23).value = '=T' + str(NomR) + '-SQRT(V' + str(NomR) + ')/SQRT(B' + str(NomR)+')*$B$1' #=D5-SQRT(F5)/SQRT(B5)*B1
+            sheet.Cells(NomR, 24).value = '=T' + str(NomR) + '+SQRT(V' + str(NomR) + ')/SQRT(B' + str(NomR)+')*$B$1' #=D5+SQRT(F5)/SQRT(B5)*B1
+            sheet.Cells(NomR, 25).value = '=T' + str(NomR) + '/(A' + str(NomR) + '*C' + str(NomR)+')' #=D5/(A5*C5)
+            sheet.Cells(NomR, 26).value = '=Y' + str(NomR) + '-SQRT(V' + str(NomR) + ')/SQRT(B' + str(NomR)+')*$B$1' #=I5-SQRT(F5)/SQRT(B5)*$B$1
+            sheet.Cells(NomR, 27).value = '=Y' + str(NomR) + '+SQRT(V' + str(NomR) + ')/SQRT(B' + str(NomR)+')*$B$1' #=I5+SQRT(F5)/SQRT(B5)*$B$1
+            sheet.Cells(NomR, 28).value = self.MIter[NomStatistics] / koliter
+            sheet.Cells(NomR, 29).value = self.DIter[NomStatistics] / koliter
 
-        NomC=40
-        #sheet.Cells(NomR, 23).value = self.MIterAllAntZero / koliter
-        #sheet.Cells(NomR, 24).value = self.DIterAllAntZero / koliter
+            NomC=40
+            #sheet.Cells(NomR, 23).value = self.MIterAllAntZero / koliter
+            #sheet.Cells(NomR, 24).value = self.DIterAllAntZero / koliter
 
-        #sheet.Cells(NomR, 30).value = self.SumProcAntZero / koliter
-        #sheet.Cells(NomR, 31).value = str(time)
+            #sheet.Cells(NomR, 30).value = self.SumProcAntZero / koliter
+            #sheet.Cells(NomR, 31).value = str(time)
 
-        #sheet.Cells(NomR, 34).value = self.MSltnAllAntZero / koliter
-        #sheet.Cells(NomR, 35).value = self.DSltnAllAntZero / koliter
-        i = 0
-        while i<KolPareto:
-            j = 0
-            while j < self.lenProcIS:
-                if self.ArrKolEndIs[j][i] != 0:
-                    sheet.Cells(NomR, NomC + j * 2).value = self.ArrMOFI[j][i] / self.ArrKolEndIs[j][i]
-                    sheet.Cells(NomR, NomC + j * 2 + 1).value = self.ArrDOFI[j][i] / self.ArrKolEndIs[j][i]
-                    sheet.Cells(NomR, NomC + j * 2 + 2 * self.lenProcIS + 4).value = self.ArrMOFS[j][i] / self.ArrKolEndIs[j][i]
-                    sheet.Cells(NomR, NomC + j * 2 + 1 + 2 * self.lenProcIS + 4).value = self.ArrDOFS[j][i] / self.ArrKolEndIs[j][i]
-                    sheet.Cells(NomR, NomC + j + 4 * self.lenProcIS + 9).value = self.ArrKolEndIs[j][i] / koliter
-                    sheet.Cells(NomR, NomC + j + 5 * self.lenProcIS + 10).value = self.ArrOFProc[j][i] / self.ArrKolEndIs[j][i]
-                    sheet.Cells(NomR, NomC + j + 6 * self.lenProcIS + 11).value = self.ArrMEndIs[j][i] / self.ArrKolEndIs[j][i]
-                j = j + 1
-                sheet.Cells(NomR, NomC + 4 * self.lenProcIS + 4).value = '=BO' + str(NomR) + '-BN' + str(NomR) + '*BN' + str(NomR)  # =E5-D5*D5
-                sheet.Cells(NomR, NomC + 4 * self.lenProcIS + 5).value = '=BN' + str(NomR) + '-SQRT(BP' + str(NomR) + ')/SQRT(B' + str(
-                    NomR) + ')*$B$1'  # =D5-SQRT(F5)/SQRT(B5)*B1
-                sheet.Cells(NomR, NomC + 4 * self.lenProcIS + 6).value = '=BN' + str(NomR) + '+SQRT(BP' + str(NomR) + ')/SQRT(B' + str(
-                    NomR) + ')*$B$1'  # =D5+SQRT(F5)/SQRT(B5)*B1
-            sheet.Cells(NomR, NomC  + 7 * self.lenProcIS+12).value = self.MOFIter[i]/ koliter
-            sheet.Cells(NomR, NomC + 7 * self.lenProcIS + 13).value = self.DOFIter[i] / koliter
-            sheet.Cells(NomR, NomC + 7 * self.lenProcIS + 14).value = self.MinOFIter[i]
-            sheet.Cells(NomR, NomC + 7 * self.lenProcIS + 15).value = self.MaxOFIter[i]
-            NomC = NomC  + 7 * self.lenProcIS + 18
-            i = i + 1
-        #i = 0
-        #while i < len(self.NomElGraphTree):
-        #    sheet.Cells(NomR, 34 + i + 7 * self.lenProcIS + 11).value = self.NomElGraphTree[i] / koliter
-        #    i = i + 1
+            #sheet.Cells(NomR, 34).value = self.MSltnAllAntZero / koliter
+            #sheet.Cells(NomR, 35).value = self.DSltnAllAntZero / koliter
+            i = 0
+            while i<KolPareto:
+                j = 0
+                while j < self.lenProcIS:
+                    if self.ArrKolEndIs[NomStatistics][j][i] != 0:
+                        sheet.Cells(NomR, NomC + j * 2).value = self.ArrMOFI[NomStatistics][j][i] / self.ArrKolEndIs[NomStatistics][j][i]
+                        sheet.Cells(NomR, NomC + j * 2 + 1).value = self.ArrDOFI[NomStatistics][j][i] / self.ArrKolEndIs[NomStatistics][j][i]
+                        sheet.Cells(NomR, NomC + j * 2 + 2 * self.lenProcIS + 4).value = self.ArrMOFS[NomStatistics][j][i] / self.ArrKolEndIs[NomStatistics][j][i]
+                        sheet.Cells(NomR, NomC + j * 2 + 1 + 2 * self.lenProcIS + 4).value = self.ArrDOFS[NomStatistics][j][i] / self.ArrKolEndIs[NomStatistics][j][i]
+                        sheet.Cells(NomR, NomC + j + 4 * self.lenProcIS + 9).value = self.ArrKolEndIs[NomStatistics][j][i] / koliter
+                        sheet.Cells(NomR, NomC + j + 5 * self.lenProcIS + 10).value = self.ArrOFProc[NomStatistics][j][i] / self.ArrKolEndIs[NomStatistics][j][i]
+                        sheet.Cells(NomR, NomC + j + 6 * self.lenProcIS + 11).value = self.ArrMEndIs[NomStatistics][j][i] / self.ArrKolEndIs[NomStatistics][j][i]
+                    j = j + 1
+                    sheet.Cells(NomR, NomC + 4 * self.lenProcIS + 4).value = '=BO' + str(NomR) + '-BN' + str(NomR) + '*BN' + str(NomR)  # =E5-D5*D5
+                    sheet.Cells(NomR, NomC + 4 * self.lenProcIS + 5).value = '=BN' + str(NomR) + '-SQRT(BP' + str(NomR) + ')/SQRT(B' + str(
+                        NomR) + ')*$B$1'  # =D5-SQRT(F5)/SQRT(B5)*B1
+                    sheet.Cells(NomR, NomC + 4 * self.lenProcIS + 6).value = '=BN' + str(NomR) + '+SQRT(BP' + str(NomR) + ')/SQRT(B' + str(
+                        NomR) + ')*$B$1'  # =D5+SQRT(F5)/SQRT(B5)*B1
+                sheet.Cells(NomR, NomC  + 7 * self.lenProcIS+12).value = self.MOFIter[NomStatistics][i]/ koliter
+                sheet.Cells(NomR, NomC + 7 * self.lenProcIS + 13).value = self.DOFIter[NomStatistics][i] / koliter
+                sheet.Cells(NomR, NomC + 7 * self.lenProcIS + 14).value = self.MinOFIter[NomStatistics][i]
+                sheet.Cells(NomR, NomC + 7 * self.lenProcIS + 15).value = self.MaxOFIter[NomStatistics][i]
+                NomC = NomC  + 7 * self.lenProcIS + 18
+                i = i + 1
+            #i = 0
+            #while i < len(self.NomElGraphTree):
+            #    sheet.Cells(NomR, 34 + i + 7 * self.lenProcIS + 11).value = self.NomElGraphTree[i] / koliter
+            #    i = i + 1
 
 
 
-        #i = 0
-        #while i < len(self.ArrTime):
-        #    sheet.Cells(NomR, 34 + i * 2 + 7 * self.lenProcIS + len(self.NomElGraphTree) + 16).value = self.ArrTime[
-        #                                                                                                   i] / koliter
-        #    sheet.Cells(NomR, 34 + i * 2 + 1 + 7 * self.lenProcIS + len(self.NomElGraphTree) + 16).value = \
-        #        self.DArrTime[i] / koliter
-        #    i = i + 1
-
-        sheet.Cells(1, 1).value = NomR + 1
+            #i = 0
+            #while i < len(self.ArrTime):
+            #    sheet.Cells(NomR, 34 + i * 2 + 7 * self.lenProcIS + len(self.NomElGraphTree) + 16).value = self.ArrTime[
+            #                                                                                                   i] / koliter
+            #    sheet.Cells(NomR, 34 + i * 2 + 1 + 7 * self.lenProcIS + len(self.NomElGraphTree) + 16).value = \
+            #        self.DArrTime[i] / koliter
+            #    i = i + 1
+            NomStatistics=NomStatistics+1
+            NomR=NomR+1
+        sheet.Cells(1, 1).value = NomR
         # сохраняем рабочую книгу
         wb.Save()
         # закрываем ее
@@ -323,262 +481,119 @@ class stat:
         # закрываем COM объект
         Excel.Quit()
 
-    def SaveProcBestOF(self, OF, Proc):
-        if (self.BestOF - self.LowOF) * Proc + self.LowOF <= OF:
-            return 1
-        else:
-            return 0
+    def SaveTimeIteration(self,NomStatistics, time1):
+        #print('time=', self.MTime, self.DTime,time1, NomStatistics)
+        self.MTime[NomStatistics] = self.MTime[NomStatistics] + time1
+        self.DTime[NomStatistics] = self.DTime[NomStatistics] + time1 * time1
 
-    def SaveTime(self, Nom, timeDuration):
-        Nom = int(Nom) - 1
-        self.ArrTime[Nom] = self.ArrTime[Nom] + timeDuration
-        self.DArrTime[Nom] = self.DArrTime[Nom] + timeDuration * timeDuration
-        return 0
+    def StatIterationAntZero(self, NomStatistics,NomIteration):
+        #print('IterationAntZero=',self.MIterationAntZero,self.DIterationAntZero,NomIteration,NomStatistics)
+        self.MIterationAntZero[NomStatistics] = self.MIterationAntZero[NomStatistics] + NomIteration
+        self.DIterationAntZero[NomStatistics] = self.DIterationAntZero[NomStatistics] + NomIteration*NomIteration
 
-    def SaveTimeIteration(self, time1):
-        self.MTime = self.MTime + time1
-        self.DTime = self.DTime + time1 * time1
+    def StatIncAllAntZero(self,NomStatistics):
+        print('StatIncAllAntZero=',self.KolAllAntZero,self.MIterAllAntZero,self.DIterAllAntZero,NomIteration,NomSolution,NomStatistics)
+        self.KolAllAntZero[NomStatistics] = self.KolAllAntZero[NomStatistics] + 1
 
-    def SaveTimeSocket(self, time1):
-        self.MSocketTime = self.MSocketTime + time1
-        self.DSocketTime = self.DSocketTime + time1 * time1
-        print(self.MSocketTime)
-        print('Cluster', self.MClusterTime)
+    def StatIncAntZero(self,NomStatistics):
+        #print('StatIncAllAntZero=',self.KolAllAntZero,self.MIterAllAntZero,self.DIterAllAntZero,NomIteration,NomSolution,NomStatistics)
+        self.KolAntZero[NomStatistics] = self.KolAntZero[NomStatistics] + 1
 
-    def SaveTimeCluster(self, time1):
-        self.MClusterTime = self.MClusterTime + time1
-        self.DClusterTime = self.DClusterTime + time1 * time1
-
-    def StatIterationAntZero(self, NomIteration):
-        self.MIterationAntZero = self.MIterationAntZero + NomIteration
-        self.DIterationAntZero = self.DIterationAntZero + NomIteration*NomIteration
-
-
-    def StatIterationAntZeroGraphTree(self, KolGraphTree):
-        i = 0
-        while i < len(self.NomElGraphTree):
-            self.NomElGraphTree[i] = self.NomElGraphTree[i] + KolGraphTree[i]
-            i = i + 1
-
-    def StatAllAntZero(self, NomIteration, NomSolution):
-        if self.EndAllAntZero == 0:
-            self.MIterAllAntZero = self.MIterAllAntZero + NomIteration
-            self.DIterAllAntZero = self.DIterAllAntZero + NomIteration * NomIteration
-            self.MSltnAllAntZero = self.MSltnAllAntZero + NomSolution
-            self.DSltnAllAntZero = self.DSltnAllAntZero + NomSolution * NomSolution
-            self.EndAllAntZero = 1
-
-    def StatParettoSet(self, KolArrayPareto, kolParetto, kolParettoElement, CurrentParettoSearch, kolCurrentParettoElement,
+    def StatParettoSet(self, NomStatistics, KolArrayPareto, kolParetto, kolParettoElement, CurrentParettoSearch, kolCurrentParettoElement,
                        ComparisonParetoSet):
-        self.MkolParetto = kolParetto
-        self.MkolParettoElement = kolParettoElement
-        # print(self.MkolCurrentParettoSearch, self.DkolCurrentParettoSearch)
-        self.MkolCurrentParettoSearch = self.MkolCurrentParettoSearch + CurrentParettoSearch
-        self.DkolCurrentParettoSearch = self.DkolCurrentParettoSearch + CurrentParettoSearch * CurrentParettoSearch
-        # print(self.MkolCurrentParettoSearch, self.DkolCurrentParettoSearch)
-        self.MkolCurrentParettoElement = kolCurrentParettoElement
-        self.MkolComparisonParetoSet = self.MkolComparisonParetoSet + len(ComparisonParetoSet)
-        self.DkolComparisonParetoSet = self.DkolComparisonParetoSet + len(ComparisonParetoSet) * len(
+        #print('StatParettoSet=',self.MkolCurrentParettoSearch,self.MkolCurrentParettoElement,self.MkolParetto,CurrentParettoSearch,kolCurrentParettoElement,NomStatistics)
+        self.MkolParetto[NomStatistics] = kolParetto
+        self.MkolParettoElement[NomStatistics] = kolParettoElement
+        self.MkolCurrentParettoSearch[NomStatistics] = self.MkolCurrentParettoSearch[NomStatistics] + CurrentParettoSearch
+        self.DkolCurrentParettoSearch[NomStatistics] = self.DkolCurrentParettoSearch[NomStatistics] + CurrentParettoSearch * CurrentParettoSearch
+        self.MkolCurrentParettoElement[NomStatistics] = kolCurrentParettoElement
+        self.MkolComparisonParetoSet[NomStatistics] = self.MkolComparisonParetoSet[NomStatistics] + len(ComparisonParetoSet)
+        self.DkolComparisonParetoSet[NomStatistics] = self.DkolComparisonParetoSet[NomStatistics] + len(ComparisonParetoSet) * len(
             ComparisonParetoSet)
+        #print('OFIter=', KolArrayPareto, NomStatistics, self.OFIter,NomStatistics, self.MinOFIter, self.MaxOFIter)
         NomPareto=0
         while NomPareto<KolArrayPareto:
-            if (self.OFIter[NomPareto] != sys.maxsize) and (self.OFIter[NomPareto] != -sys.maxsize):
-                self.MOFIter[NomPareto] = self.MOFIter [NomPareto]+ self.OFIter[NomPareto]
-                self.DOFIter[NomPareto] = self.DOFIter[NomPareto] + self.OFIter[NomPareto]*self.OFIter[NomPareto]
-                if self.OFIter[NomPareto]<self.MinOFIter[NomPareto]:
-                    self.MinOFIter[NomPareto]= self.OFIter[NomPareto]
-                if self.OFIter[NomPareto]>self.MaxOFIter[NomPareto]:
-                    self.MaxOFIter[NomPareto] = self.OFIter[NomPareto]
+            if (self.OFIter[NomStatistics][NomPareto] != sys.maxsize) and (self.OFIter[NomStatistics][NomPareto] != -sys.maxsize):
+                self.MOFIter[NomStatistics][NomPareto] = self.MOFIter[NomStatistics] [NomPareto]+ self.OFIter[NomStatistics][NomPareto]
+                self.DOFIter[NomStatistics][NomPareto] = self.DOFIter[NomStatistics][NomPareto] + self.OFIter[NomStatistics][NomPareto]*self.OFIter[NomStatistics][NomPareto]
+                if self.OFIter[NomStatistics][NomPareto]<self.MinOFIter[NomStatistics][NomPareto]:
+                    self.MinOFIter[NomStatistics][NomPareto]= self.OFIter[NomStatistics][NomPareto]
+                if self.OFIter[NomStatistics][NomPareto]>self.MaxOFIter[NomStatistics][NomPareto]:
+                    self.MaxOFIter[NomStatistics][NomPareto] = self.OFIter[NomStatistics][NomPareto]
             NomPareto=NomPareto+1
 
-    def EndStatistik(self, NomIteration, NomSolution):
-        self.MSolution = self.MSolution + NomSolution
-        self.DSolution = self.DSolution + NomSolution * NomSolution
-        self.MIter = self.MIter + NomIteration
-        self.DIter = self.DIter + NomIteration * NomIteration
-        self.SumProcAntZero = self.SumProcAntZero + self.ProcAntZero / NomIteration
+    def EndStatistik(self, NomStatistics, NomIteration, NomSolution):
+        #print('Solution=', self.MSolution, self.DSolution,NomSolution,'iter=', self.MIter, self.DIter,NomIteration, NomStatistics, self.lenProcIS,self.MEndIs)
+        #print('Solution=', NomIteration, NomStatistics, self.lenProcIS, self.MEndIs, self.EndIS)
+        self.MSolution[NomStatistics] = self.MSolution[NomStatistics] + NomSolution
+        self.DSolution[NomStatistics] = self.DSolution[NomStatistics] + NomSolution * NomSolution
+        self.MIter[NomStatistics] = self.MIter[NomStatistics] + NomIteration
+        self.DIter[NomStatistics] = self.DIter[NomStatistics] + NomIteration * NomIteration
+        #self.SumProcAntZero[NomStatistics] = self.SumProcAntZero[NomStatistics] + self.ProcAntZero / NomIteration
         i = 0
         while i < self.lenProcIS:
-            self.MEndIs[i] = self.MEndIs[i] + self.EndIS[i]
+            self.MEndIs[NomStatistics][i] = self.MEndIs[NomStatistics][i] + self.EndIS[NomStatistics][i]
             i = i + 1
 
-    def ProcBestOFArray(self, OF, NomArr, MaxOptimization, NomIteration, NomSolution):
+
+    def ProcBestOFArray(self, NomStatistics, OF, NomArr, MaxOptimization, NomIteration, NomSolution):
         if (OF != sys.maxsize) and (OF != -sys.maxsize):
             i = 0
-            #print(self.ArrBestOF,self.ArrLowOF,self.ArrEndIS, self.ArrMOFI)
+            #print('ProcBestOFArray',NomStatistics,NomArr,OF,self.OFIter,self.ArrBestOF,self.ArrLowOF,self.ProcIS, self.ArrEndIS)
             while i < self.lenProcIS:
                 if MaxOptimization == 1:
-                    if OF>self.OFIter[NomArr]:
-                        self.OFIter[NomArr]=OF
+                    if OF>self.OFIter[NomStatistics][NomArr]:
+                        self.OFIter[NomStatistics][NomArr]=OF
+                    #print(OF,NomArr,(self.ArrBestOF[NomArr] - self.ArrLowOF[NomArr]) * self.ProcIS[i] + self.ArrLowOF[NomArr],self.ArrEndIS[NomStatistics][i][NomArr])
                     if (self.ArrBestOF[NomArr] - self.ArrLowOF[NomArr]) * self.ProcIS[i] + self.ArrLowOF[NomArr] <= OF and \
-                            self.ArrEndIS[i][NomArr]== 0:
-                        self.ArrMOFI[i][NomArr] = self.ArrMOFI[i][NomArr] + NomIteration
-                        self.ArrDOFI[i][NomArr] = self.ArrDOFI[i][NomArr] + NomIteration * NomIteration
-                        self.ArrMOFS[i][NomArr] = self.ArrMOFS[i][NomArr] + NomSolution
-                        self.ArrDOFS[i][NomArr] = self.ArrDOFS[i][NomArr] + NomSolution * NomSolution
-                        self.ArrOFProc[i][NomArr] = self.ArrOFProc[i][NomArr] + OF
-                        self.ArrKolEndIs[i][NomArr] = self.ArrKolEndIs[i][NomArr] + 1
+                            self.ArrEndIS[NomStatistics][i][NomArr]== 0:
+                        self.ArrMOFI[NomStatistics][i][NomArr] = self.ArrMOFI[NomStatistics][i][NomArr] + NomIteration
+                        self.ArrDOFI[NomStatistics][i][NomArr] = self.ArrDOFI[NomStatistics][i][NomArr] + NomIteration * NomIteration
+                        self.ArrMOFS[NomStatistics][i][NomArr] = self.ArrMOFS[NomStatistics][i][NomArr] + NomSolution
+                        self.ArrDOFS[NomStatistics][i][NomArr] = self.ArrDOFS[NomStatistics][i][NomArr] + NomSolution * NomSolution
+                        self.ArrOFProc[NomStatistics][i][NomArr] = self.ArrOFProc[NomStatistics][i][NomArr] + OF
+                        self.ArrKolEndIs[NomStatistics][i][NomArr] = self.ArrKolEndIs[NomStatistics][i][NomArr] + 1
                     if (self.ArrBestOF[NomArr] - self.ArrLowOF[NomArr]) * self.ProcIS[i] + self.ArrLowOF[NomArr] <= OF:
-                        self.ArrEndIS[i][NomArr] = self.ArrEndIS[i][NomArr] + 1
+                        self.ArrEndIS[NomStatistics][i][NomArr] = self.ArrEndIS[NomStatistics][i][NomArr] + 1
+                        self.ArrMEndIs[NomStatistics][i][NomArr] = self.ArrMEndIs[NomStatistics][i][NomArr] + 1
                 else:
-                    if OF<self.OFIter[NomArr]:
-                        self.OFIter[NomArr]=OF
-                    if self.ArrBestOF[NomArr] - (self.ArrBestOF[NomArr] - self.ArrLowOF[NomArr]) * self.ProcIS[i] >= OF and self.ArrEndIS[i][NomArr] == 0:
-                        self.ArrMOFI[i][NomArr] = self.ArrMOFI[i][NomArr] + NomIteration
-                        self.ArrDOFI[i][NomArr] = self.ArrDOFI[i][NomArr] + NomIteration * NomIteration
-                        self.ArrMOFS[i][NomArr] = self.ArrMOFS[i][NomArr] + NomSolution
-                        self.ArrDOFS[i][NomArr] = self.ArrDOFS[i][NomArr] + NomSolution * NomSolution
-                        self.ArrOFProc[i][NomArr] = self.ArrOFProc[i][NomArr] + OF
-                        self.ArrKolEndIs[i][NomArr] = self.ArrKolEndIs[i][NomArr] + 1
+                    if OF<self.OFIter[NomStatistics][NomArr]:
+                        self.OFIter[NomStatistics][NomArr]=OF
+                    if self.ArrBestOF[NomArr] - (self.ArrBestOF[NomArr] - self.ArrLowOF[NomArr]) * self.ProcIS[i] >= OF and self.ArrEndIS[NomStatistics][i][NomArr] == 0:
+                        self.ArrMOFI[NomStatistics][i][NomArr] = self.ArrMOFI[NomStatistics][i][NomArr] + NomIteration
+                        self.ArrDOFI[NomStatistics][i][NomArr] = self.ArrDOFI[NomStatistics][i][NomArr] + NomIteration * NomIteration
+                        self.ArrMOFS[NomStatistics][i][NomArr] = self.ArrMOFS[NomStatistics][i][NomArr] + NomSolution
+                        self.ArrDOFS[NomStatistics][i][NomArr] = self.ArrDOFS[NomStatistics][i][NomArr] + NomSolution * NomSolution
+                        self.ArrOFProc[NomStatistics][i][NomArr] = self.ArrOFProc[NomStatistics][i][NomArr] + OF
+                        self.ArrKolEndIs[NomStatistics][i][NomArr] = self.ArrKolEndIs[NomStatistics][i][NomArr] + 1
                     if self.ArrBestOF[NomArr] - (self.ArrBestOF[NomArr] - self.ArrLowOF[NomArr]) * self.ProcIS[i] >= OF:
-                        self.ArrEndIS[i][NomArr] = self.ArrEndIS[i][NomArr] + 1
+                        self.ArrEndIS[NomStatistics][i][NomArr] = self.ArrEndIS[NomStatistics][i][NomArr] + 1
+                        self.ArrMEndIs[NomStatistics][i][NomArr] = self.ArrMEndIs[NomStatistics][i][NomArr] + 1
                 i = i + 1
 
-    def ProcBestOF(self, OF, MaxOptimization, NomIteration, NomSolution):
-        if (OF !=sys.maxsize) and (OF !=-sys.maxsize):
+
+    def SbrosStatistic(self,KolStatistics,KolPareto):
+        NomStatistics=0
+        while NomStatistics<KolStatistics:
+            self.EndIS[NomStatistics].clear()
+            self.ArrEndIS[NomStatistics].clear()
+            #self.EndAllAntZero[NomStatistics] = 0
             i = 0
             while i < self.lenProcIS:
-                if MaxOptimization == 1:
-                    if (self.BestOF - self.LowOF) * self.ProcIS[i] + self.LowOF <= OF and self.EndIS[i] == 0:
-                        self.MOFI[i] = self.MOFI[i] + NomIteration
-                        self.DOFI[i] = self.DOFI[i] + NomIteration * NomIteration
-                        self.MOFS[i] = self.MOFS[i] + NomSolution
-                        self.DOFS[i] = self.DOFS[i] + NomSolution * NomSolution
-                        self.OFProc[i] = self.OFProc[i] + OF
-                        self.KolEndIs[i] = self.KolEndIs[i] + 1
-                    if (self.BestOF - self.LowOF) * self.ProcIS[i] + self.LowOF <= OF:
-                        self.EndIS[i] = self.EndIS[i] + 1
-                else:
-                    if self.BestOF - (self.BestOF - self.LowOF) * self.ProcIS[i] >= OF and self.EndIS[i] == 0:
-                        self.MOFI[i] = self.MOFI[i] + NomIteration
-                        self.DOFI[i] = self.DOFI[i] + NomIteration * NomIteration
-                        self.MOFS[i] = self.MOFS[i] + NomSolution
-                        self.DOFS[i] = self.DOFS[i] + NomSolution * NomSolution
-                        self.OFProc[i] = self.OFProc[i] + OF
-                        self.KolEndIs[i] = self.KolEndIs[i] + 1
-                    if self.BestOF - (self.BestOF - self.LowOF) * self.ProcIS[i] >= OF:
-                        self.EndIS[i] = self.EndIS[i] + 1
+                self.EndIS[NomStatistics].append(0)
+                self.ArrEndIS[NomStatistics].append([])
+                j = 0
+                while j < KolPareto:
+                    self.ArrEndIS[NomStatistics][i].append(0)
+                    j=j+1
                 i = i + 1
-
-    def SbrosStatistic(self,KolPareto):
-        self.EndIS.clear()
-        self.EndAllAntZero = 0
-        i = 0
-        while i < self.lenProcIS:
-            self.EndIS.append(0)
-            i = i + 1
-        self.ArrEndIS.clear()
-        i = 0
-        while i < self.lenProcIS:
-            self.ArrEndIS.append([])
-            j = 0
-            while j < KolPareto:
-                self.ArrEndIS[i].append(0)
-                j=j+1
-            i = i + 1
-
+            NomStatistics=NomStatistics+1
 
     def StartStatisticGrahTree(self, KolEl):
         self.NomElGraphTree.clear()
         i = 0
         while i < KolEl:
             self.NomElGraphTree.append(0)
-            i = i + 1
-
-    def StartStatistic(self, KolPareto, MaxOptimization):
-
-        self.MSolution = 0
-        self.DSolution = 0
-        self.MIter = 0
-        self.DIter = 0
-        self.MIterAllAntZero = 0
-        self.DIterAllAntZero = 0
-        self.MSltnAllAntZero = 0
-        self.DSltnAllAntZero = 0
-        self.KolAllAntZero = 0
-        self.KolAntZero = 0
-        self.ProcAntZero = 0
-        self.SumProcAntZero = 0
-        self.MIterationAntZero = 0
-        self.DIterationAntZero = 0
-        self.MTime = 0
-        self.DTime = 0
-        self.MkolParetto = 0
-        self.MkolParettoElement = 0
-        self.MkolCurrentParettoSearch = 0
-        self.DkolCurrentParettoSearch = 0
-        self.MkolCurrentParettoElement = 0
-        self.MkolComparisonParetoSet = 0
-        self.DkolComparisonParetoSet = 0
-        self.EndIS.clear()
-        self.MOFI.clear()
-        self.DOFI.clear()
-        self.MOFS.clear()
-        self.DOFS.clear()
-        self.OFProc.clear()
-        self.KolEndIs.clear()
-        self.ArrEndIS.clear()
-        self.ArrMOFI.clear()
-        self.ArrDOFI.clear()
-        self.ArrMOFS.clear()
-        self.ArrDOFS.clear()
-        self.ArrOFProc.clear()
-        self.ArrKolEndIs.clear()
-        self.ArrTime.clear()
-        self.ArrMEndIs.clear()
-        self.OFIter.clear()
-        self.MaxOFIter.clear()
-        self.MinOFIter.clear()
-        self.MOFIter.clear()
-        self.DOFIter.clear()
-
-        j = 0
-        while j < KolPareto:
-            if MaxOptimization == 1:
-                self.OFIter.append(-sys.maxsize - 1)
-            else:
-                self.OFIter.append(sys.maxsize)
-            self.MaxOFIter.append(-sys.maxsize - 1)
-            self.MinOFIter.append(sys.maxsize)
-            self.MOFIter.append(0)
-            self.DOFIter.append(0)
-            j=j+1
-
-        self.EndAllAntZero = 0
-        i = 0
-        while i < self.lenProcIS:
-            self.EndIS.append(0)
-            self.MOFI.append(0)
-            self.DOFI.append(0)
-            self.MOFS.append(0)
-            self.DOFS.append(0)
-            self.OFProc.append(0)
-            self.KolEndIs.append(0)
-            self.MEndIs.append(0)
-            self.ArrEndIS.append([])
-            self.ArrMOFI.append([])
-            self.ArrDOFI.append([])
-            self.ArrMOFS.append([])
-            self.ArrDOFS.append([])
-            self.ArrOFProc.append([])
-            self.ArrKolEndIs.append([])
-            self.ArrMEndIs.append([])
-            j = 0
-            while j < KolPareto:
-                self.ArrEndIS[i].append(0)
-                self.ArrMOFI[i].append(0)
-                self.ArrDOFI[i].append(0)
-                self.ArrMOFS[i].append(0)
-                self.ArrDOFS[i].append(0)
-                self.ArrOFProc[i].append(0)
-                self.ArrKolEndIs[i].append(0)
-                self.ArrMEndIs[i].append(0)
-                j=j+1
-            i = i + 1
-        i = 0
-        while i < self.KolTimeDelEl:
-            self.ArrTime.append(0.0)
-            self.DArrTime.append(0.0)
             i = i + 1
 
     def SaveParametr(self, version, NameFile, N, Ro, Q, KolElitAgent, DeltZeroPheromon, alf1, alf2, alf3, koef1, koef2,
@@ -749,3 +764,69 @@ class stat:
         wb.Close()
         # закрываем COM объект
         Excel.Quit()
+
+    def SaveTime(self, NomStatistics,Nom, timeDuration):
+        Nom = int(int(Nom) - 1)
+        self.ArrTime[NomStatistics][Nom] = self.ArrTime[NomStatistics][Nom] + timeDuration
+        self.DArrTime[NomStatistics][Nom] = self.DArrTime[NomStatistics][Nom] + timeDuration * timeDuration
+        return 0
+
+    def StatIterationAntZeroGraphTree(self, KolGraphTree):
+        i = 0
+        while i < len(self.NomElGraphTree):
+            self.NomElGraphTree[i] = self.NomElGraphTree[i] + KolGraphTree[i]
+            i = i + 1
+
+    def StatAllAntZero(self, NomStatistics,NomIteration, NomSolution):
+        #print('StatAllAntZero=',self.EndAllAntZero,self.MIterAllAntZero,self.DIterAllAntZero,NomIteration,NomSolution,NomStatistics)
+        if self.EndAllAntZero[NomStatistics] == 0:
+            self.MIterAllAntZero[NomStatistics] = self.MIterAllAntZero[NomStatistics] + NomIteration
+            self.DIterAllAntZero[NomStatistics] = self.DIterAllAntZero[NomStatistics] + NomIteration * NomIteration
+            self.MSltnAllAntZero[NomStatistics] = self.MSltnAllAntZero[NomStatistics] + NomSolution
+            self.DSltnAllAntZero[NomStatistics] = self.DSltnAllAntZero[NomStatistics] + NomSolution * NomSolution
+            self.EndAllAntZero[NomStatistics] = 1
+
+    def SaveTimeSocket(self, time1):
+        self.MSocketTime = self.MSocketTime + time1
+        self.DSocketTime = self.DSocketTime + time1 * time1
+        print(self.MSocketTime)
+        print('Cluster', self.MClusterTime)
+
+    def SaveTimeCluster(self, time1):
+        self.MClusterTime = self.MClusterTime + time1
+        self.DClusterTime = self.DClusterTime + time1 * time1
+
+    def ProcBestOF(self, NomStatistics, OF, MaxOptimization, NomIteration, NomSolution):
+        if (OF != sys.maxsize) and (OF != -sys.maxsize):
+            i = 0
+            # print('ProcBestOF', NomStatistics, OF, self.ProcIS, NomIteration, NomSolution, self.KolEndIs, self.OFProc, self.EndIS)
+            while i < self.lenProcIS:
+                if MaxOptimization == 1:
+                    if (self.BestOF - self.LowOF) * self.ProcIS[i] + self.LowOF <= OF and self.EndIS[NomStatistics][
+                        i] == 0:
+                        self.MOFI[NomStatistics][i] = self.MOFI[NomStatistics][i] + NomIteration
+                        self.DOFI[NomStatistics][i] = self.DOFI[NomStatistics][i] + NomIteration * NomIteration
+                        self.MOFS[NomStatistics][i] = self.MOFS[NomStatistics][i] + NomSolution
+                        self.DOFS[NomStatistics][i] = self.DOFS[NomStatistics][i] + NomSolution * NomSolution
+                        self.OFProc[NomStatistics][i] = self.OFProc[NomStatistics][i] + OF
+                        self.KolEndIs[NomStatistics][i] = self.KolEndIs[NomStatistics][i] + 1
+                    if (self.BestOF - self.LowOF) * self.ProcIS[i] + self.LowOF <= OF:
+                        self.EndIS[NomStatistics][i] = self.EndIS[NomStatistics][i] + 1
+                else:
+                    if self.BestOF - (self.BestOF - self.LowOF) * self.ProcIS[i] >= OF and self.EndIS[NomStatistics][
+                        i] == 0:
+                        self.MOFI[NomStatistics][i] = self.MOFI[NomStatistics][i] + NomIteration
+                        self.DOFI[NomStatistics][i] = self.DOFI[NomStatistics][i] + NomIteration * NomIteration
+                        self.MOFS[NomStatistics][i] = self.MOFS[NomStatistics][i] + NomSolution
+                        self.DOFS[NomStatistics][i] = self.DOFS[NomStatistics][i] + NomSolution * NomSolution
+                        self.OFProc[NomStatistics][i] = self.OFProc[NomStatistics][i] + OF
+                        self.KolEndIs[NomStatistics][i] = self.KolEndIs[NomStatistics][i] + 1
+                    if self.BestOF - (self.BestOF - self.LowOF) * self.ProcIS[i] >= OF:
+                        self.EndIS[NomStatistics][i] = self.EndIS[NomStatistics][i] + 1
+                i = i + 1
+
+    def SaveProcBestOF(self, OF, Proc):
+        if (self.BestOF - self.LowOF) * Proc + self.LowOF <= OF:
+            return 1
+        else:
+            return 0

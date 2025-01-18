@@ -21,7 +21,7 @@ from keras.callbacks import EarlyStopping
 train=None
 test=None
 data=None
-column_index = 13
+column_index = 5
 
 def start_rosaviation():
     os.environ[
@@ -266,7 +266,7 @@ def goSARIMAX(path):
         sys.stdout = f  # Change the standard output to the file we created.
         print(GoTime.now(),GoTime.now()-Time1,periods_predict,order, seasonal_order,res,path)
     sys.stdout = original_stdout  # Reset the standard output to its original value
-    #print(GoTime.now(),GoTime.now()-Time1,periods_predict,order, seasonal_order,res)
+    print(GoTime.now(),GoTime.now()-Time1,periods_predict,order, seasonal_order,res)
     return res
 
 def goSARIMAX_component(path):
