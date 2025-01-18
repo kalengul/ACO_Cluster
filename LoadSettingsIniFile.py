@@ -36,6 +36,7 @@ KolParetto = 2
 GoLoadParetto = 0
 KolSborStatIteration= 20
 ShagIterationStatistics = 100
+TrenSizeRosaviation = 0.75
 
 def readSetting(NameFile):
     global endprint
@@ -58,6 +59,7 @@ def readSetting(NameFile):
     global GoLoadParetto
     global KolSborStatIteration
     global ShagIterationStatistics
+    global TrenSizeRosaviation
 
     config = configparser.ConfigParser()  # создаём объекта парсера
     config.read(NameFile)  # читаем конфиг
@@ -104,6 +106,8 @@ def readSetting(NameFile):
     VirtualKlaster.VivodKlasterExcel=int(config["VirtualKlaster"]["VivodKlasterExcel"]) 
     Stat.lenProcIS=int(config["Stat"]["lenProcIS"]) 
     Stat.KolTimeDelEl=int(config["Stat"]["KolTimeDelEl"])
+
+    TrenSizeRosaviation=float(config["Rosaviation"]["TrenSizeRosaviation"])
 
 
 def readSettingVirtualClaster(NameFile):    

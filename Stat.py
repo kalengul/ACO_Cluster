@@ -391,7 +391,7 @@ class stat:
         NomR = int(sheet.Cells(1, 1).value)
         NomStatistics=0
         while NomStatistics<KolStatistics:
-            sheet.Cells(NomR, 1).value = KolIterationEnd // KolStatistics * NomStatistics
+            sheet.Cells(NomR, 1).value = KolIterationEnd // KolStatistics * (NomStatistics+1)
             sheet.Cells(NomR, 2).value = koliter
             sheet.Cells(NomR, 3).value = KolAnt
 
@@ -492,12 +492,16 @@ class stat:
         self.DIterationAntZero[NomStatistics] = self.DIterationAntZero[NomStatistics] + NomIteration*NomIteration
 
     def StatIncAllAntZero(self,NomStatistics):
-        print('StatIncAllAntZero=',self.KolAllAntZero,self.MIterAllAntZero,self.DIterAllAntZero,NomIteration,NomSolution,NomStatistics)
+        #print('StatIncAllAntZero=',self.KolAllAntZero,NomStatistics)
         self.KolAllAntZero[NomStatistics] = self.KolAllAntZero[NomStatistics] + 1
 
     def StatIncAntZero(self,NomStatistics):
         #print('StatIncAllAntZero=',self.KolAllAntZero,self.MIterAllAntZero,self.DIterAllAntZero,NomIteration,NomSolution,NomStatistics)
         self.KolAntZero[NomStatistics] = self.KolAntZero[NomStatistics] + 1
+
+    def SaveAntZeroNextIteration(self,NomStatistics):
+        self.KolAntZero[NomStatistics] = self.KolAntZero[NomStatistics-1]
+        self.KolAllAntZero[NomStatistics] = self.KolAllAntZero[NomStatistics-1]
 
     def StatParettoSet(self, NomStatistics, KolArrayPareto, kolParetto, kolParettoElement, CurrentParettoSearch, kolCurrentParettoElement,
                        ComparisonParetoSet):
@@ -574,9 +578,11 @@ class stat:
 
     def SbrosStatistic(self,KolStatistics,KolPareto):
         NomStatistics=0
+        self.EndIS.clear()
+        self.ArrEndIS.clear()
         while NomStatistics<KolStatistics:
-            self.EndIS[NomStatistics].clear()
-            self.ArrEndIS[NomStatistics].clear()
+            self.EndIS.append([])
+            self.ArrEndIS.append([])
             #self.EndAllAntZero[NomStatistics] = 0
             i = 0
             while i < self.lenProcIS:

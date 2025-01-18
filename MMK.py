@@ -28,7 +28,7 @@ import GoParetto
 import Model.Rosaviation.Rosaviation
 
 version='1.5.0'
-dateversion='18.01.2025'
+dateversion='19.01.2025'
 
 def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
 
@@ -278,7 +278,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
     Stat.SaveParametr(version,NameFileRes,Ant.N,Ant.Ro,Ant.Q,Ant.KolElitAgent, Ant.DeltZeroPheromon, pg.PG.alf1,pg.PG.alf2,pg.PG.alf3,pg.PG.koef1,pg.PG.koef2,pg.PG.koef3,pg.PG.typeProbability,pg.PG.EndAllSolution,NameFile,Setting.AddFeromonAntZero,Setting.SbrosGraphAllAntZero,Setting.goNewIterationAntZero,Setting.goGraphTree,gt.SortPheromon,Setting.KolIteration,Setting.KolStatIteration,Setting.MaxkolIterationAntZero,Setting.typeParametr,Setting.GoParallelAnt,Setting.KolParallelAnt,len(wayPg.pg.ParametricGraph),wayPg.pg.KoefLineSummPareto,Setting.KolParetto,wayPg.pg.OF,wayPg.pg.MinOF)
 
     if (wayPg.pg.TypeKlaster>=6000) and (wayPg.pg.TypeKlaster<=6010):
-       Model.Rosaviation.Rosaviation.load_data_rosaviation_excel(column_index=Model.Rosaviation.Rosaviation.column_index, tren_size=0.75)
+       Model.Rosaviation.Rosaviation.load_data_rosaviation_excel(column_index=Model.Rosaviation.Rosaviation.column_index, tren_size=Setting.TrenSizeRosaviation)
     print(GoTime.now(),NomProc,'Go ParetoSet')
     if (pg.PG.typeProbability>=30) and (pg.PG.typeProbability<40):
         if (wayPg.pg.TypeKlaster >= 6000) and (wayPg.pg.TypeKlaster <= 6010):
@@ -326,6 +326,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                         wayPg.NomArr=NomAnt % Setting.KolParetto
                         TrueEndGoAnt, KolAntZero, optPathHash, optOFHash, kolAntZero = GoAnt(NomAnt, KolAntZero, optPathHash, optOFHash)
                         kolIterationAntZero=kolIterationAntZero+kolAntZero
+
                         if TrueEndGoAnt:
                             KolAntEnd, KolIterationEnd = EndSolution(NomAnt, NomIteration)
                         else:
@@ -424,6 +425,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                     Stat.StatIterationAntZero(NomStatistics, kolIterationAntZero)
                     Stat.EndStatistik(NomStatistics, NomIteration, wayPg.pg.NomSolution)
                     Stat.SaveTimeIteration(NomStatistics, (GoTime.DeltStartTime()).total_seconds())
+                    Stat.SaveAntZeroNextIteration(NomStatistics)
                     if (pg.PG.typeProbability >= 30) and (pg.PG.typeProbability < 40):
                         Stat.StatParettoSet(NomStatistics, Setting.KolParetto, len(GoParetto.AllParetoSet),
                                             GoParetto.AllSolution, len(ParetoSet), kolParetoSet,
@@ -436,9 +438,8 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
             #Stat.StatIterationAntZero(NomStatistics,kolIterationAntZero)
             #Stat.EndStatistik(NomStatistics,NomIteration, wayPg.pg.NomSolution)
             #Stat.SaveTimeIteration(NomStatistics,(GoTime.DeltStartTime()).total_seconds())
-            #NomStatIteration=NomStatIteration+1
+            NomStatIteration=NomStatIteration+1
             #if (pg.PG.typeProbability >= 30) and (pg.PG.typeProbability < 40):
-
                 #Stat.StatParettoSet(NomStatistics,Setting.KolParetto,len(GoParetto.AllParetoSet), GoParetto.AllSolution, len(ParetoSet), kolParetoSet, GoParetto.ComparisonParetoSet(ParetoSet))
                 # lock_excel.acquire()
                 #Stat.save_pareto_set_excel(folder+'/'+'ParetoSet600.xlsx', GoTime.DeltStartTime(), GoParetto.ComparisonParetoSet(ParetoSet), [], pg.PG.typeProbability)
