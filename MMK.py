@@ -278,6 +278,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
     Stat.SaveParametr(version,NameFileRes,Ant.N,Ant.Ro,Ant.Q,Ant.KolElitAgent, Ant.DeltZeroPheromon, pg.PG.alf1,pg.PG.alf2,pg.PG.alf3,pg.PG.koef1,pg.PG.koef2,pg.PG.koef3,pg.PG.typeProbability,pg.PG.EndAllSolution,NameFile,Setting.AddFeromonAntZero,Setting.SbrosGraphAllAntZero,Setting.goNewIterationAntZero,Setting.goGraphTree,gt.SortPheromon,Setting.KolIteration,Setting.KolStatIteration,Setting.MaxkolIterationAntZero,Setting.typeParametr,Setting.GoParallelAnt,Setting.KolParallelAnt,len(wayPg.pg.ParametricGraph),wayPg.pg.KoefLineSummPareto,Setting.KolParetto,wayPg.pg.OF,wayPg.pg.MinOF)
 
     if (wayPg.pg.TypeKlaster>=6000) and (wayPg.pg.TypeKlaster<=6010):
+       Model.Rosaviation.Rosaviation.column_index=Setting.RosaviationColumIndex
        Model.Rosaviation.Rosaviation.load_data_rosaviation_excel(column_index=Model.Rosaviation.Rosaviation.column_index, tren_size=Setting.TrenSizeRosaviation)
     print(GoTime.now(),NomProc,'Go ParetoSet')
     if (pg.PG.typeProbability>=30) and (pg.PG.typeProbability<40):
