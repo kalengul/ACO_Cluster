@@ -31,10 +31,12 @@ class PG:
     koef2 = 1 #1
     koef3 = 0
     difZero=0
+    KoefLineSummPareto=0
+    ArrDifZero=[]
     typeProbability = 3
     EndAllSolution = 0
     NomCurrentPG=0
-    def __init__(self,NameFile):
+    def __init__(self,NameFile,KolDifZero):
         self.ParametricGraph=[] #Параметрический граф
         self.AllSolution = 1    #Общее количество решений в параметрическом графе
         self.NomSolution=0
@@ -44,8 +46,13 @@ class PG:
         self.BestOF=0
         self.LowOF=0
         self.MaxOptimization=1
+        nomDifZer=0
+        while nomDifZer<KolDifZero:
+            self.ArrDifZero.append(0)
+            nomDifZer=nomDifZer+1
+
         
-    def ReadParametrGraphExcelFile(self):
+    def ReadParametrGraphExcelFile(self,KolOF):
         Excel = win32com.client.Dispatch("Excel.Application")
         wb = Excel.Workbooks.Open(self.NameFilePg)
         sheet = wb.ActiveSheet
@@ -53,9 +60,17 @@ class PG:
         self.TypeKlaster = sheet.Cells(2,1).value
         self.KolSolution = sheet.Cells(2,2).value
         self.MaxOptimization = sheet.Cells(2,3).value
+        if KolOF==None:
+            KolOF=0
+        else:
+            KolOF=int(KolOF)
         self.OF = sheet.Cells(1,11).value
         self.MinOF = sheet.Cells(1,12).value
-        # Загрузка самого граа
+        self.ArrOF=[]
+        self.ArrOF.append(self.OF)
+        self.ArrMinOF = []
+        self.ArrMinOF.append(self.MinOF)
+        # Загрузка самого графа
         i=1
         val = sheet.Cells(4,1).value
         while val != None :
@@ -64,7 +79,7 @@ class PG:
             j=5
             val = sheet.Cells(j,i).value
             while val != None :
-                new_node=Node(val)
+                new_node=Node(val,KolOF)
                 parametr_array.append(new_node)
                 j=j+1
                 val = sheet.Cells(j,i).value
@@ -87,26 +102,51 @@ class PG:
         NomPar=0
         while NomPar<len(self.ParametricGraph):
             MaxP=0
+            MaxPArr=[]
+            nomDifZer = 0
+            while nomDifZer < len(self.ParametricGraph[NomPar].node[0].ArrPheromon):
+                MaxPArr.append(0)
+                nomDifZer = nomDifZer + 1
             MaxK=0
             NomEl=0
             while NomEl<len(self.ParametricGraph[NomPar].node):
+                #print(self.ParametricGraph[NomPar].node[NomEl].ArrPheromon,self.ParametricGraph[NomPar].node[NomEl].ArrPheromonNorm)
                 if self.ParametricGraph[NomPar].node[NomEl].pheromon==0:
                     self.ParametricGraph[NomPar].node[NomEl].pheromon=0.00000001
                 if self.ParametricGraph[NomPar].node[NomEl].pheromon>MaxP:
                     MaxP=self.ParametricGraph[NomPar].node[NomEl].pheromon
                 if self.ParametricGraph[NomPar].node[NomEl].KolSolution>MaxK:
                     MaxK=self.ParametricGraph[NomPar].node[NomEl].KolSolution
+                NomArr = 0
+                while NomArr < len(MaxPArr):
+                    if self.ParametricGraph[NomPar].node[NomEl].ArrPheromon[NomArr] == 0:
+                        self.ParametricGraph[NomPar].node[NomEl].ArrPheromon[NomArr] = 0.00000001
+                    if self.ParametricGraph[NomPar].node[NomEl].ArrPheromon[NomArr]>MaxPArr[NomArr]:
+                        MaxPArr[NomArr]=self.ParametricGraph[NomPar].node[NomEl].ArrPheromon[NomArr]
+                    NomArr = NomArr + 1
                 NomEl=NomEl+1
             NomEl=0
             while NomEl<len(self.ParametricGraph[NomPar].node):
+                NomArr = 0
+                while NomArr < len(MaxPArr):
+                    if MaxPArr[NomArr]!=0:
+                        self.ParametricGraph[NomPar].node[NomEl].ArrPheromonNorm[NomArr] = self.ParametricGraph[NomPar].node[NomEl].ArrPheromon[NomArr]/MaxPArr[NomArr]
+                    NomArr = NomArr + 1
                 if MaxP!=0:
                     self.ParametricGraph[NomPar].node[NomEl].pheromonNorm=self.ParametricGraph[NomPar].node[NomEl].pheromon/MaxP
                 if MaxK!=0:
                     self.ParametricGraph[NomPar].node[NomEl].KolSolutionNorm=self.ParametricGraph[NomPar].node[NomEl].KolSolution/MaxK
+                #print('1 ',self.ParametricGraph[NomPar].node[NomEl].ArrPheromon,self.ParametricGraph[NomPar].node[NomEl].ArrPheromonNorm)
                 NomEl=NomEl+1
             NomPar=NomPar+1        
 
     def ClearPheromon(self,allClear):
+        self.NomSolution = 0
+        self.difZero = 0
+        nomDifZer = 0
+        while nomDifZer < len(self.ArrDifZero):
+            self.ArrDifZero[nomDifZer]=0
+            nomDifZer = nomDifZer + 1
         NomPar=0
         while NomPar<len(self.ParametricGraph):
             self.ParametricGraph[NomPar].ClearAllNode(allClear)
@@ -134,8 +174,14 @@ class PG:
             NomPar=NomPar+1    
 
 class Node:  #Узел графа
-    def __init__(self,value):
-
+    def __init__(self,value,KolOF):
+        self.ArrPheromon=[]
+        self.ArrPheromonNorm = []
+        nomDifZer = 0
+        while nomDifZer < KolOF:
+            self.ArrPheromon.append(1)
+            self.ArrPheromonNorm.append(1)
+            nomDifZer = nomDifZer + 1
         self.clear(1)
         self.val = value
         
@@ -143,13 +189,22 @@ class Node:  #Узел графа
         self.pheromon=1
         self.KolSolution=0
         self.pheromonNorm = 1
-        self.KolSolutionNorm = 1 
+        self.KolSolutionNorm = 1
+        nomDifZer = 0
+        while nomDifZer < len(self.ArrPheromon):
+            self.ArrPheromon[nomDifZer] = 1
+            self.ArrPheromonNorm[nomDifZer] = 1
+            nomDifZer = nomDifZer + 1
         if allClear==1:
             self.KolSolutionAll=0
             self.KolSolutionIteration = []
         
     def DecreasePheromon(self,par):
         self.pheromon=self.pheromon*par
+        nomDifZer = 0
+        while nomDifZer < len(self.ArrPheromon):
+            self.ArrPheromon[nomDifZer] = self.ArrPheromon[nomDifZer]*par
+            nomDifZer = nomDifZer + 1
         
 class Parametr:
    def __init__(self,value):
@@ -175,12 +230,13 @@ class Parametr:
            NomEl=NomEl+1
             
 class ProbabilityWay:
-    def __init__(self,NameFile):  
+    def __init__(self,NameFile,KolPareto):
         global NomCurrentPG
         self.pg,NomCurrentPG=SearchPGName(NameFile)
         if self.pg==False:
-            self.pg=PG(NameFile)
-            self.pg.ReadParametrGraphExcelFile()
+            self.pg=PG(NameFile,KolPareto)
+            self.pg.ReadParametrGraphExcelFile(KolPareto)
+            self.NomArr=0
 #            print(self.pg.NameFilePg)
             NomCurrentPG=len(PG.ArrayAllPG)
             PG.ArrayAllPG.append(self.pg)
@@ -198,10 +254,10 @@ class ProbabilityWay:
             # Окончание движения агента
             while NomParametr<len(self.pg.ParametricGraph):
                 # Получение вершины из слоя
-                way.append(GoAntNextNode(self.pg,self.pg.ParametricGraph[NomParametr].node))
+                way.append(GoAntNextNode(self.pg,self.pg.ParametricGraph[NomParametr].node,self.NomArr))
                 # Выбор следующего слоя
                 NomParametr = NextNode(NomParametr)
-            #print(way)
+            #print(self.NomArr,way)
             return way
         else:
             raise StopIteration
@@ -227,7 +283,7 @@ def NextNode(nom):
     nom=nom+1
     return nom
 
-def ProbabilityNode(AllSolution,Node):
+def ProbabilityNode(AllSolution,Node,NomArr):
     kolSolution= Node.KolSolution
     if kolSolution==0:
         kolSolution=0.5
@@ -239,21 +295,29 @@ def ProbabilityNode(AllSolution,Node):
         Probability=(Node.pheromon**PG.alf1)*(1/(kolSolution**PG.alf2))
     elif PG.typeProbability==3:
         Probability=PG.koef1*(Node.pheromonNorm**PG.alf1)+PG.koef2*(1/(kolSolution))**PG.alf2+PG.koef3*(Node.KolSolutionAll/(AllSolution))**PG.alf3
+    elif (PG.typeProbability>=30) and (PG.typeProbability<=35):
+        Probability = PG.koef1 * (Node.ArrPheromonNorm[PG.typeProbability-30] ** PG.alf1) + PG.koef2 * (1 / (kolSolution)) ** PG.alf2 + PG.koef3 * (Node.KolSolutionAll / (AllSolution)) ** PG.alf3
+        #print(Node.pheromonNorm,Node.ArrPheromonNorm,PG.typeProbability-30,Probability)
+    elif (PG.typeProbability ==36):
+        Probability = PG.koef1 * ((Node.ArrPheromonNorm[0]*(PG.KoefLineSummPareto)+Node.ArrPheromonNorm[1]*(1-PG.KoefLineSummPareto)) ** PG.alf1) + PG.koef2 * (1 / (kolSolution)) ** PG.alf2 + PG.koef3 * (Node.KolSolutionAll / (AllSolution)) ** PG.alf3
+    elif (PG.typeProbability == 37):
+        Probability = PG.koef1 * (Node.ArrPheromonNorm[NomArr] ** PG.alf1) + PG.koef2 * (1 / (kolSolution)) ** PG.alf2 + PG.koef3 * (Node.KolSolutionAll / (AllSolution)) ** PG.alf3
     if Probability==0:
         Probability=0.00000001
     return Probability
        
-def GoAntNextNode(ParametricGraph,ArrayNode):
+def GoAntNextNode(ParametricGraph,ArrayNode,NomArr):
     probability = []
     sum=0
     i=0
     while i<len(ArrayNode):
        if (PG.EndAllSolution==0) or (ParametricGraph.AllSolution/len(ArrayNode)>ArrayNode[i].KolSolutionAll): 
-           sum=sum + ProbabilityNode(ParametricGraph.AllSolution/len(ArrayNode),ArrayNode[i])
+           sum=sum + ProbabilityNode(ParametricGraph.AllSolution/len(ArrayNode),ArrayNode[i],NomArr)
        probability.append(sum)
        i=i+1
     rnd=random.random()
     i=0
     while rnd>probability[i]/sum:
         i=i+1
+    #print(probability,sum,rnd,i)
     return i

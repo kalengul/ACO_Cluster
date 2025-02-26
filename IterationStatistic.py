@@ -34,15 +34,9 @@ def run_script(nom_proc, folder, folder_pg, lock_excel):
     Функция для запуска ММК.
     """
     array_parametr=[]
-    array_parametr.append('0.5')
     array_parametr.append('1')
-    array_parametr.append('2')
-    array_parametr.append('10')
     array_parametr2=[]
-    array_parametr2.append('0.5')
     array_parametr2.append('1')
-    array_parametr2.append('2')
-    array_parametr2.append('10')
     type_config='ParametricGraph'
     subtype_config='koef1'
     type_config2='ParametricGraph'

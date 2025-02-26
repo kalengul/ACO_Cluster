@@ -25,11 +25,19 @@ endParametr = 100
 shagParametr = 5
 typeParametr = 1
 GoSaveMap2=0
+GoParallelAnt=0
+KolParallelAnt=0
 NameFileGraph='test1.xlsx'
 SocketKolCluster=0
 SocketIp='127.0.0.1'
 SocketPort=8080
 SocketClusterTime=0
+KolParetto = 2
+GoLoadParetto = 0
+KolSborStatIteration= 20
+ShagIterationStatistics = 100
+TrenSizeRosaviation = 0.75
+RosaviationColumIndex = 2
 
 def readSetting(NameFile):
     global endprint
@@ -46,6 +54,14 @@ def readSetting(NameFile):
     global NameFileGraph
     global KolTimeDelEl
     global GoSaveMap2
+    global GoParallelAnt
+    global KolParallelAnt
+    global KolParetto
+    global GoLoadParetto
+    global KolSborStatIteration
+    global ShagIterationStatistics
+    global TrenSizeRosaviation
+    global RosaviationColumIndex
 
     config = configparser.ConfigParser()  # создаём объекта парсера
     config.read(NameFile)  # читаем конфиг
@@ -62,8 +78,14 @@ def readSetting(NameFile):
     MaxkolIterationAntZero=int(config["setting_global"]["MaxkolIterationAntZero"]) 
     KolTimeDelEl=int(config["setting_global"]["KolTimeDelEl"]) 
     NameFileGraph=config["setting_global"]["NameFileGraph"]
-    GoSaveMap2=int(config["setting_global"]["GoSaveMap2"]) 
-    
+    GoSaveMap2=int(config["setting_global"]["GoSaveMap2"])
+    GoParallelAnt = int(config["setting_global"]["GoParallelAnt"])
+    KolParallelAnt = int(config["setting_global"]["KolParallelAnt"])
+    KolParetto = int(config["setting_global"]["KolParetto"])
+    GoLoadParetto = int(config["setting_global"]["GoLoadParetto"])
+    KolSborStatIteration = int(config["setting_global"]["KolSborStatIteration"])
+    ShagIterationStatistics = KolIteration // KolSborStatIteration
+
     Ant.N=float(config["ant"]["N"]) 
     Ant.Q=float(config["ant"]["Q"]) 
     Ant.Ro=float(config["ant"]["Ro"]) 
@@ -77,8 +99,9 @@ def readSetting(NameFile):
     ParametricGraph.PG.koef2=float(config["ParametricGraph"]["koef2"] )
     ParametricGraph.PG.koef3=float(config["ParametricGraph"]["koef3"] )
     ParametricGraph.PG.typeProbability=int(config["ParametricGraph"]["typeProbability"]) 
-    ParametricGraph.PG.EndAllSolution=int(config["ParametricGraph"]["EndAllSolution"]) 
-    
+    ParametricGraph.PG.EndAllSolution=int(config["ParametricGraph"]["EndAllSolution"])
+    ParametricGraph.PG.KoefLineSummPareto = float(config["ParametricGraph"]["KoefLineSummPareto"])
+
     GraphTree.SortPheromon=int(config["graph_tree"]["SortPheromon"]) 
     GraphTree.HorizontalTree=int(config["graph_tree"]["HorizontalTree"])
     
@@ -86,6 +109,8 @@ def readSetting(NameFile):
     Stat.lenProcIS=int(config["Stat"]["lenProcIS"]) 
     Stat.KolTimeDelEl=int(config["Stat"]["KolTimeDelEl"])
 
+    TrenSizeRosaviation=float(config["Rosaviation"]["TrenSizeRosaviation"])
+    RosaviationColumIndex = int(config["Rosaviation"]["RosaviationColumIndex"])
 
 def readSettingVirtualClaster(NameFile):    
     global SocketKolCluster
@@ -105,6 +130,7 @@ def readSettingVirtualClaster(NameFile):
 def GoNZTypeParametr(typeParametr):
     global KolIteration
     global MaxkolIterationAntZero
+    global KolParallelAnt
     if typeParametr==1:
       return Ant.N  
     elif typeParametr==2:
@@ -126,11 +152,14 @@ def GoNZTypeParametr(typeParametr):
     elif typeParametr==10:
       return ParametricGraph.PG.alf3  
     elif typeParametr==11:
-      return ParametricGraph.PG.koef3  
+      return ParametricGraph.PG.koef3
+    elif typeParametr == 12:
+      return KolParallelAnt
     
 def EndTypeParametr(typeParametr,Par):
     global KolIteration
     global MaxkolIterationAntZero
+    global KolParallelAnt
     if typeParametr==1:
       Ant.N=Par   
     elif typeParametr==2:
@@ -152,5 +181,7 @@ def EndTypeParametr(typeParametr,Par):
     elif typeParametr==10:
       ParametricGraph.PG.alf3=Par 
     elif typeParametr==11:
-      ParametricGraph.PG.koef3=Par 
+      ParametricGraph.PG.koef3=Par
+    elif typeParametr==12:
+      KolParallelAnt=Par
       
