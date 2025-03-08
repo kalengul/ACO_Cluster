@@ -38,6 +38,7 @@ KolSborStatIteration= 20
 ShagIterationStatistics = 100
 TrenSizeRosaviation = 0.75
 RosaviationColumIndex = 2
+LoaPQDSarima = 0
 
 def readSetting(NameFile):
     global endprint
@@ -62,6 +63,7 @@ def readSetting(NameFile):
     global ShagIterationStatistics
     global TrenSizeRosaviation
     global RosaviationColumIndex
+    global LoaPQDSarima
 
     config = configparser.ConfigParser()  # создаём объекта парсера
     config.read(NameFile)  # читаем конфиг
@@ -111,6 +113,7 @@ def readSetting(NameFile):
 
     TrenSizeRosaviation=float(config["Rosaviation"]["TrenSizeRosaviation"])
     RosaviationColumIndex = int(config["Rosaviation"]["RosaviationColumIndex"])
+    LoaPQDSarima = int(config["Rosaviation"]["loapqdsarima"])
 
 def readSettingVirtualClaster(NameFile):    
     global SocketKolCluster
