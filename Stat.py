@@ -7,6 +7,7 @@ Created on Fri Jul 29 19:14:48 2022
 import sys
 
 import win32com.client  # Для загрузки из Excel
+from datetime import datetime
 import json
 import os
 
@@ -624,7 +625,8 @@ class stat:
         wb = Excel.Workbooks.Open(NameFile)
         sheet = wb.ActiveSheet
         NomR = sheet.Cells(1, 1).value
-
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        sheet.Cells(NomR, 1).value = current_time
         a = 'Version - ' + version
         sheet.Cells(NomR, 5).value = a
         a = 'NameFilePar= ' + NameFileXL

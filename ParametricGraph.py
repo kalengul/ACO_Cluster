@@ -175,6 +175,7 @@ class PG:
 
 class Node:  #Узел графа
     def __init__(self,value,KolOF):
+        self.StartKolPheromon = 1
         self.ArrPheromon=[]
         self.ArrPheromonNorm = []
         nomDifZer = 0
@@ -185,14 +186,14 @@ class Node:  #Узел графа
         self.clear(1)
         self.val = value
         
-    def clear(self,allClear):
-        self.pheromon=1
+    def clear(self,allClear = 0):
+        self.pheromon=self.StartKolPheromon
         self.KolSolution=0
         self.pheromonNorm = 1
         self.KolSolutionNorm = 1
         nomDifZer = 0
         while nomDifZer < len(self.ArrPheromon):
-            self.ArrPheromon[nomDifZer] = 1
+            self.ArrPheromon[nomDifZer] = self.StartKolPheromon
             self.ArrPheromonNorm[nomDifZer] = 1
             nomDifZer = nomDifZer + 1
         if allClear==1:
@@ -211,11 +212,30 @@ class Parametr:
        self.name = value 
        self.node=[]
        
-   def ClearAllNode(self,allClear):
+   def ClearAllNode(self,allClear = 0):
        NomEl=0
+       allPheromon=0
+       allPheromonArr =[]
+       nomDifZer = 0
+       while nomDifZer < len(self.node[0].ArrPheromon):
+           allPheromonArr.append(0)
+           nomDifZer=nomDifZer+1
        while NomEl<len(self.node):
            self.node[NomEl].clear(allClear)
+           allPheromon=allPheromon+ self.node[NomEl].pheromon;
+           nomDifZer = 0
+           while nomDifZer < len(self.node[NomEl].ArrPheromon):
+               allPheromonArr[nomDifZer]=allPheromonArr[nomDifZer]+self.node[NomEl].ArrPheromon[nomDifZer]
+               nomDifZer = nomDifZer + 1
            NomEl=NomEl+1
+       NomEl = 0
+       while NomEl < len(self.node):
+           self.node[NomEl].pheromon = self.node[NomEl].pheromon / allPheromon;
+           nomDifZer = 0
+           while nomDifZer < len(self.node[NomEl].ArrPheromon):
+               self.node[NomEl].ArrPheromon[nomDifZer] = self.node[NomEl].ArrPheromon[nomDifZer] / allPheromonArr[nomDifZer]
+               nomDifZer = nomDifZer + 1
+           NomEl = NomEl + 1
            
    def DecreasePheromon(self,par):
        NomEl=0
@@ -228,7 +248,13 @@ class Parametr:
        while NomEl<len(self.node):
            self.node[NomEl].KolSolutionIteration.append(0)
            NomEl=NomEl+1
-            
+
+   def SetStartPheromon(self,start_pheromon_array):
+        NomEl = 0
+        while NomEl < len(self.node):
+            self.node[NomEl].StartKolPheromon=start_pheromon_array[NomEl]
+            NomEl = NomEl + 1
+
 class ProbabilityWay:
     def __init__(self,NameFile,KolPareto):
         global NomCurrentPG
@@ -276,7 +302,7 @@ def PrintParametr(Par:Parametr,VivodPheromon):
         if VivodPheromon==0:
             print(elem.val, end=' ')
         else:
-            print(elem.val,'(',elem.pheromon,elem.KolSolution,')', end=' ')
+            print(elem.val,'(',elem.StartKolPheromon,elem.ArrPheromon,elem.pheromonNorm,elem.KolSolution,')', end=' ')
 
 
 def NextNode(nom):

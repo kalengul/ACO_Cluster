@@ -27,8 +27,8 @@ import ClientSocket
 import GoParetto
 import Model.Rosaviation.Rosaviation
 
-version='1.5.0'
-dateversion='19.01.2025'
+version='1.5.1'
+dateversion='08.03.2025'
 
 def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
 
@@ -279,9 +279,12 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
 
     if (wayPg.pg.TypeKlaster>=6000) and (wayPg.pg.TypeKlaster<=6010):
        Model.Rosaviation.Rosaviation.column_index=Setting.RosaviationColumIndex
-       Model.Rosaviation.Rosaviation.load_data_rosaviation_excel(column_index=Model.Rosaviation.Rosaviation.column_index, tren_size=Setting.TrenSizeRosaviation)
+       p,q=Model.Rosaviation.Rosaviation.load_data_rosaviation_excel(column_index=Model.Rosaviation.Rosaviation.column_index, tren_size=Setting.TrenSizeRosaviation)
+       if Setting.LoaPQDSarima ==1:
+         Model.Rosaviation.Rosaviation.add_pq_to_start_pheromon(print_information=False,p=p, d=[], q=q, P=[], D=[], Q=[], parametric_graph=wayPg.pg.ParametricGraph,paramtr_p=3,paramtr_d=1,paramtr_q=3)
+
     print(GoTime.now(),NomProc,'Go ParetoSet')
-    if (pg.PG.typeProbability>=30) and (pg.PG.typeProbability<40):
+    if (wayPg.pg.typeProbability>=30) and (wayPg.pg.typeProbability<40):
         if (wayPg.pg.TypeKlaster >= 6000) and (wayPg.pg.TypeKlaster <= 6010):
             NameFileParetoSet=folderPg + '/EnableParetoSet/'+Setting.NameFileGraph[:-5]+str(Setting.KolParetto)+'_'+str(Model.Rosaviation.Rosaviation.column_index)+'.xlsx'
         else:
@@ -295,6 +298,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
                 GoParetto.CreateAllParetoSet(wayPg.pg.ParametricGraph, wayPg.pg.TypeKlaster, wayPg.pg.typeProbability-30,Stat,folder+'/'+'ParetoSet.xlsx',lock_excel)
 
     lock_excel.release()
+
     colored_print(NomProc)
     print(GoTime.now(),NomProc,'Go',TextPrint)
     while Par<=Setting.endParametr:
@@ -304,7 +308,6 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
         if Setting.GoSaveMap2==1:
             SaveMap.CreateElMap2(1200, 1200)
 #            SaveMap.CreateElMap2(len(wayPg.pg.ParametricGraph[0].node), len(wayPg.pg.ParametricGraph[1].node))
-
         NomStatIteration = 0
         while NomStatIteration<=Setting.KolStatIteration:
             GoTime.setPrintTime()
@@ -313,6 +316,7 @@ def run_script(TextPrint,NomProc,folder,folderPg,lock_excel):
             kolIterationAntZero = 0
             NomStatIteration,Par=St.JSONFile.LoadIterJSONFileIfExist(Stat,Par)
             optPathHash,optOFHash,NomIteration,KolAntEnd,KolIterationEnd,NomIterationTime=clearStartIteration(Stat,wayPg.pg)
+            #wayPg.pg.PrintParametricGraph(1)
             while NomIteration<KolIterationEnd:
                 NomStatistics = NomIteration // Setting.ShagIterationStatistics
                 #print('NomStatistics',NomStatistics,NomIteration,Setting.ShagIterationStatistics)
